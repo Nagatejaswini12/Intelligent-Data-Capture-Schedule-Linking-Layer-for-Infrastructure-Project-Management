@@ -1,0 +1,19 @@
+DAILY PROGRESS REPORT
+Project: Crude Oil Gathering Station Expansion (synthetic)
+Discipline: Instrumentation    Contractor: M/s Synthetic Instrumentation Services
+Date: Sep 8, 2026    Report No: INS/DPR/007
+Weather: Heavy rain 14:00-16:00
+Manpower: Supervisors 2, Skilled 28, Helpers 33
+
+Work done today:
+1. Installation of junction box JB-309 in progress
+
+Hold / constraints:
+- Nil
+
+Plan for tomorrow:
+- Impulse tubing for PT-2041
+- Instrument cable laying in Area-4
+
+Safety: Toolbox talk on working at height. No LTI.
+Prepared by: Site Engineer (Instrumentation)

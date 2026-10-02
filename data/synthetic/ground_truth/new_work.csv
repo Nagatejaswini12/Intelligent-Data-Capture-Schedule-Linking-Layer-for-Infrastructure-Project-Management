@@ -1,0 +1,15 @@
+new_work_key,discipline,area,description,suggested_parent_wbs,tags,n_items
+NW-01,civil,A3,Temporary drainage trench near PR-3 due to waterlogging,CGS-EXP-01.A3.CIV,PR-3,2
+NW-02,civil,A3,Additional PCC below pipe sleeper at road crossing RC-2,CGS-EXP-01.A3.CIV,RC-2,2
+NW-03,civil,A1,Chipping & repair of honeycombed concrete at V-102 pedestal,CGS-EXP-01.A1.CIV,V-102,2
+NW-04,piping,A3,Additional pipe support AS-17 at PR-2 (field clash),CGS-EXP-01.A3.PIP,AS-17;PR-2,2
+NW-05,piping,A3,Cut & re-weld of joint 1205-W12 after RT repair,CGS-EXP-01.A3.PIP,LINE-1205,1
+NW-06,piping,A3,Temporary strainer at P-101A suction for flushing,CGS-EXP-01.A3.PIP,P-101A,2
+NW-07,rotating_eq,A1,Additional shim plates for K-301 skid,CGS-EXP-01.A1.ROT,K-301,2
+NW-08,electrical,A3,Temporary power DB for welding machines in Area-3,CGS-EXP-01.A3.ELE,,2
+NW-09,electrical,A4,Extra cable trench crossing near tank farm road,CGS-EXP-01.A4.ELE,,1
+NW-10,instrumentation,A3,Relocation of PT-2042 stand due to access issue,CGS-EXP-01.A3.INS,PT-2042,2
+NW-11,hse,A3,Temporary barricading & signage at excavation near P-102B,CGS-EXP-01.A3.HSE,P-102B,2
+NW-12,hse,A1,Additional eyewash station near chemical dosing skid,CGS-EXP-01.A1.HSE,,1
+NW-13,civil,A4,Re-excavation of T-401 drain pit after collapse,CGS-EXP-01.A4.CIV,T-401,2
+NW-14,piping,A1,"Hot tap connection on existing 24"" header (unplanned tie-in)",CGS-EXP-01.A1.PIP,,2

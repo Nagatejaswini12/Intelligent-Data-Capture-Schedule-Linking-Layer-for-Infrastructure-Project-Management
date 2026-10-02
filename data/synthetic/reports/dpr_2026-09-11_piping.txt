@@ -1,0 +1,22 @@
+DAILY PROGRESS REPORT
+Project: Crude Oil Gathering Station Expansion (synthetic)
+Discipline: Piping    Contractor: M/s Synthetic Piping Works
+Date: Sep 11, 2026    Report No: PIP/DPR/010
+Weather: Humid, 30°C
+Manpower: Supervisors 1, Skilled 17, Helpers 34
+
+Work done today:
+1. welding of 16" pump discharge line started today
+2. L-1407 job commenced on 10.09.26
+3. L1203 welding+RT start yesterday
+4. Joint welding and radiography 1215 line going on
+
+Hold / constraints:
+- L-1405 erctn hold – clash with cable tray, RFI raised
+
+Plan for tomorrow:
+- Piping erection line 18"-P-1205-A1A
+- Hydrotest of line 16"-P-1211-A1A
+
+Safety: Toolbox talk on working at height. No LTI.
+Prepared by: Site Engineer (Piping)

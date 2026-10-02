@@ -1,0 +1,26 @@
+DAILY PROGRESS REPORT
+Project: Crude Oil Gathering Station Expansion (synthetic)
+Discipline: Piping    Contractor: M/s Synthetic Piping Works
+Date: 05-Sep-26    Report No: PIP/DPR/005
+Weather: Sunny, 33°C
+Manpower: Supervisors 2, Skilled 9, Helpers 21
+
+Work done today:
+1. L1217 erctn done today
+2. Wldg/NDT L1407 done
+3. Wldg/NDT L1217 restarted
+4. P-1209 erctn WIP, Spool erection 10 inch line 1215 – 1 spool erected
+5. Erec L-1405 strtd
+6. Fixing of shoes & guiddes at rack 1 WIP today
+7. 1211 welding ka kaam chal raha hai
+8. Hot tap connection on existing 24" header (unplanned tie-in) started
+
+Hold / constraints:
+- Nil
+
+Plan for tomorrow:
+- Piping erection line 24"-P-1203-A1A
+- Hydrotest of line 8"-F-1407-F1A
+
+Safety: TBT: hot work precautions. Nil incident.
+Prepared by: Site Engineer (Piping)

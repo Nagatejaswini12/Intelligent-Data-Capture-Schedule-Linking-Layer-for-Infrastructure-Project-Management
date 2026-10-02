@@ -1,0 +1,448 @@
+{
+  "method": "deterministic rule/template extraction; items matched on (document, locator)",
+  "splits": {
+    "dev": {
+      "expected_items": 213,
+      "predicted_items": 213,
+      "matched": 213,
+      "missing": 0,
+      "extra": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "field_exact": {
+        "event_type": 1.0,
+        "date": 1.0,
+        "time": 0.9531,
+        "quantity": 1.0,
+        "unit": 1.0,
+        "discipline": 1.0,
+        "area": 0.9718,
+        "tags": 1.0,
+        "delay_reason": 1.0,
+        "delay_category": 1.0,
+        "activity_text": 1.0,
+        "source_span": 0.9953
+      },
+      "field_exact_excluding_gt_gaps": {
+        "event_type": 1.0,
+        "date": 1.0,
+        "time": 1.0,
+        "quantity": 1.0,
+        "unit": 1.0,
+        "discipline": 1.0,
+        "area": 1.0,
+        "tags": 1.0,
+        "delay_reason": 1.0,
+        "delay_category": 1.0,
+        "activity_text": 1.0,
+        "source_span": 1.0
+      }
+    },
+    "test": {
+      "expected_items": 220,
+      "predicted_items": 220,
+      "matched": 220,
+      "missing": 0,
+      "extra": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "field_exact": {
+        "event_type": 1.0,
+        "date": 1.0,
+        "time": 0.95,
+        "quantity": 1.0,
+        "unit": 1.0,
+        "discipline": 1.0,
+        "area": 0.9682,
+        "tags": 1.0,
+        "delay_reason": 1.0,
+        "delay_category": 1.0,
+        "activity_text": 1.0,
+        "source_span": 0.9955
+      },
+      "field_exact_excluding_gt_gaps": {
+        "event_type": 1.0,
+        "date": 1.0,
+        "time": 1.0,
+        "quantity": 1.0,
+        "unit": 1.0,
+        "discipline": 1.0,
+        "area": 1.0,
+        "tags": 1.0,
+        "delay_reason": 1.0,
+        "delay_category": 1.0,
+        "activity_text": 1.0,
+        "source_span": 1.0
+      }
+    },
+    "all": {
+      "expected_items": 433,
+      "predicted_items": 433,
+      "matched": 433,
+      "missing": 0,
+      "extra": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "field_exact": {
+        "event_type": 1.0,
+        "date": 1.0,
+        "time": 0.9515,
+        "quantity": 1.0,
+        "unit": 1.0,
+        "discipline": 1.0,
+        "area": 0.97,
+        "tags": 1.0,
+        "delay_reason": 1.0,
+        "delay_category": 1.0,
+        "activity_text": 1.0,
+        "source_span": 0.9954
+      },
+      "field_exact_excluding_gt_gaps": {
+        "event_type": 1.0,
+        "date": 1.0,
+        "time": 1.0,
+        "quantity": 1.0,
+        "unit": 1.0,
+        "discipline": 1.0,
+        "area": 1.0,
+        "tags": 1.0,
+        "delay_reason": 1.0,
+        "delay_category": 1.0,
+        "activity_text": 1.0,
+        "source_span": 1.0
+      }
+    }
+  },
+  "documents": {
+    "report_date_ok": 81,
+    "group_ok": 81,
+    "dpr_docs": 81,
+    "sheets": {
+      "XLS-piping-spool-tracker": {
+        "header_row_ok": true,
+        "column_mapping_ok": true
+      },
+      "XLS-electrical-cable-log": {
+        "header_row_ok": true,
+        "column_mapping_ok": true
+      },
+      "XLS-instrument-register": {
+        "header_row_ok": true,
+        "column_mapping_ok": true
+      }
+    },
+    "noise_line_extractions": 0,
+    "issues": 0
+  },
+  "field_mismatch_counts": {
+    "area": 13,
+    "source_span": 2,
+    "time": 21
+  },
+  "ground_truth_gaps": {
+    "note": "field mismatches caused by incomplete expected_extraction.json, not by the extractor (ground truth left unchanged): `time` is always null there (Phase 0 wrote it under another key; truth times are in truth_events.csv); `area` is omitted although stated in the text or the Loc column; two cable rows' expected cells omit the Pulled? cell",
+    "count": 36,
+    "by_field": {
+      "area": 13,
+      "source_span": 2,
+      "time": 21
+    }
+  },
+  "misses": {
+    "missing": [],
+    "extra": [],
+    "field": [
+      [
+        "DPR-2026-09-01-electrical",
+        "line=2;index=1",
+        "time",
+        "None",
+        "10:00",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-01-instrumentation",
+        "line=3;index=0",
+        "time",
+        "None",
+        "08:30",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-02-civil",
+        "line=13;index=0",
+        "time",
+        "None",
+        "09:30",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-02-electrical",
+        "line=11;index=0",
+        "area",
+        "None",
+        "A3",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-03-mechanical",
+        "line=3;index=0",
+        "time",
+        "None",
+        "10:00",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-03-instrumentation",
+        "line=2;index=0",
+        "time",
+        "None",
+        "09:30",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-04-civil",
+        "line=3;index=0",
+        "time",
+        "None",
+        "10:00",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-04-instrumentation",
+        "line=2;index=0",
+        "time",
+        "None",
+        "10:00",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-05-electrical",
+        "line=3;index=0",
+        "area",
+        "None",
+        "A3",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-05-instrumentation",
+        "line=9;index=0",
+        "time",
+        "None",
+        "14:00",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-07-piping",
+        "line=3;index=0",
+        "time",
+        "None",
+        "14:00",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-07-electrical",
+        "line=4;index=0",
+        "time",
+        "None",
+        "10:00",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-09-civil",
+        "line=3;index=0",
+        "time",
+        "None",
+        "10:00",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-10-instrumentation",
+        "line=2;index=1",
+        "time",
+        "None",
+        "10:00",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-11-civil",
+        "line=10;index=0",
+        "time",
+        "None",
+        "10:00",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-11-instrumentation",
+        "line=9;index=0",
+        "time",
+        "None",
+        "10:00",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-12-civil",
+        "line=9;index=0",
+        "time",
+        "None",
+        "14:00",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-15-civil",
+        "line=10;index=0",
+        "time",
+        "None",
+        "08:30",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-15-piping",
+        "line=10;index=0",
+        "time",
+        "None",
+        "08:30",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-15-electrical",
+        "line=14;index=0",
+        "time",
+        "None",
+        "08:30",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-16-mechanical",
+        "line=2;index=1",
+        "time",
+        "None",
+        "10:00",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-16-electrical",
+        "line=13;index=0",
+        "time",
+        "None",
+        "14:00",
+        "gt_gap"
+      ],
+      [
+        "DPR-2026-09-16-instrumentation",
+        "line=13;index=1",
+        "time",
+        "None",
+        "14:00",
+        "gt_gap"
+      ],
+      [
+        "XLS-electrical-cable-log",
+        "sheet=Cable Log;row=28;field=pull",
+        "source_span",
+        "C-MCC3-002 | MCC-3 | 65 | 2026-09-12",
+        "C-MCC3-002 | MCC-3 | 65 | Yes | 2026-09-12",
+        "gt_gap"
+      ],
+      [
+        "XLS-electrical-cable-log",
+        "sheet=Cable Log;row=34;field=pull",
+        "source_span",
+        "C-MCC3-001 | MCC-3 | 55 | 2026-09-14",
+        "C-MCC3-001 | MCC-3 | 55 | Y | 2026-09-14",
+        "gt_gap"
+      ],
+      [
+        "XLS-instrument-register",
+        "sheet=Register;row=3;field=install",
+        "area",
+        "None",
+        "A1",
+        "gt_gap"
+      ],
+      [
+        "XLS-instrument-register",
+        "sheet=Register;row=3;field=tubing",
+        "area",
+        "None",
+        "A1",
+        "gt_gap"
+      ],
+      [
+        "XLS-instrument-register",
+        "sheet=Register;row=4;field=install",
+        "area",
+        "None",
+        "A4",
+        "gt_gap"
+      ],
+      [
+        "XLS-instrument-register",
+        "sheet=Register;row=4;field=tubing",
+        "area",
+        "None",
+        "A4",
+        "gt_gap"
+      ],
+      [
+        "XLS-instrument-register",
+        "sheet=Register;row=5;field=install",
+        "area",
+        "None",
+        "A3",
+        "gt_gap"
+      ],
+      [
+        "XLS-instrument-register",
+        "sheet=Register;row=6;field=install",
+        "area",
+        "None",
+        "A1",
+        "gt_gap"
+      ],
+      [
+        "XLS-instrument-register",
+        "sheet=Register;row=7;field=install",
+        "area",
+        "None",
+        "A1",
+        "gt_gap"
+      ],
+      [
+        "XLS-instrument-register",
+        "sheet=Register;row=7;field=tubing",
+        "area",
+        "None",
+        "A1",
+        "gt_gap"
+      ],
+      [
+        "XLS-instrument-register",
+        "sheet=Register;row=8;field=install",
+        "area",
+        "None",
+        "A1",
+        "gt_gap"
+      ],
+      [
+        "XLS-instrument-register",
+        "sheet=Register;row=9;field=install",
+        "area",
+        "None",
+        "A3",
+        "gt_gap"
+      ],
+      [
+        "XLS-instrument-register",
+        "sheet=Register;row=10;field=install",
+        "area",
+        "None",
+        "A4",
+        "gt_gap"
+      ]
+    ]
+  }
+}

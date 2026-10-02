@@ -1,0 +1,20 @@
+DAILY PROGRESS REPORT
+Project: Crude Oil Gathering Station Expansion (synthetic)
+Discipline: Electrical    Contractor: M/s Synthetic Electricals
+Date: 2026-09-14    Report No: ELE/DPR/012
+Weather: Sunny, 33°C
+Manpower: Supervisors 2, Skilled 28, Helpers 16
+
+Work done today:
+1. Cable termination work MCC-2 cables – 1 cable terminated
+2. work at MCC-2 completed & Earth pit instlalation area 1 in prog.
+
+Hold / constraints:
+- Nil
+
+Plan for tomorrow:
+- Glanding & termination for 11 kV HT cable to TR-2
+- Glanding & termination for 11 kV HT cable to TR-1
+
+Safety: Toolbox talk on working at height. No LTI.
+Prepared by: Site Engineer (Electrical)

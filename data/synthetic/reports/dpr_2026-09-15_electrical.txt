@@ -1,0 +1,24 @@
+DAILY PROGRESS REPORT
+Project: Crude Oil Gathering Station Expansion (synthetic)
+Discipline: Electrical    Contractor: M/s Synthetic Electricals
+Date: Sep 15, 2026    Report No: ELE/DPR/013
+Weather: Sunny, 33°C
+Manpower: Supervisors 2, Skilled 26, Helpers 21
+
+Work done today:
+1. power cable laying back on track
+2. Electrical works area 1 ongoing
+3. Glanding & termination for MCC-2 incomer & feeders – 2 cables terminated
+4. Cable laying LV cables area 4 – 195 m pulled today
+5. LV cables area 1 work – 380 m pulled today
+6. Termn A3 LV cbls start at 8.30 am
+
+Hold / constraints:
+- Nil
+
+Plan for tomorrow:
+- Glanding & termination for 11 kV HT cable to TR-1
+- Lighting poles & fixtures in Area-4
+
+Safety: PPE audit done. No incident.
+Prepared by: Site Engineer (Electrical)

@@ -1,0 +1,22 @@
+DAILY PROGRESS REPORT
+Project: Crude Oil Gathering Station Expansion (synthetic)
+Discipline: Instrumentation    Contractor: M/s Synthetic Instrumentation Services
+Date: 15.09.2026    Report No: INS/DPR/012
+Weather: Humid, 30°C
+Manpower: Supervisors 2, Skilled 14, Helpers 14
+
+Work done today:
+1. PT 1102 job commenced
+2. SS tubinng hook-up flow transmitter 1101 start
+3. Instrument installation A1 in progress
+4. Mounting of pressure transmitter 2042 on stand begun today
+
+Hold / constraints:
+- Nil
+
+Plan for tomorrow:
+- Impulse tubing for PT-2042
+- Impulse tubing for LT-4012
+
+Safety: PPE audit done. No incident.
+Prepared by: Site Engineer (Instrumentation)

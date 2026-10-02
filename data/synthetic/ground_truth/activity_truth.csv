@@ -1,0 +1,318 @@
+activity_id,object_key,step_key,description,canonical_tags,true_actual_start,true_actual_finish,status_at_window_end
+CIV-A3-P101A-EXC,P101A,fdn_exc,crude transfer pump,P-101A,2026-07-24,2026-07-27,completed
+CIV-A3-P101A-PCC,P101A,fdn_pcc,crude transfer pump,P-101A,2026-07-28,2026-07-28,completed
+CIV-A3-P101A-REB,P101A,fdn_reb,crude transfer pump,P-101A,2026-07-30,2026-08-03,completed
+CIV-A3-P101A-RCC,P101A,fdn_rcc,crude transfer pump,P-101A,2026-08-04,2026-08-05,completed
+CIV-A3-P101A-BKF,P101A,fdn_bf,crude transfer pump,P-101A,2026-08-13,2026-08-15,completed
+CIV-A3-P101B-EXC,P101B,fdn_exc,crude transfer pump,P-101B,2026-07-29,2026-08-01,completed
+CIV-A3-P101B-PCC,P101B,fdn_pcc,crude transfer pump,P-101B,2026-08-03,2026-08-03,completed
+CIV-A3-P101B-REB,P101B,fdn_reb,crude transfer pump,P-101B,2026-08-05,2026-08-08,completed
+CIV-A3-P101B-RCC,P101B,fdn_rcc,crude transfer pump,P-101B,2026-08-10,2026-08-11,completed
+CIV-A3-P101B-BKF,P101B,fdn_bf,crude transfer pump,P-101B,2026-08-19,2026-08-21,completed
+CIV-A3-P102A-EXC,P102A,fdn_exc,produced water pump,P-102A,2026-08-08,2026-08-11,completed
+CIV-A3-P102A-PCC,P102A,fdn_pcc,produced water pump,P-102A,2026-08-12,2026-08-12,completed
+CIV-A3-P102A-REB,P102A,fdn_reb,produced water pump,P-102A,2026-08-15,2026-08-18,completed
+CIV-A3-P102A-RCC,P102A,fdn_rcc,produced water pump,P-102A,2026-08-20,2026-08-21,completed
+CIV-A3-P102A-BKF,P102A,fdn_bf,produced water pump,P-102A,2026-08-31,2026-09-02,completed
+CIV-A3-P102B-EXC,P102B,fdn_exc,produced water pump,P-102B,2026-08-08,2026-08-10,completed
+CIV-A3-P102B-PCC,P102B,fdn_pcc,produced water pump,P-102B,2026-08-13,2026-08-13,completed
+CIV-A3-P102B-REB,P102B,fdn_reb,produced water pump,P-102B,2026-08-15,2026-08-18,completed
+CIV-A3-P102B-RCC,P102B,fdn_rcc,produced water pump,P-102B,2026-08-20,2026-08-22,completed
+CIV-A3-P102B-BKF,P102B,fdn_bf,produced water pump,P-102B,2026-08-31,2026-09-03,completed
+CIV-A4-P201A-EXC,P201A,fdn_exc,fire water pump,P-201A,2026-07-22,2026-07-24,completed
+CIV-A4-P201A-PCC,P201A,fdn_pcc,fire water pump,P-201A,2026-07-27,2026-07-27,completed
+CIV-A4-P201A-REB,P201A,fdn_reb,fire water pump,P-201A,2026-07-29,2026-08-01,completed
+CIV-A4-P201A-RCC,P201A,fdn_rcc,fire water pump,P-201A,2026-08-03,2026-08-04,completed
+CIV-A4-P201A-BKF,P201A,fdn_bf,fire water pump,P-201A,2026-08-12,2026-08-14,completed
+CIV-A4-P201B-EXC,P201B,fdn_exc,fire water pump,P-201B,2026-07-24,2026-07-27,completed
+CIV-A4-P201B-PCC,P201B,fdn_pcc,fire water pump,P-201B,2026-07-28,2026-07-28,completed
+CIV-A4-P201B-REB,P201B,fdn_reb,fire water pump,P-201B,2026-07-30,2026-08-01,completed
+CIV-A4-P201B-RCC,P201B,fdn_rcc,fire water pump,P-201B,2026-08-03,2026-08-05,completed
+CIV-A4-P201B-BKF,P201B,fdn_bf,fire water pump,P-201B,2026-08-13,2026-08-15,completed
+CIV-A1-K301-EXC,K301,fdn_exc,gas compressor,K-301,2026-08-05,2026-08-07,completed
+CIV-A1-K301-PCC,K301,fdn_pcc,gas compressor,K-301,2026-08-08,2026-08-08,completed
+CIV-A1-K301-REB,K301,fdn_reb,gas compressor,K-301,2026-08-11,2026-08-14,completed
+CIV-A1-K301-RCC,K301,fdn_rcc,gas compressor,K-301,2026-08-15,2026-08-17,completed
+CIV-A1-K301-BKF,K301,fdn_bf,gas compressor,K-301,2026-08-25,2026-08-28,completed
+CIV-A1-V101-EXC,V101,fdn_exc,inlet separator,V-101,2026-09-04,2026-09-07,completed
+CIV-A1-V101-PCC,V101,fdn_pcc,inlet separator,V-101,2026-09-08,2026-09-08,completed
+CIV-A1-V101-REB,V101,fdn_reb,inlet separator,V-101,2026-09-10,2026-09-14,completed
+CIV-A1-V101-RCC,V101,fdn_rcc,inlet separator,V-101,2026-09-15,2026-09-16,completed
+CIV-A1-V101-BKF,V101,fdn_bf,inlet separator,V-101,,,not_started
+CIV-A1-V102-EXC,V102,fdn_exc,test separator,V-102,2026-08-18,2026-08-21,completed
+CIV-A1-V102-PCC,V102,fdn_pcc,test separator,V-102,2026-08-22,2026-08-22,completed
+CIV-A1-V102-REB,V102,fdn_reb,test separator,V-102,2026-08-24,2026-08-28,completed
+CIV-A1-V102-RCC,V102,fdn_rcc,test separator,V-102,2026-08-29,2026-08-31,completed
+CIV-A1-V102-BKF,V102,fdn_bf,test separator,V-102,2026-09-08,2026-09-09,completed
+CIV-A1-V103-EXC,V103,fdn_exc,gas scrubber,V-103,2026-08-26,2026-08-29,completed
+CIV-A1-V103-PCC,V103,fdn_pcc,gas scrubber,V-103,2026-08-31,2026-08-31,completed
+CIV-A1-V103-REB,V103,fdn_reb,gas scrubber,V-103,2026-09-02,2026-09-07,completed
+CIV-A1-V103-RCC,V103,fdn_rcc,gas scrubber,V-103,2026-09-08,2026-09-09,completed
+CIV-A1-V103-BKF,V103,fdn_bf,gas scrubber,V-103,,,not_started
+CIV-A3-E101-EXC,E101,fdn_exc,crude heat exchanger,E-101,2026-07-27,2026-07-30,completed
+CIV-A3-E101-PCC,E101,fdn_pcc,crude heat exchanger,E-101,2026-08-01,2026-08-01,completed
+CIV-A3-E101-REB,E101,fdn_reb,crude heat exchanger,E-101,2026-08-05,2026-08-10,completed
+CIV-A3-E101-RCC,E101,fdn_rcc,crude heat exchanger,E-101,2026-08-11,2026-08-12,completed
+CIV-A3-E101-BKF,E101,fdn_bf,crude heat exchanger,E-101,2026-08-20,2026-08-24,completed
+CIV-A4-T401-EXC,T401,fdn_exc,crude storage tank,T-401,2026-07-23,2026-07-27,completed
+CIV-A4-T401-PCC,T401,fdn_pcc,crude storage tank,T-401,2026-07-28,2026-07-28,completed
+CIV-A4-T401-REB,T401,fdn_reb,crude storage tank,T-401,2026-07-30,2026-08-03,completed
+CIV-A4-T401-RCC,T401,fdn_rcc,crude storage tank,T-401,2026-08-04,2026-08-05,completed
+CIV-A4-T401-BKF,T401,fdn_bf,crude storage tank,T-401,2026-08-13,2026-08-15,completed
+CIV-A4-T402-EXC,T402,fdn_exc,crude storage tank,T-402,2026-07-10,2026-07-13,completed
+CIV-A4-T402-PCC,T402,fdn_pcc,crude storage tank,T-402,2026-07-14,2026-07-14,completed
+CIV-A4-T402-REB,T402,fdn_reb,crude storage tank,T-402,2026-07-17,2026-07-21,completed
+CIV-A4-T402-RCC,T402,fdn_rcc,crude storage tank,T-402,2026-07-23,2026-07-24,completed
+CIV-A4-T402-BKF,T402,fdn_bf,crude storage tank,T-402,2026-08-03,2026-08-05,completed
+CIV-A1-PR1-FTG,PR1,pr_ftg,pipe rack,PR-1,2026-07-22,2026-07-28,completed
+CIV-A1-PR1-PED,PR1,pr_ped,pipe rack,PR-1,2026-07-30,2026-08-08,completed
+CIV-A1-PR1-STL,PR1,pr_stl,pipe rack,PR-1,2026-08-14,2026-08-24,completed
+CIV-A3-PR2-FTG,PR2,pr_ftg,pipe rack,PR-2,2026-07-16,2026-07-22,completed
+CIV-A3-PR2-PED,PR2,pr_ped,pipe rack,PR-2,2026-07-24,2026-07-30,completed
+CIV-A3-PR2-STL,PR2,pr_stl,pipe rack,PR-2,2026-08-07,2026-08-15,completed
+CIV-A3-PR3-FTG,PR3,pr_ftg,pipe rack,PR-3,2026-08-17,2026-08-24,completed
+CIV-A3-PR3-PED,PR3,pr_ped,pipe rack,PR-3,2026-08-26,2026-09-05,completed
+CIV-A3-PR3-STL,PR3,pr_stl,pipe rack,PR-3,2026-09-11,,in_progress
+CIV-A4-PR4-FTG,PR4,pr_ftg,pipe rack,PR-4,2026-07-27,2026-08-03,completed
+CIV-A4-PR4-PED,PR4,pr_ped,pipe rack,PR-4,2026-08-05,2026-08-15,completed
+CIV-A4-PR4-STL,PR4,pr_stl,pipe rack,PR-4,2026-08-21,2026-08-29,completed
+CIV-A2-SSB-PLN,SSB,sub_plinth,substation building,,2026-07-18,2026-07-27,completed
+CIV-A2-SSB-COL,SSB,sub_col,substation building,,2026-07-29,2026-08-08,completed
+CIV-A2-SSB-ROF,SSB,sub_roof,substation building,,2026-08-11,2026-08-24,completed
+CIV-A2-SSB-BRK,SSB,sub_brick,substation building,,2026-08-26,2026-09-10,completed
+CIV-A2-SSB-PLS,SSB,sub_plaster,substation building,,2026-09-11,,in_progress
+CIV-A2-CTN-EXC,CTN,ct_exc,cable trench,CT-N,2026-08-24,2026-08-31,completed
+CIV-A2-CTN-WAL,CTN,ct_wall,cable trench,CT-N,2026-09-02,2026-09-09,completed
+CIV-A2-CTS-EXC,CTS,ct_exc,cable trench,CT-S,2026-08-29,2026-09-07,completed
+CIV-A2-CTS-WAL,CTS,ct_wall,cable trench,CT-S,2026-09-09,,in_progress
+CIV-A3-SWD3-SWD,SWD3,swd,storm water drain,,2026-09-03,,in_progress
+CIV-A4-SWD4-SWD,SWD4,swd,storm water drain,,2026-09-01,,in_progress
+PIP-A1-1101-ERC,1101,pip_erect,"24"" crude inlet header",LINE-1101,2026-09-16,,in_progress
+PIP-A1-1101-WLD,1101,pip_weld,"24"" crude inlet header",LINE-1101,,,not_started
+PIP-A1-1101-HT,1101,pip_ht,"24"" crude inlet header",LINE-1101;TP-011,,,not_started
+PIP-A1-1101-RST,1101,pip_rein,"24"" crude inlet header",LINE-1101,,,not_started
+PIP-A1-1102-ERC,1102,pip_erect,"18"" separator outlet line",LINE-1102,,,not_started
+PIP-A1-1102-WLD,1102,pip_weld,"18"" separator outlet line",LINE-1102,,,not_started
+PIP-A1-1102-HT,1102,pip_ht,"18"" separator outlet line",LINE-1102;TP-012,,,not_started
+PIP-A1-1102-RST,1102,pip_rein,"18"" separator outlet line",LINE-1102,,,not_started
+PIP-A1-1103-ERC,1103,pip_erect,"12"" gas line",LINE-1103,,,not_started
+PIP-A1-1103-WLD,1103,pip_weld,"12"" gas line",LINE-1103,,,not_started
+PIP-A1-1103-HT,1103,pip_ht,"12"" gas line",LINE-1103;TP-013,,,not_started
+PIP-A1-1103-RST,1103,pip_rein,"12"" gas line",LINE-1103,,,not_started
+PIP-A1-1104-ERC,1104,pip_erect,"8"" test separator line",LINE-1104,2026-09-14,,in_progress
+PIP-A1-1104-WLD,1104,pip_weld,"8"" test separator line",LINE-1104,,,not_started
+PIP-A1-1104-HT,1104,pip_ht,"8"" test separator line",LINE-1104;TP-014,,,not_started
+PIP-A1-1104-RST,1104,pip_rein,"8"" test separator line",LINE-1104,,,not_started
+PIP-A1-1105-ERC,1105,pip_erect,"6"" produced water line",LINE-1105,2026-08-31,2026-09-07,completed
+PIP-A1-1105-WLD,1105,pip_weld,"6"" produced water line",LINE-1105,2026-09-02,2026-09-15,completed
+PIP-A1-1105-HT,1105,pip_ht,"6"" produced water line",LINE-1105;TP-015,,,not_started
+PIP-A1-1105-RST,1105,pip_rein,"6"" produced water line",LINE-1105,,,not_started
+PIP-A3-1201-ERC,1201,pip_erect,"24"" crude header",LINE-1201,,,not_started
+PIP-A3-1201-WLD,1201,pip_weld,"24"" crude header",LINE-1201,,,not_started
+PIP-A3-1201-HT,1201,pip_ht,"24"" crude header",LINE-1201;TP-016,,,not_started
+PIP-A3-1201-RST,1201,pip_rein,"24"" crude header",LINE-1201,,,not_started
+PIP-A3-1203-ERC,1203,pip_erect,"24"" crude header",LINE-1203,2026-09-07,,in_progress
+PIP-A3-1203-WLD,1203,pip_weld,"24"" crude header",LINE-1203,2026-09-10,,in_progress
+PIP-A3-1203-HT,1203,pip_ht,"24"" crude header",LINE-1203;TP-017,,,not_started
+PIP-A3-1203-RST,1203,pip_rein,"24"" crude header",LINE-1203,,,not_started
+PIP-A3-1205-ERC,1205,pip_erect,"18"" pump suction line",LINE-1205,,,not_started
+PIP-A3-1205-WLD,1205,pip_weld,"18"" pump suction line",LINE-1205,,,not_started
+PIP-A3-1205-HT,1205,pip_ht,"18"" pump suction line",LINE-1205;TP-018,,,not_started
+PIP-A3-1205-RST,1205,pip_rein,"18"" pump suction line",LINE-1205,,,not_started
+PIP-A3-1207-ERC,1207,pip_erect,"16"" pump discharge line",LINE-1207,2026-09-08,,in_progress
+PIP-A3-1207-WLD,1207,pip_weld,"16"" pump discharge line",LINE-1207,2026-09-11,,in_progress
+PIP-A3-1207-HT,1207,pip_ht,"16"" pump discharge line",LINE-1207;TP-019,,,not_started
+PIP-A3-1207-RST,1207,pip_rein,"16"" pump discharge line",LINE-1207,,,not_started
+PIP-A3-1211-ERC,1211,pip_erect,"16"" pump discharge line",LINE-1211,2026-08-31,2026-09-07,completed
+PIP-A3-1211-WLD,1211,pip_weld,"16"" pump discharge line",LINE-1211,2026-09-03,2026-09-11,completed
+PIP-A3-1211-HT,1211,pip_ht,"16"" pump discharge line",LINE-1211;TP-020,2026-09-15,2026-09-16,completed
+PIP-A3-1211-RST,1211,pip_rein,"16"" pump discharge line",LINE-1211,,,not_started
+PIP-A3-1213-ERC,1213,pip_erect,"12"" heater bypass line",LINE-1213,2026-09-10,,in_progress
+PIP-A3-1213-WLD,1213,pip_weld,"12"" heater bypass line",LINE-1213,2026-09-12,,in_progress
+PIP-A3-1213-HT,1213,pip_ht,"12"" heater bypass line",LINE-1213;TP-021,,,not_started
+PIP-A3-1213-RST,1213,pip_rein,"12"" heater bypass line",LINE-1213,,,not_started
+PIP-A3-1215-ERC,1215,pip_erect,"10"" produced water line",LINE-1215,2026-09-03,,in_progress
+PIP-A3-1215-WLD,1215,pip_weld,"10"" produced water line",LINE-1215,2026-09-07,,in_progress
+PIP-A3-1215-HT,1215,pip_ht,"10"" produced water line",LINE-1215;TP-022,,,not_started
+PIP-A3-1215-RST,1215,pip_rein,"10"" produced water line",LINE-1215,,,not_started
+PIP-A3-1217-ERC,1217,pip_erect,"8"" recirculation line",LINE-1217,2026-08-18,2026-09-05,completed
+PIP-A3-1217-WLD,1217,pip_weld,"8"" recirculation line",LINE-1217,2026-08-20,2026-09-12,completed
+PIP-A3-1217-HT,1217,pip_ht,"8"" recirculation line",LINE-1217;TP-023,2026-09-16,,in_progress
+PIP-A3-1217-RST,1217,pip_rein,"8"" recirculation line",LINE-1217,,,not_started
+PIP-A4-1401-ERC,1401,pip_erect,"20"" tank inlet line",LINE-1401,,,not_started
+PIP-A4-1401-WLD,1401,pip_weld,"20"" tank inlet line",LINE-1401,,,not_started
+PIP-A4-1401-HT,1401,pip_ht,"20"" tank inlet line",LINE-1401;TP-024,,,not_started
+PIP-A4-1401-RST,1401,pip_rein,"20"" tank inlet line",LINE-1401,,,not_started
+PIP-A4-1403-ERC,1403,pip_erect,"16"" tank outlet line",LINE-1403,2026-09-14,,in_progress
+PIP-A4-1403-WLD,1403,pip_weld,"16"" tank outlet line",LINE-1403,2026-09-16,,in_progress
+PIP-A4-1403-HT,1403,pip_ht,"16"" tank outlet line",LINE-1403;TP-025,,,not_started
+PIP-A4-1403-RST,1403,pip_rein,"16"" tank outlet line",LINE-1403,,,not_started
+PIP-A4-1405-ERC,1405,pip_erect,"10"" tank drain line",LINE-1405,2026-09-05,,in_progress
+PIP-A4-1405-WLD,1405,pip_weld,"10"" tank drain line",LINE-1405,2026-09-07,,in_progress
+PIP-A4-1405-HT,1405,pip_ht,"10"" tank drain line",LINE-1405;TP-026,,,not_started
+PIP-A4-1405-RST,1405,pip_rein,"10"" tank drain line",LINE-1405,,,not_started
+PIP-A4-1407-ERC,1407,pip_erect,"8"" fire water ring main",LINE-1407,2026-08-17,2026-09-01,completed
+PIP-A4-1407-WLD,1407,pip_weld,"8"" fire water ring main",LINE-1407,2026-08-19,2026-09-05,completed
+PIP-A4-1407-HT,1407,pip_ht,"8"" fire water ring main",LINE-1407;TP-027,2026-09-10,2026-09-11,completed
+PIP-A4-1407-RST,1407,pip_rein,"8"" fire water ring main",LINE-1407,2026-09-14,2026-09-16,completed
+PIP-A1-PS1-FAB,PS1,ps_fab,pipe rack,PR-1,2026-08-12,2026-08-25,completed
+PIP-A1-PS1-PSE,PS1,ps_erect,pipe rack,PR-1,2026-08-28,2026-09-14,completed
+PIP-A3-PS2-FAB,PS2,ps_fab,pipe rack,PR-2,2026-08-20,2026-08-31,completed
+PIP-A3-PS2-PSE,PS2,ps_erect,pipe rack,PR-2,2026-09-03,2026-09-14,completed
+PIP-A3-PS3-FAB,PS3,ps_fab,pipe rack,PR-3,2026-08-17,2026-08-25,completed
+PIP-A3-PS3-PSE,PS3,ps_erect,pipe rack,PR-3,2026-08-31,2026-09-09,completed
+PIP-A4-PS4-FAB,PS4,ps_fab,pipe rack,PR-4,2026-08-07,2026-08-17,completed
+PIP-A4-PS4-PSE,PS4,ps_erect,pipe rack,PR-4,2026-08-20,2026-09-02,completed
+SEQ-A1-V101-RCV,V101,eq_recv,inlet separator,V-101,2026-08-15,2026-08-15,completed
+SEQ-A1-V101-ERC,V101,eq_erect,inlet separator,V-101,,,not_started
+SEQ-A1-V101-GRT,V101,eq_grout,inlet separator,V-101,,,not_started
+SEQ-A1-V101-INT,V101,eq_int,inlet separator,V-101,,,not_started
+SEQ-A1-V101-BOX,V101,eq_boxup,inlet separator,V-101,,,not_started
+SEQ-A1-V102-RCV,V102,eq_recv,test separator,V-102,2026-08-12,2026-08-12,completed
+SEQ-A1-V102-ERC,V102,eq_erect,test separator,V-102,2026-09-11,2026-09-12,completed
+SEQ-A1-V102-GRT,V102,eq_grout,test separator,V-102,2026-09-15,,in_progress
+SEQ-A1-V102-INT,V102,eq_int,test separator,V-102,,,not_started
+SEQ-A1-V102-BOX,V102,eq_boxup,test separator,V-102,,,not_started
+SEQ-A1-V103-RCV,V103,eq_recv,gas scrubber,V-103,2026-08-31,2026-08-31,completed
+SEQ-A1-V103-ERC,V103,eq_erect,gas scrubber,V-103,,,not_started
+SEQ-A1-V103-GRT,V103,eq_grout,gas scrubber,V-103,,,not_started
+SEQ-A1-V103-INT,V103,eq_int,gas scrubber,V-103,,,not_started
+SEQ-A1-V103-BOX,V103,eq_boxup,gas scrubber,V-103,,,not_started
+SEQ-A3-E101-RCV,E101,eq_recv,crude heat exchanger,E-101,2026-08-31,2026-08-31,completed
+SEQ-A3-E101-ERC,E101,eq_erect,crude heat exchanger,E-101,2026-09-04,2026-09-07,completed
+SEQ-A3-E101-GRT,E101,eq_grout,crude heat exchanger,E-101,2026-09-10,2026-09-12,completed
+SEQ-A3-E101-BOX,E101,eq_boxup,crude heat exchanger,E-101,,,not_started
+SEQ-A4-T401-BTM,T401,tk_bottom,crude storage tank,T-401,2026-08-18,2026-08-28,completed
+SEQ-A4-T401-SH1,T401,tk_shell1,crude storage tank,T-401,2026-08-31,2026-09-15,completed
+SEQ-A4-T401-SH2,T401,tk_shell2,crude storage tank,T-401,,,not_started
+SEQ-A4-T401-ROF,T401,tk_roof,crude storage tank,T-401,,,not_started
+SEQ-A4-T401-HT,T401,tk_ht,crude storage tank,T-401,,,not_started
+SEQ-A4-T402-BTM,T402,tk_bottom,crude storage tank,T-402,2026-08-13,2026-08-26,completed
+SEQ-A4-T402-SH1,T402,tk_shell1,crude storage tank,T-402,2026-08-28,,in_progress
+SEQ-A4-T402-SH2,T402,tk_shell2,crude storage tank,T-402,,,not_started
+SEQ-A4-T402-ROF,T402,tk_roof,crude storage tank,T-402,,,not_started
+SEQ-A4-T402-HT,T402,tk_ht,crude storage tank,T-402,,,not_started
+ROT-A3-P101A-SET,P101A,pmp_set,crude transfer pump,P-101A,2026-09-03,2026-09-03,completed
+ROT-A3-P101A-GRT,P101A,pmp_grout,crude transfer pump,P-101A,2026-09-07,2026-09-07,completed
+ROT-A3-P101A-ALN,P101A,pmp_align,crude transfer pump,P-101A,,,not_started
+ROT-A3-P101A-SOL,P101A,pmp_solo,crude transfer pump,P-101A,,,not_started
+ROT-A3-P101B-SET,P101B,pmp_set,crude transfer pump,P-101B,2026-08-31,2026-08-31,completed
+ROT-A3-P101B-GRT,P101B,pmp_grout,crude transfer pump,P-101B,2026-09-04,2026-09-04,completed
+ROT-A3-P101B-ALN,P101B,pmp_align,crude transfer pump,P-101B,,,not_started
+ROT-A3-P101B-SOL,P101B,pmp_solo,crude transfer pump,P-101B,,,not_started
+ROT-A3-P102A-SET,P102A,pmp_set,produced water pump,P-102A,2026-09-02,2026-09-02,completed
+ROT-A3-P102A-GRT,P102A,pmp_grout,produced water pump,P-102A,2026-09-07,2026-09-07,completed
+ROT-A3-P102A-ALN,P102A,pmp_align,produced water pump,P-102A,,,not_started
+ROT-A3-P102A-SOL,P102A,pmp_solo,produced water pump,P-102A,,,not_started
+ROT-A3-P102B-SET,P102B,pmp_set,produced water pump,P-102B,2026-09-16,2026-09-16,completed
+ROT-A3-P102B-GRT,P102B,pmp_grout,produced water pump,P-102B,,,not_started
+ROT-A3-P102B-ALN,P102B,pmp_align,produced water pump,P-102B,,,not_started
+ROT-A3-P102B-SOL,P102B,pmp_solo,produced water pump,P-102B,,,not_started
+ROT-A4-P201A-SET,P201A,pmp_set,fire water pump,P-201A,,,not_started
+ROT-A4-P201A-GRT,P201A,pmp_grout,fire water pump,P-201A,,,not_started
+ROT-A4-P201A-ALN,P201A,pmp_align,fire water pump,P-201A,,,not_started
+ROT-A4-P201A-SOL,P201A,pmp_solo,fire water pump,P-201A,,,not_started
+ROT-A4-P201B-SET,P201B,pmp_set,fire water pump,P-201B,2026-09-01,2026-09-01,completed
+ROT-A4-P201B-GRT,P201B,pmp_grout,fire water pump,P-201B,2026-09-05,2026-09-05,completed
+ROT-A4-P201B-ALN,P201B,pmp_align,fire water pump,P-201B,,,not_started
+ROT-A4-P201B-SOL,P201B,pmp_solo,fire water pump,P-201B,,,not_started
+ROT-A1-K301-SKD,K301,cmp_skid,gas compressor,K-301,2026-08-28,2026-08-31,completed
+ROT-A1-K301-GRT,K301,cmp_grout,gas compressor,K-301,2026-09-03,2026-09-05,completed
+ROT-A1-K301-LUB,K301,cmp_lube,gas compressor,K-301,2026-09-16,,in_progress
+ROT-A1-K301-ALN,K301,cmp_align,gas compressor,K-301,,,not_started
+ROT-A1-K301-RUN,K301,cmp_run,gas compressor,K-301,,,not_started
+ELE-A2-TR1-PLC,TR1,tr_place,transformer,TR-1,,,not_started
+ELE-A2-TR2-PLC,TR2,tr_place,transformer,TR-2,2026-09-10,2026-09-11,completed
+ELE-A2-HTSWBD1-INS,HTSWBD1,pnl_inst,HT switchboard,HT-SWBD-1,2026-09-04,2026-09-11,completed
+ELE-A2-MCC1-INS,MCC1,pnl_inst,MCC panel,MCC-1,2026-09-09,2026-09-12,completed
+ELE-A2-MCC2-INS,MCC2,pnl_inst,MCC panel,MCC-2,2026-08-26,2026-08-29,completed
+ELE-A2-PCC1-INS,PCC1,pnl_inst,PCC panel,PCC-1,2026-08-31,2026-09-03,completed
+ELE-A2-CMCC1-CBL,CMCC1,cbl_pull,power cable,MCC-1,2026-09-01,,in_progress
+ELE-A2-CMCC1-TRM,CMCC1,cbl_term,power cable,MCC-1,2026-09-07,,in_progress
+ELE-A2-CMCC1-IRT,CMCC1,irt,power cable,MCC-1,,,not_started
+ELE-A2-CMCC2-CBL,CMCC2,cbl_pull,power cable,MCC-2,2026-08-28,2026-09-14,completed
+ELE-A2-CMCC2-TRM,CMCC2,cbl_term,power cable,MCC-2,2026-09-02,,in_progress
+ELE-A2-CMCC2-IRT,CMCC2,irt,power cable,MCC-2,,,not_started
+ELE-A1-CLVA1-CBL,CLVA1,cbl_pull,power cable,,2026-09-09,,in_progress
+ELE-A1-CLVA1-TRM,CLVA1,cbl_term,power cable,,2026-09-16,,in_progress
+ELE-A3-CLVA3-CBL,CLVA3,cbl_pull,power cable,,2026-09-09,,in_progress
+ELE-A3-CLVA3-TRM,CLVA3,cbl_term,power cable,,2026-09-15,,in_progress
+ELE-A4-CLVA4-CBL,CLVA4,cbl_pull,power cable,,2026-09-11,,in_progress
+ELE-A4-CLVA4-TRM,CLVA4,cbl_term,power cable,,,,not_started
+ELE-A2-CHTTR1-CBL,CHTTR1,cbl_pull,power cable,TR-1,2026-09-12,,in_progress
+ELE-A2-CHTTR1-TRM,CHTTR1,cbl_term,power cable,TR-1,,,not_started
+ELE-A2-CHTTR2-CBL,CHTTR2,cbl_pull,power cable,TR-2,2026-09-16,,in_progress
+ELE-A2-CHTTR2-TRM,CHTTR2,cbl_term,power cable,TR-2,,,not_started
+ELE-A1-ERT1-ERT,ERT1,earth,earthing,,2026-09-07,,in_progress
+ELE-A2-ERT2-ERT,ERT2,earth,earthing,,2026-08-25,2026-09-07,completed
+ELE-A3-ERT3-ERT,ERT3,earth,earthing,,2026-08-25,2026-09-04,completed
+ELE-A4-ERT4-ERT,ERT4,earth,earthing,,2026-08-15,2026-08-27,completed
+ELE-A1-TRY1-TRY,TRY1,tray,cable tray,,2026-08-20,2026-09-03,completed
+ELE-A2-TRY2-TRY,TRY2,tray,cable tray,,2026-08-20,2026-08-31,completed
+ELE-A3-TRY3-TRY,TRY3,tray,cable tray,,2026-08-17,2026-08-31,completed
+ELE-A4-TRY4-TRY,TRY4,tray,cable tray,,2026-08-17,2026-08-29,completed
+ELE-A1-LGT1-LGT,LGT1,light,area lighting,,,,not_started
+ELE-A2-LGT2-LGT,LGT2,light,area lighting,,,,not_started
+ELE-A3-LGT3-LGT,LGT3,light,area lighting,,,,not_started
+ELE-A4-LGT4-LGT,LGT4,light,area lighting,,,,not_started
+INS-A1-FT1101-INS,FT1101,ins_inst,flow transmitter,FT-1101,2026-09-11,2026-09-12,completed
+INS-A1-FT1101-TUB,FT1101,ins_tube,flow transmitter,FT-1101,2026-09-15,2026-09-16,completed
+INS-A1-FT1101-LCK,FT1101,ins_loop,flow transmitter,FT-1101,,,not_started
+INS-A1-PT1102-INS,PT1102,ins_inst,pressure transmitter,PT-1102,2026-09-10,2026-09-12,completed
+INS-A1-PT1102-TUB,PT1102,ins_tube,pressure transmitter,PT-1102,2026-09-15,,in_progress
+INS-A1-PT1102-LCK,PT1102,ins_loop,pressure transmitter,PT-1102,,,not_started
+INS-A1-LT1103-INS,LT1103,ins_inst,level transmitter,LT-1103,2026-08-27,2026-08-29,completed
+INS-A1-LT1103-TUB,LT1103,ins_tube,level transmitter,LT-1103,2026-09-01,2026-09-03,completed
+INS-A1-LT1103-LCK,LT1103,ins_loop,level transmitter,LT-1103,,,not_started
+INS-A1-PT1104-INS,PT1104,ins_inst,pressure transmitter,PT-1104,2026-08-31,2026-09-01,completed
+INS-A1-PT1104-TUB,PT1104,ins_tube,pressure transmitter,PT-1104,2026-09-04,2026-09-09,completed
+INS-A1-PT1104-LCK,PT1104,ins_loop,pressure transmitter,PT-1104,,,not_started
+INS-A1-TT1105-INS,TT1105,ins_inst,temperature transmitter,TT-1105,2026-09-05,2026-09-07,completed
+INS-A1-TT1105-LCK,TT1105,ins_loop,temperature transmitter,TT-1105,,,not_started
+INS-A3-FT2031-INS,FT2031,ins_inst,flow transmitter,FT-2031,2026-08-29,2026-08-31,completed
+INS-A3-FT2031-TUB,FT2031,ins_tube,flow transmitter,FT-2031,2026-09-04,2026-09-07,completed
+INS-A3-FT2031-LCK,FT2031,ins_loop,flow transmitter,FT-2031,,,not_started
+INS-A3-PT2041-INS,PT2041,ins_inst,pressure transmitter,PT-2041,,,not_started
+INS-A3-PT2041-TUB,PT2041,ins_tube,pressure transmitter,PT-2041,,,not_started
+INS-A3-PT2041-LCK,PT2041,ins_loop,pressure transmitter,PT-2041,,,not_started
+INS-A3-PT2042-INS,PT2042,ins_inst,pressure transmitter,PT-2042,2026-09-15,2026-09-16,completed
+INS-A3-PT2042-TUB,PT2042,ins_tube,pressure transmitter,PT-2042,,,not_started
+INS-A3-PT2042-LCK,PT2042,ins_loop,pressure transmitter,PT-2042,,,not_started
+INS-A3-TT2051-INS,TT2051,ins_inst,temperature transmitter,TT-2051,,,not_started
+INS-A3-TT2051-LCK,TT2051,ins_loop,temperature transmitter,TT-2051,,,not_started
+INS-A3-FT2033-INS,FT2033,ins_inst,flow transmitter,FT-2033,2026-09-16,,in_progress
+INS-A3-FT2033-TUB,FT2033,ins_tube,flow transmitter,FT-2033,,,not_started
+INS-A3-FT2033-LCK,FT2033,ins_loop,flow transmitter,FT-2033,,,not_started
+INS-A4-LT4011-INS,LT4011,ins_inst,level transmitter,LT-4011,2026-08-31,2026-09-01,completed
+INS-A4-LT4011-TUB,LT4011,ins_tube,level transmitter,LT-4011,2026-09-04,2026-09-07,completed
+INS-A4-LT4011-LCK,LT4011,ins_loop,level transmitter,LT-4011,,,not_started
+INS-A4-LT4012-INS,LT4012,ins_inst,level transmitter,LT-4012,,,not_started
+INS-A4-LT4012-TUB,LT4012,ins_tube,level transmitter,LT-4012,,,not_started
+INS-A4-LT4012-LCK,LT4012,ins_loop,level transmitter,LT-4012,,,not_started
+INS-A4-TT4013-INS,TT4013,ins_inst,temperature transmitter,TT-4013,2026-09-14,2026-09-16,completed
+INS-A4-TT4013-LCK,TT4013,ins_loop,temperature transmitter,TT-4013,,,not_started
+INS-A1-JB101-INS,JB101,jb_inst,junction box,JB-101,,,not_started
+INS-A1-JB102-INS,JB102,jb_inst,junction box,JB-102,2026-09-10,2026-09-12,completed
+INS-A3-JB301-INS,JB301,jb_inst,junction box,JB-301,2026-08-27,2026-08-29,completed
+INS-A3-JB302-INS,JB302,jb_inst,junction box,JB-302,2026-08-26,2026-08-27,completed
+INS-A3-JB303-INS,JB303,jb_inst,junction box,JB-303,2026-08-28,2026-08-29,completed
+INS-A3-JB304-INS,JB304,jb_inst,junction box,JB-304,2026-09-01,2026-09-02,completed
+INS-A4-JB401-INS,JB401,jb_inst,junction box,JB-401,2026-09-01,2026-09-02,completed
+INS-A1-ICB1-ICB,ICB1,icbl,instrument cable,,2026-09-15,,in_progress
+INS-A3-ICB3-ICB,ICB3,icbl,instrument cable,,2026-09-02,2026-09-14,completed
+INS-A4-ICB4-ICB,ICB4,icbl,instrument cable,,2026-09-16,,in_progress
+INS-A2-DCS-DCS,DCS,dcs,DCS cabinet,DCS,2026-08-31,2026-09-07,completed
+INS-A2-MC1-INS,MC1,mc_inst,marshalling cabinet,MC-1,2026-09-10,2026-09-14,completed
+HSE-A1-GD101-INS,GD101,gd_inst,gas detector,GD-101,,,not_started
+HSE-A1-GD102-INS,GD102,gd_inst,gas detector,GD-102,,,not_started
+HSE-A3-GD301-INS,GD301,gd_inst,gas detector,GD-301,2026-09-03,2026-09-03,completed
+HSE-A3-GD302-INS,GD302,gd_inst,gas detector,GD-302,2026-09-01,2026-09-01,completed
+HSE-A1-HYD1-HYD,HYD1,hyd,fire hydrant,,2026-09-08,,in_progress
+HSE-A3-HYD3-HYD,HYD3,hyd,fire hydrant,,2026-09-07,,in_progress
+HSE-A4-HYD4-HYD,HYD4,hyd,fire hydrant,,2026-09-12,,in_progress
+HSE-A1-SS101-INS,SS101,ss_inst,safety shower,SS-101,2026-09-14,2026-09-16,completed
+HSE-A3-SS301-INS,SS301,ss_inst,safety shower,SS-301,,,not_started
+HSE-A2-FAP1-INS,FAP1,fap,fire alarm panel,FAP-1,2026-09-02,2026-09-04,completed
+HSE-A1-WS1-INS,WS1,ws,windsock,WS-1,2026-09-09,2026-09-09,completed
+HSE-A1-FGL1-FGL,FGL1,fg_loop,F&G loop,,,,not_started
+HSE-A3-FGL3-FGL,FGL3,fg_loop,F&G loop,,,,not_started

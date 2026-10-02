@@ -1,0 +1,21 @@
+DAILY PROGRESS REPORT
+Project: Crude Oil Gathering Station Expansion (synthetic)
+Discipline: Electrical    Contractor: M/s Synthetic Electricals
+Date: 12-Sep-26    Report No: ELE/DPR/011
+Weather: Cloudy, light drizzle in afternoon
+Manpower: Supervisors 1, Skilled 23, Helpers 10
+
+Work done today:
+1. Cable laying in A2 in progress
+2. Erection of MCC-1 paanel done
+3. TR-1 HT cable khinchai chalu kiya
+
+Hold / constraints:
+- Cable laying LV cables area 3 on hold yday, cable drums not received
+
+Plan for tomorrow:
+- Glanding & termination for Area-1 LV power cables
+- Glanding & termination for Area-4 LV power cables
+
+Safety: Toolbox talk on working at height. No LTI.
+Prepared by: Site Engineer (Electrical)

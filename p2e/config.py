@@ -1,0 +1,34 @@
+"""Settings from environment variables (no extra dependency; `.env` files are not loaded — set variables in the shell/service).
+
+P2E_DB_URL        database URL (default sqlite:///data/p2e.db)
+P2E_UPLOAD_DIR    raw upload store (default data/uploads)
+P2E_GLOSSARY      project vocabulary used by the extractors (default data/synthetic/glossary.json)
+P2E_API_KEYS      "role:key,role:key" with role in supervisor|planner|admin; keys >= 16 characters. Unset = writes disabled.
+"""
+from __future__ import annotations
+
+import os
+from dataclasses import dataclass
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+@dataclass(frozen=True)
+class Settings:
+    db_url: str
+    synthetic_dir: Path
+    upload_dir: Path
+    glossary_path: Path
+    api_keys_spec: str | None
+
+
+def get_settings() -> Settings:
+    synthetic = Path(os.environ.get("P2E_SYNTHETIC_DIR", REPO_ROOT / "data" / "synthetic"))
+    return Settings(
+        db_url=os.environ.get("P2E_DB_URL", f"sqlite:///{(REPO_ROOT / 'data' / 'p2e.db').as_posix()}"),
+        synthetic_dir=synthetic,
+        upload_dir=Path(os.environ.get("P2E_UPLOAD_DIR", REPO_ROOT / "data" / "uploads")),
+        glossary_path=Path(os.environ.get("P2E_GLOSSARY", synthetic / "glossary.json")),
+        api_keys_spec=os.environ.get("P2E_API_KEYS"),
+    )

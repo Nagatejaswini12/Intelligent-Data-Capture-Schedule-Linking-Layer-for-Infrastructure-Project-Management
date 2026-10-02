@@ -1,0 +1,21 @@
+DAILY PROGRESS REPORT
+Project: Crude Oil Gathering Station Expansion (synthetic)
+Discipline: Instrumentation    Contractor: M/s Synthetic Instrumentation Services
+Date: 07/09/2026    Report No: INS/DPR/006
+Weather: Humid, 30°C
+Manpower: Supervisors 1, Skilled 8, Helpers 20
+
+Work done today:
+1. Positioning DCS panels in CCR in control room completed today
+2. Impulse tubing for FT-2031 over
+3. Instrument installation A1 in progress
+4. SS tubnig hook-up level transmitter 4011 compl.
+
+Hold / constraints:
+- PT 1104 work stuck due to drawing revision awaited
+
+Plan for tomorrow:
+- Impulse tubing for PT-2041
+
+Safety: PPE audit done. No incident.
+Prepared by: Site Engineer (Instrumentation)
