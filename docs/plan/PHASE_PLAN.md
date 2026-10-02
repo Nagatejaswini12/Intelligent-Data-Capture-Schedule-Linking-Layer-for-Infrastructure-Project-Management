@@ -200,6 +200,8 @@ Phase 0 ─► 1 ─► 2 ─► 3 ─┬─► 5 ─► 7 ─► 8
 >
 > **Delivered vs plan.** Calibrated `T_auto`/`T_review` stay with Phase 7 (apply uses the linker's gates). "Merge duplicates" is covered by the rules instead of a separate action: dates use the earliest start / latest finish across reports and percent uses the largest single-source quantity, so a fact reported twice is never counted twice. A start is applied only when it was reported explicitly (progress alone only proves the work had begun; 7/11 such inferred starts were wrong). Not done: React review/schedule pages (frontend scope), "propose" values for conflicts beyond the review listing (the planner sets them by override).
 >
+> **Silent-activity watch (added before Phase 6).** Flags what the field did NOT report: activities the plan expects to be active (no actual finish; started or past planned start) with no linked report in the last N days (default 3) or never. `GET …/watch/silent`, `GET …/watch/checklist?discipline=` (supervisor's daily list with what was reported today), the Time Agent answers "what should I report today?", CLI `scripts\phase5\watch.py`. Read-only. Synthetic run (as of 2026-09-16, 3 days): 75 silent activities, 13 of them truly worked in the window without any report (missed reports), the rest mostly past their planned finish without a start (likely slippage). 6 tests.
+>
 > Run: `scripts\phase5\apply_actuals.py [--dry-run] [--export DIR]`, `scripts\phase5\evaluate_apply.py`, `pytest`.
 
 

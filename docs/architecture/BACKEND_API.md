@@ -136,6 +136,8 @@ Optional env: `P2E_LLM_ENDPOINT` (self-hosted text-generation endpoint; non-priv
 | POST | `/audit/{id}/undo` | planner, admin | compensating entry; 409 if already undone or the values changed since |
 | GET | `/stream` (`limit`, `interval`) | any | `text/event-stream`: `update` events with a state snapshot whenever it changes |
 | GET | `/export/schedule.csv`, `/export/schedule.xml` (`status_date`) | any | schedule with current actuals, importable by the Phase 1 importer / MS Project (Activity ID in Text1) |
+| GET | `/watch/silent` (`as_of`, `days` 1–60, `discipline`, `area`) | any | expected-active activities with no linked report in `days` days (or never), with the reason they are expected and the last report date |
+| GET | `/watch/checklist?discipline=` (`area`, `as_of`) | any | a supervisor's expected-active activities and whether each was reported today |
 
 Rules and evaluation: [Phase plan, Phase 5](../plan/PHASE_PLAN.md). Reject stays `POST /links/{event_id}/reject`.
 

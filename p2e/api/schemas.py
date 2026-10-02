@@ -374,7 +374,7 @@ class AgentMessageIn(BaseModel):
 
 
 class AgentReplyOut(Out):
-    status: Literal["recorded", "duplicate", "needs_clarification", "rejected"]
+    status: Literal["recorded", "duplicate", "needs_clarification", "rejected", "checklist"]
     reply: str
     question: str | None
     interpretation: dict
@@ -382,6 +382,7 @@ class AgentReplyOut(Out):
     document_id: int | None
     reference_datetime: datetime
     link: LinkDetailOut | None
+    checklist: list[dict] | None = None     # "what should I report today?": expected-active activities
 
 
 # ----------------------------------------------------------------------------- Phase 5: review queue, apply, audit
@@ -467,3 +468,26 @@ class AuditPage(Out):
     total: int
     limit: int
     offset: int
+
+
+# ----------------------------------------------------------------------------- Silent-activity watch
+
+class WatchItemOut(Out):
+    plan_node_code: str
+    activity_name: str
+    discipline: Discipline | None
+    area: str | None
+    planned_start: date
+    planned_finish: date
+    actual_start: date | None
+    expectation: str
+    last_reported: date | None
+    days_silent: int | None = None          # None = never reported
+    reported_today: bool | None = None      # checklist only
+
+
+class WatchOut(Out):
+    as_of: date
+    days: int | None
+    counts: dict[str, int]
+    items: list[WatchItemOut]

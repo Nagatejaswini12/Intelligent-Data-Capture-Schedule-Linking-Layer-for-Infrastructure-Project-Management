@@ -31,6 +31,8 @@ Rules interpreter: Phase 2 glossary event verbs, `parse_date` / `parse_time`, ta
 
 Only for fields the event cannot be recorded without: activity (resend with the line/equipment/area), status (start/finish/progress), date, discipline (also taken from the request's `discipline`, the supervisor's own discipline). Stateless: the client resends the same message with `answers: {date, discipline}`. A vague but identifiable report ("Foundation works in Area-3") is recorded and left to the linker, which sends it to review.
 
+**Checklist turn.** "What should I report today?" (or "checklist") returns the supervisor's expected-active activities for their discipline and which were already reported today (status `checklist`, nothing stored); see the silent-activity watch in the [phase plan](../plan/PHASE_PLAN.md).
+
 ## Linking result
 
 | Linker decision | Reply |

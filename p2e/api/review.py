@@ -19,6 +19,7 @@ from p2e.api.links import Planner, detail_out, link_or_404
 from p2e.api.routes import NOT_FOUND, SessionDep, project_or_404
 from p2e.db.models import AuditLog, EventLink, LinkCandidate, PlanNode, Project
 from p2e.decide import apply as engine
+from p2e.decide import watch
 from p2e.link import service as linking
 from p2e.plan import exporters
 
@@ -212,6 +213,32 @@ def stream(project_code: str, request: Request, session: SessionDep, _: AnyRole,
                 idle = 0.0
                 yield ": keep-alive\n\n"
     return StreamingResponse(events(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"})
+
+
+def watch_out(as_of: date, days: int | None, items: list[dict]) -> s.WatchOut:
+    counts: dict[str, int] = {}
+    for i in items:
+        counts[i["expectation"]] = counts.get(i["expectation"], 0) + 1
+    return s.WatchOut(as_of=as_of, days=days, counts=counts, items=[s.WatchItemOut(**i) for i in items])
+
+
+@router.get("/watch/silent", response_model=s.WatchOut, responses={**AUTH, **NOT_FOUND})
+def silent_activities(project_code: str, session: SessionDep, _: AnyRole, as_of: date | None = None,
+                      days: Annotated[int, Query(ge=1, le=60)] = watch.WATCH_DAYS, discipline: s.Discipline | None = None,
+                      area: Annotated[str | None, Query(max_length=32)] = None):
+    """Activities the plan expects to be active that no field report mentioned in the last `days` days (or ever)."""
+    project = project_or_404(session, project_code)
+    as_of = as_of or today(project)
+    return watch_out(as_of, days, watch.silent_activities(session, project, as_of, days, discipline, area))
+
+
+@router.get("/watch/checklist", response_model=s.WatchOut, responses={**AUTH, **NOT_FOUND})
+def report_checklist(project_code: str, discipline: s.Discipline, session: SessionDep, _: AnyRole, as_of: date | None = None,
+                     area: Annotated[str | None, Query(max_length=32)] = None):
+    """A supervisor's daily list: expected-active activities of one discipline (and area) and whether reported today."""
+    project = project_or_404(session, project_code)
+    as_of = as_of or today(project)
+    return watch_out(as_of, None, watch.checklist(session, project, as_of, discipline, area))
 
 
 @router.get("/export/schedule.csv", responses={**AUTH, **NOT_FOUND, 200: {"content": {"text/csv": {}}}})

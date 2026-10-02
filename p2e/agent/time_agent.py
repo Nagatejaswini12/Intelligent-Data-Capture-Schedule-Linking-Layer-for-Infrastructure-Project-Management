@@ -29,6 +29,7 @@ from p2e.extract.pipeline import load_project_vocab, validate_item
 from p2e.extract.rules import Vocabulary, extract_area, extract_tags, parse_date, parse_time
 from p2e.ingest import service as ingest
 from p2e.link import service as linking
+from p2e.decide import watch
 from p2e.link.context import ProjectContext, get_context
 
 AGENT_EXTRACTOR = "time-agent"
@@ -45,6 +46,7 @@ DATE_RE = re.compile(r"\b(?:on\s+)?(\d{4}-\d{2}-\d{2}|\d{1,2}[/.]\d{1,2}(?:[/.]\
                      r"|\d{1,2}(?:st|nd|rd|th)?[- ][a-z]{3,4}(?:[- ]\d{2,4})?|[a-z]{3,4} \d{1,2},? \d{4})\b")
 REL_RE = re.compile(r"\b(today|yesterday|yday)\b")
 QTY_RE = re.compile(r"\b(\d+(?:\.\d+)?)\s*(" + "|".join(sorted(UNITS, key=len, reverse=True)) + r")\b")
+CHECKLIST_RE = re.compile(r"^\s*(?:checklist|what (?:should|do|must) i report(?: today)?)\s*\??\s*$", re.IGNORECASE)
 EDGE_WORDS = {"on", "at", "for", "of", "in", "and", "the", "is", "was", "has", "been", "from", "by"}
 
 
@@ -256,6 +258,8 @@ def handle(session: Session, project: Project, message: str, ref: datetime, role
     """One supervisor turn. Returns {status, reply, question, interpretation, event_id, document_id, link_event_id}.
     status: needs_clarification | rejected (nothing stored) | recorded | duplicate."""
     answers = {k: v for k, v in (answers or {}).items() if v}
+    if CHECKLIST_RE.match(message):                     # "what should I report today?" -> silent-activity checklist
+        return checklist_reply(session, project, ref, discipline or answers.get("discipline"))
     ctx = get_context(session, project, glossary_path)
     raw, note = interpret_llm(llm, ctx, message) if llm is not None else (None, None)
     raw = raw or interpret_rules(message, load_project_vocab(glossary_path).vocab)
@@ -296,6 +300,20 @@ def handle(session: Session, project: Project, message: str, ref: datetime, role
     linking.link_events(session, project, glossary_path, event_ids=[ev.id], llm=llm)    # the existing Phase 3 linker
     link = linking.get_link(session, project, ev.id)
     return out | {"status": "recorded", "reply": reply_for(link), "event_id": ev.id, "document_id": doc.id}
+
+
+def checklist_reply(session: Session, project: Project, ref: datetime, discipline: str | None) -> dict:
+    base = {"interpretation": {}, "event_id": None, "document_id": None}
+    if discipline not in DISCIPLINES:
+        q = "Which discipline is this (civil, piping, electrical, instrumentation, hse)?"
+        return base | {"status": "needs_clarification", "reply": q, "question": q}
+    items = watch.checklist(session, project, ref.date(), discipline)
+    done = sum(i["reported_today"] for i in items)
+    reply = (f"{len(items)} {discipline} activities are expected to be active today; {done} already reported."
+             + (" Not reported yet: " + "; ".join(f"{i['plan_node_code']} {i['activity_name']}" for i in items if not i["reported_today"])[:600]
+                if done < len(items) else ""))
+    return base | {"status": "checklist", "reply": reply, "question": None,
+                   "checklist": [{k: (v.isoformat() if isinstance(v, date) else v) for k, v in i.items()} for i in items]}
 
 
 def reply_for(link) -> str:
