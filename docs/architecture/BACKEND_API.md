@@ -123,6 +123,22 @@ Optional env: `P2E_LLM_ENDPOINT` (self-hosted text-generation endpoint; non-priv
 
 `POST /api/v1/projects/{code}/agent/messages` (any role) `{message (one line), reference_datetime?, discipline?, answers?: {date, discipline}}` → `AgentReplyOut {status: recorded | duplicate | needs_clarification | rejected, reply, question, interpretation, event_id, document_id, reference_datetime, link (LinkDetailOut)}`. Details: [Time Agent](../ai/TIME_AGENT.md).
 
+## 0e. Phase 5 (review queue, apply, audit, export)
+
+| Method | Path (under `/api/v1/projects/{code}`) | Role | Returns |
+|---|---|---|---|
+| POST | `/apply` `{as_of?, dry_run?}` | any | applied audit entries (or `would_apply`), blocked activities with reasons, unchanged count; idempotent |
+| GET | `/review` (`as_of`, `limit`) | any | pending link decisions (evidence, conflict, top-3 candidates) + activities blocked by a rule; counts |
+| POST | `/review/events/{event_id}/approve` `{plan_node_code?, as_of?}` | planner, admin | confirm the top candidate or another activity (alias memory learns) + apply that activity |
+| POST | `/review/events/{event_id}/new-activity` `{parent_code, code, name, planned_start?, planned_finish?, as_of?}` | planner, admin | create an L5 (under an L4 WBS) / L6 (under a summary) activity, link the report, apply |
+| POST | `/review/activities/{node_code}/override` `{actual_start?, actual_finish?, percent_complete?, evidence_event_ids?, as_of?}` | planner, admin | planner-set actuals (only the fields sent), validated, audited |
+| GET | `/audit` (`plan_node_code`, `action`, paging) | any | audit entries with `undone_by` |
+| POST | `/audit/{id}/undo` | planner, admin | compensating entry; 409 if already undone or the values changed since |
+| GET | `/stream` (`limit`, `interval`) | any | `text/event-stream`: `update` events with a state snapshot whenever it changes |
+| GET | `/export/schedule.csv`, `/export/schedule.xml` (`status_date`) | any | schedule with current actuals, importable by the Phase 1 importer / MS Project (Activity ID in Text1) |
+
+Rules and evaluation: [Phase plan, Phase 5](../plan/PHASE_PLAN.md). Reject stays `POST /links/{event_id}/reject`.
+
 ## 1. Stack
 
 | Layer | Choice | Status |

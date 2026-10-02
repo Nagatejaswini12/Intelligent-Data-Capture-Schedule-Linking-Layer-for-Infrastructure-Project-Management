@@ -29,9 +29,12 @@ def init_db(engine: Engine) -> None:
         raise SchemaOutdated("database was created before Phase 2 (missing source_document.status); rebuild it with "
                              "scripts/phase1/init_database.py --rebuild")
     Base.metadata.create_all(engine)
-    if "conflict" not in {c["name"] for c in inspect(engine).get_columns("event_link")}:
-        with engine.begin() as conn:    # Phase 3.1 additive, nullable column: existing Phase 3 databases keep their decisions
-            conn.execute(text("ALTER TABLE event_link ADD COLUMN conflict JSON"))
+    insp = inspect(engine)
+    for table, column, ddl in (("event_link", "conflict", "JSON"),          # Phase 3.1
+                               ("plan_node", "percent_complete", "FLOAT")):  # Phase 5
+        if column not in {c["name"] for c in insp.get_columns(table)}:
+            with engine.begin() as conn:    # additive, nullable: existing databases keep all their data
+                conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {ddl}"))
 
 
 def make_sessionmaker(engine: Engine) -> sessionmaker[Session]:

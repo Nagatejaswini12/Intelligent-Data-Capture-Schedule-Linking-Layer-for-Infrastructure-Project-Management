@@ -1,5 +1,6 @@
 """Phase 1 schema: project, schedule import provenance, the L1–L6 plan tree, tags and logic links.
 Phase 2: extraction runs, progress events, extraction issues. Phase 3: event links, link candidates, alias memory (MAG).
+Phase 5: append-only audit log of schedule changes (apply / override / undo / new activity), plan_node.percent_complete.
 
 Portable SQLAlchemy types only, so the same models run on SQLite (prototype) and PostgreSQL (production).
 Database constraints mirror the importer's validation so bad data cannot get in by another path.
@@ -8,7 +9,7 @@ from __future__ import annotations
 
 from datetime import date, datetime, timezone
 
-from sqlalchemy import JSON, CheckConstraint, Date, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint
+from sqlalchemy import JSON, CheckConstraint, Date, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint, event
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 DISCIPLINES = ("civil", "piping", "static_eq", "rotating_eq", "electrical", "instrumentation", "hse", "other")
@@ -108,6 +109,7 @@ class PlanNode(Timestamps, Base):
     qty_unit: Mapped[str | None] = mapped_column(String(32))
     actual_start: Mapped[date | None] = mapped_column(Date)    # as imported; only the Phase 5 apply engine changes these
     actual_finish: Mapped[date | None] = mapped_column(Date)
+    percent_complete: Mapped[float | None] = mapped_column(Float)   # Phase 5 apply engine (None = not known)
 
     parent: Mapped[PlanNode | None] = relationship(remote_side=[id], back_populates="children")
     children: Mapped[list[PlanNode]] = relationship(back_populates="parent", order_by="PlanNode.seq")
@@ -312,3 +314,35 @@ class Alias(Base):
 
     node: Mapped[PlanNode] = relationship()
     source_event: Mapped[ProgressEvent] = relationship()
+
+
+# ----------------------------------------------------------------------------- Phase 5: schedule write-back audit
+
+AUDIT_ACTIONS = ("apply", "override", "undo", "create_activity")
+
+
+class AuditLog(Base):
+    """Append-only record of every schedule change. Undo is a new, compensating entry (`reverts_id`); rows are never edited."""
+    __tablename__ = "audit_log"
+    __table_args__ = (CheckConstraint(_in("action", AUDIT_ACTIONS)), UniqueConstraint("reverts_id"),
+                      Index("ix_audit_node", "project_id", "plan_node_id"))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    project_id: Mapped[int] = mapped_column(ForeignKey("project.id"))
+    plan_node_id: Mapped[int] = mapped_column(ForeignKey("plan_node.id"))
+    action: Mapped[str] = mapped_column(String(16))
+    changes: Mapped[dict] = mapped_column(JSON)                  # {field: [before, after]} (ISO dates / numbers / null)
+    actor: Mapped[str] = mapped_column(String(64))               # human:<role> | process:<id>
+    rule: Mapped[str] = mapped_column(String(64))                # auto_evidence | planner_evidence | mixed_evidence | planner_override | undo | new_activity
+    confidence: Mapped[float | None] = mapped_column(Float)      # lowest link confidence of the evidence
+    evidence_event_ids: Mapped[list] = mapped_column(JSON, default=list)
+    warnings: Mapped[list] = mapped_column(JSON, default=list)
+    reverts_id: Mapped[int | None] = mapped_column(ForeignKey("audit_log.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    node: Mapped[PlanNode] = relationship()
+
+
+@event.listens_for(AuditLog, "before_update")
+@event.listens_for(AuditLog, "before_delete")
+def _append_only(mapper, connection, target):
+    raise ValueError("audit_log is append-only; write a compensating entry instead")

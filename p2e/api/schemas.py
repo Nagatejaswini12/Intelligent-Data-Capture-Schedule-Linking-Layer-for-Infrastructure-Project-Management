@@ -382,3 +382,88 @@ class AgentReplyOut(Out):
     document_id: int | None
     reference_datetime: datetime
     link: LinkDetailOut | None
+
+
+# ----------------------------------------------------------------------------- Phase 5: review queue, apply, audit
+
+class AuditOut(Out):
+    id: int
+    plan_node_code: str
+    action: Literal["apply", "override", "undo", "create_activity"]
+    changes: dict
+    actor: str
+    rule: str
+    confidence: float | None
+    evidence_event_ids: list[int]
+    warnings: list[str]
+    reverts_id: int | None
+    undone_by: int | None
+    created_at: datetime
+
+
+class ProposalOut(Out):
+    plan_node_code: str
+    activity_name: str
+    proposed: dict
+    changes: dict
+    evidence_event_ids: list[int]
+    confidence: float | None
+    basis: Literal["auto", "planner", "mixed"]
+    blockers: list[str]
+    warnings: list[str]
+
+
+class ApplyIn(BaseModel):
+    as_of: date | None = Field(None, description="latest allowed actual date; default: today in the project timezone")
+    dry_run: bool = False
+
+
+class ApplyOut(Out):
+    as_of: date
+    dry_run: bool
+    applied: list[AuditOut]
+    would_apply: list[ProposalOut]
+    blocked: list[ProposalOut]
+    unchanged: int
+
+
+class ReviewQueueOut(Out):
+    as_of: date
+    counts: dict[str, int]
+    events: list[LinkDetailOut]          # pending link decisions, top-3 candidates
+    activities: list[ProposalOut]        # activities whose evidence cannot be applied automatically
+
+
+class ApproveIn(BaseModel):
+    plan_node_code: str | None = Field(None, max_length=64, description="omit = the top candidate")
+    as_of: date | None = None
+
+
+class ApproveOut(Out):
+    link: LinkDetailOut
+    learned: list[dict]
+    apply: ApplyOut
+
+
+class NewActivityIn(BaseModel):
+    parent_code: str = Field(min_length=1, max_length=128, description="L4 WBS node (or L5 summary) to create the activity under")
+    code: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+    name: str = Field(min_length=1, max_length=512)
+    planned_start: date | None = None
+    planned_finish: date | None = None
+    as_of: date | None = None
+
+
+class OverrideIn(BaseModel):
+    actual_start: date | None = None
+    actual_finish: date | None = None
+    percent_complete: float | None = Field(None, ge=0, le=100)
+    evidence_event_ids: list[int] = Field(default_factory=list, max_length=1000)
+    as_of: date | None = None
+
+
+class AuditPage(Out):
+    items: list[AuditOut]
+    total: int
+    limit: int
+    offset: int

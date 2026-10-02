@@ -1,0 +1,41 @@
+{
+  "as_of": "2026-09-16",
+  "applied_activities": 63,
+  "applied_fields": {
+    "actual_start": 48,
+    "actual_finish": 31,
+    "percent_complete": 45
+  },
+  "blocked_activities": 23,
+  "blocked_by_rule": {
+    "finish reported without any known actual start": 13,
+    "actual start not reported": 11
+  },
+  "unchanged": 4,
+  "applied_vs_truth": {
+    "actual_start": {
+      "exact": 48
+    },
+    "actual_finish": {
+      "exact": 31
+    }
+  },
+  "applied_not_matching_truth": [],
+  "truth_actuals_in_window_not_applied": {
+    "actual_start": 41,
+    "actual_finish": 41
+  },
+  "warnings": {
+    "predecessor": 16
+  },
+  "exit_gate": {
+    "audit_entries": 63,
+    "audit_complete": true,
+    "undo_restored_state": true,
+    "undone_changes_reapplied": 0
+  },
+  "export_round_trip": {
+    "csv": true,
+    "xml": true
+  }
+}

@@ -196,6 +196,12 @@ Phase 0 ─► 1 ─► 2 ─► 3 ─┬─► 5 ─► 7 ─► 8
 ## Phase 5: Review queue, schedule write-back & audit
 
 **Purpose.** Make automation trustworthy: humans resolve uncertainty, every change is traceable, and actuals flow to the schedule in near real time.
+> **Status: backend done (2026-10-02).** `p2e/decide/apply.py` (rules + apply + override + undo + new activity), `audit_log` (append-only), `plan_node.percent_complete`, `p2e/api/review.py` (apply, review queue, approve / choose another / new activity / override, audit + undo, SSE stream, CSV + MSPDI export), `p2e/plan/exporters.py`, CLI `scripts/phase5/apply_actuals.py`, evaluation `scripts/phase5/evaluate_apply.py`, 17 tests. Synthetic run (as of 2026-09-16): 63 activities updated, **every applied date equals the ground truth** (48/48 starts, 31/31 finishes), 23 activities held for review with reasons; exit gate passes (audit present, undo restores the exact state, undone changes not re-applied); CSV and MSPDI exports re-import through the Phase 1 importer with identical actuals.
+>
+> **Delivered vs plan.** Calibrated `T_auto`/`T_review` stay with Phase 7 (apply uses the linker's gates). "Merge duplicates" is covered by the rules instead of a separate action: dates use the earliest start / latest finish across reports and percent uses the largest single-source quantity, so a fact reported twice is never counted twice. A start is applied only when it was reported explicitly (progress alone only proves the work had begun; 7/11 such inferred starts were wrong). Not done: React review/schedule pages (frontend scope), "propose" values for conflicts beyond the review listing (the planner sets them by override).
+>
+> Run: `scripts\phase5\apply_actuals.py [--dry-run] [--export DIR]`, `scripts\phase5\evaluate_apply.py`, `pytest`.
+
 
 **Features**
 - Decision engine: thresholds `T_auto` and `T_review` (calibrated in Phase 7), validation rules (AF ≥ AS, no future dates, no finish before start, predecessor-logic warning, conflict with an existing actual).
