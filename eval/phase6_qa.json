@@ -1,0 +1,169 @@
+{
+  "passed": 10,
+  "total": 10,
+  "results": [
+    {
+      "question": "How many civil activities were completed by 2026-08-31?",
+      "intent": "count",
+      "passed": true,
+      "detail": "ok",
+      "answer": "68 completed as of 2026-08-31 (completed 68, in progress 5, not started 15).",
+      "citations": 68,
+      "expected": {
+        "count": 68
+      }
+    },
+    {
+      "question": "Which piping activities started late by 2026-08-31?",
+      "intent": "late",
+      "passed": true,
+      "detail": "ok",
+      "answer": "9 started late as of 2026-08-31; largest: PIP-A3-PS2-FAB (+10 d), PIP-A1-PS1-PSE (+4 d), PIP-A3-PS3-PSE (+4 d), PIP-A3-PS3-FAB (+2 d), PIP-A3-1217-ERC (+1 d).",
+      "citations": 9,
+      "expected": {
+        "started_late": [
+          "PIP-A1-PS1-PSE",
+          "PIP-A3-1217-ERC",
+          "PIP-A3-1217-WLD",
+          "PIP-A3-PS2-FAB",
+          "PIP-A3-PS3-FAB",
+          "PIP-A3-PS3-PSE",
+          "PIP-A4-1407-ERC",
+          "PIP-A4-1407-WLD",
+          "PIP-A4-PS4-PSE"
+        ]
+      }
+    },
+    {
+      "question": "Which civil activities in Area 3 finished late by 2026-08-31?",
+      "intent": "late",
+      "passed": true,
+      "detail": "ok",
+      "answer": "26 finished late as of 2026-08-31; largest: CIV-A3-PR3-FTG (+12 d), CIV-A3-E101-BKF (+11 d), CIV-A3-E101-REB (+9 d), CIV-A3-E101-RCC (+9 d), CIV-A3-P101B-RCC (+6 d).",
+      "citations": 26,
+      "expected": {
+        "finished_late": [
+          "CIV-A3-E101-BKF",
+          "CIV-A3-E101-EXC",
+          "CIV-A3-E101-PCC",
+          "CIV-A3-E101-RCC",
+          "CIV-A3-E101-REB",
+          "CIV-A3-P101A-BKF",
+          "CIV-A3-P101A-EXC",
+          "CIV-A3-P101A-PCC",
+          "CIV-A3-P101A-RCC",
+          "CIV-A3-P101A-REB",
+          "CIV-A3-P101B-BKF",
+          "CIV-A3-P101B-EXC",
+          "CIV-A3-P101B-PCC",
+          "CIV-A3-P101B-RCC",
+          "CIV-A3-P101B-REB",
+          "CIV-A3-P102A-EXC",
+          "CIV-A3-P102A-PCC",
+          "CIV-A3-P102A-RCC",
+          "CIV-A3-P102A-REB",
+          "CIV-A3-P102B-PCC",
+          "CIV-A3-P102B-RCC",
+          "CIV-A3-P102B-REB",
+          "CIV-A3-PR2-FTG",
+          "CIV-A3-PR2-PED",
+          "CIV-A3-PR2-STL",
+          "CIV-A3-PR3-FTG"
+        ]
+      }
+    },
+    {
+      "question": "How long did backfilling take by 2026-08-31?",
+      "intent": "duration",
+      "passed": true,
+      "detail": "ok",
+      "answer": "8 completed activities took 3.38 days on average (range 3-5) against 3.0 days planned, as of 2026-08-31.",
+      "citations": 8,
+      "expected": {
+        "n": 8,
+        "mean_actual_days": 3.38,
+        "mean_planned_days": 3.0
+      }
+    },
+    {
+      "question": "How many instrumentation activities were in progress on 2026-08-31?",
+      "intent": "count",
+      "passed": true,
+      "detail": "ok",
+      "answer": "3 in progress as of 2026-08-31 (completed 5, in progress 3, not started 40).",
+      "citations": 3,
+      "expected": {
+        "count": 3
+      }
+    },
+    {
+      "question": "What was the status of P-101A excavation on 2026-08-31?",
+      "intent": "status",
+      "passed": true,
+      "detail": "ok",
+      "answer": "As of 2026-08-31: CIV-A3-P101A-EXC: completed, started 2026-07-24, finished 2026-07-27.",
+      "citations": 1,
+      "expected": {
+        "CIV-A3-P101A-EXC": "completed"
+      }
+    },
+    {
+      "question": "What delayed electrical cable pulling in Area 3?",
+      "intent": "delays",
+      "passed": true,
+      "detail": "ok",
+      "answer": "1 hold reports: material 1x (cable drums not received).",
+      "citations": 1,
+      "expected": {
+        "by_category": {
+          "material": 1
+        }
+      }
+    },
+    {
+      "question": "What delayed piping work?",
+      "intent": "delays",
+      "passed": true,
+      "detail": "ok",
+      "answer": "3 hold reports: material 2x (bolts short supply, spools not delivered from fab shop); design 1x (clash with cable tray, RFI raised).",
+      "citations": 3,
+      "expected": {
+        "by_category": {
+          "design": 1,
+          "material": 2
+        }
+      }
+    },
+    {
+      "question": "Why was HT-SWBD-1 installation held up?",
+      "intent": "delays",
+      "passed": true,
+      "detail": "ok",
+      "answer": "1 hold reports: design 1x (drawing revision awaited).",
+      "citations": 1,
+      "expected": {
+        "by_category": {
+          "design": 1
+        }
+      }
+    },
+    {
+      "question": "When did each discipline last report by 2026-09-10?",
+      "intent": "freshness",
+      "passed": true,
+      "detail": "ok",
+      "answer": "As of 2026-09-10: civil last reported 2026-09-10 (0 d ago); electrical last reported 2026-09-10 (0 d ago); hse last reported 2026-09-10 (0 d ago); instrumentation last reported 2026-09-10 (0 d ago); mechanical last reported 2026-09-10 (0 d ago); piping last reported 2026-09-10 (0 d ago). 60 activities expected to be active have no report in 3 days.",
+      "citations": 6,
+      "expected": {
+        "last_report": {
+          "civil": "2026-09-10",
+          "electrical": "2026-09-10",
+          "hse": "2026-09-10",
+          "instrumentation": "2026-09-10",
+          "mechanical": "2026-09-10",
+          "piping": "2026-09-10"
+        }
+      }
+    }
+  ]
+}

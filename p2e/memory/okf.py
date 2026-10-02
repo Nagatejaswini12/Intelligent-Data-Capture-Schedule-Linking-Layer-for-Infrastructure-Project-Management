@@ -31,6 +31,7 @@ from p2e import __version__
 from p2e.db.models import Alias, PlanNode, Project, SourceDocument
 from p2e.link.context import RULES_PATH, ProjectContext
 from p2e.link.decide import LINKER_VERSION, WEIGHTS
+from p2e.memory import knowledge
 
 OKF_VERSION = "0.2"
 PRODUCER = f"p2e-okf-export/{__version__}"
@@ -133,6 +134,19 @@ def build_bundle(session: Session, project: Project, ctx: ProjectContext, now: d
             f"| Confirmations | {a.confirmations} |\n| Used in automatic matches | {a.use_count} |\n| Created | {_ts(a.created_at)} |\n\n"
             "[^event]: confirmed report text\n")
         alias_index.append(f"* [{a.phrase}](/{path}) - {desc}")
+    know_index = []
+    for k in knowledge.entries(session, project, now.date()):         # Phase 6: institutional knowledge
+        path = f"knowledge/{k['id']}.md"
+        refs = [{"id": f"r{i}", "resource": f"p2e://projects/{project.code}/{'activities' if c['kind'] == 'activity' else 'events'}/{c['id']}",
+                 "title": c["text"][:200]} for i, c in enumerate(k["citations"], 1)]
+        table = "\n".join(f"| {c['id']} | {c['text']} | {c.get('date') or '-'} |" for c in k["citations"])
+        files[path] = _doc(
+            {"type": "Knowledge Entry", "title": k["title"], "description": k["text"], "tags": ["knowledge", k["kind"]],
+             "generated": gen, "sources": refs, "values": k["values"]},
+            f"# Finding\n\n{k['text']}\n\n# Evidence\n\n| Record | Text | Date |\n|---|---|---|\n{table}\n")
+        know_index.append(f"* [{k['title']}](/{path}) - {k['text']}")
+    if know_index:
+        files["knowledge/index.md"] = "# Institutional knowledge\n\n" + "\n".join(know_index) + "\n"
     files["aliases/index.md"] = "# Confirmed aliases (MAG)\n\n" + ("\n".join(alias_index) if alias_index else "* (none confirmed yet)") + "\n"
     files["schedule/index.md"] = "# Schedule activity families\n\n" + "\n".join(sched_index) + "\n"
     files["index.md"] = _doc({"okf_version": OKF_VERSION}, (
@@ -140,7 +154,8 @@ def build_bundle(session: Session, project: Project, ctx: ProjectContext, now: d
         "* [Glossary](/project/glossary.md) - How site reports abbreviate work.\n"
         "* [Matching rules](/project/matching-rules.md) - What the linker applies.\n\n"
         "# Knowledge\n\n* [Schedule activity families](schedule/) - One concept per activity type.\n"
-        "* [Confirmed aliases](aliases/) - Field wording learned from planner confirmations.\n"))
+        "* [Confirmed aliases](aliases/) - Field wording learned from planner confirmations.\n"
+        "* [Institutional knowledge](knowledge/) - Actual durations and delay patterns from the project history.\n"))
     log = defaultdict(list)
     log[now.date().isoformat()].append(f"* **Update**: Exported by {PRODUCER} (context `{ctx.version}`, {len(aliases)} aliases).")
     for a in aliases:

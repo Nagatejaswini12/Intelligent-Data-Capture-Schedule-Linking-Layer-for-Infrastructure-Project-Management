@@ -141,6 +141,17 @@ Optional env: `P2E_LLM_ENDPOINT` (self-hosted text-generation endpoint; non-priv
 
 Rules and evaluation: [Phase plan, Phase 5](../plan/PHASE_PLAN.md). Reject stays `POST /links/{event_id}/reject`.
 
+## 0f. Phase 6 (analytics & institutional memory; read-only, any role)
+
+| Method | Path (under `/api/v1/projects/{code}`) | Returns |
+|---|---|---|
+| GET | `/analytics/dashboard` (`as_of`) | plan vs actual by discipline / area (completed, in progress, not started, started / finished late, due not started), last DPR per discipline, silent activities, review backlog |
+| GET | `/analytics/dataset.csv` (`as_of`) | actual-progress dataset, one row per activity: planned vs actual dates, durations, ratio, variances, status, percent, reported quantity, reports, sources, last report, delay categories |
+| GET | `/analytics/productivity` (`as_of`) | actual / planned duration per activity type; reported quantity per day per type and unit (most complete single source) |
+| GET | `/analytics/delays` (`as_of`) | hold reports by category, discipline and area; recurring causes; each report with its source text |
+| GET | `/knowledge` (`as_of`) | knowledge entries (activity-type durations, delay patterns) with citations |
+| POST | `/memory/ask` `{question, as_of?}` | `{intent, filters, answer, values, citations}`; every answer cites activities / reports / documents; an unidentified subject or no matching record gives no answer rather than a guess |
+
 ## 1. Stack
 
 | Layer | Choice | Status |

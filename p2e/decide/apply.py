@@ -59,7 +59,7 @@ def _value(f: str, v):
     return date.fromisoformat(v) if v is not None and f != "percent_complete" else v
 
 
-def _accepted(session: Session, project: Project, node_ids) -> dict[int, list[EventLink]]:
+def accepted_links(session: Session, project: Project, node_ids) -> dict[int, list[EventLink]]:
     stmt = (select(EventLink).options(selectinload(EventLink.event).selectinload(ProgressEvent.document))
             .where(EventLink.project_id == project.id, EventLink.decision == "matched", EventLink.plan_node_id.is_not(None),
                    EventLink.state.in_(("auto", "confirmed"))).order_by(EventLink.progress_event_id))
@@ -86,7 +86,7 @@ def json_key(v):
 
 
 def propose(session: Session, project: Project, as_of: date, node_ids=None) -> list[Proposal]:
-    groups = _accepted(session, project, node_ids)
+    groups = accepted_links(session, project, node_ids)
     nodes = {n.id: n for n in session.scalars(select(PlanNode).options(
         selectinload(PlanNode.predecessors).selectinload(PlanDependency.predecessor)).where(PlanNode.id.in_(list(groups))))}
     undone = _undone(session, project)

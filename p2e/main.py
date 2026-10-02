@@ -11,6 +11,7 @@ from starlette.status import HTTP_422_UNPROCESSABLE_CONTENT
 
 from p2e import __version__
 from p2e.api.agent import router as agent_router
+from p2e.api.analytics import router as analytics_router
 from p2e.api.auth import parse_api_keys
 from p2e.api.documents import router as documents_router
 from p2e.api.links import router as links_router
@@ -43,6 +44,7 @@ def create_app(db_url: str | None = None, *, api_keys: dict[str, str] | None = N
     app.include_router(links_router)
     app.include_router(agent_router)
     app.include_router(review_router)
+    app.include_router(analytics_router)
 
     @app.exception_handler(StarletteHTTPException)
     async def http_problem(_: Request, exc: StarletteHTTPException):

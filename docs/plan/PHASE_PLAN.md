@@ -232,6 +232,12 @@ Phase 0 ─► 1 ─► 2 ─► 3 ─┬─► 5 ─► 7 ─► 8
 ## Phase 6: Analytics & institutional memory
 
 **Purpose.** Deliver the PS's second purpose: the clean dataset becomes insight now and memory later.
+> **Status: backend done (2026-10-02).** `p2e/analytics/metrics.py` (actual-progress dataset, dashboard, productivity, quantity rates, delay events), `p2e/analytics/qa.py` (memory Q&A), `p2e/memory/knowledge.py` (knowledge entries), OKF bundle extended with `knowledge/` concepts, `p2e/api/analytics.py` (6 endpoints), benchmark `scripts\phase6\evaluate_qa.py`, 15 tests. **Exit gate: 10/10 benchmark questions answered correctly with citations**, expected answers computed independently from the ground-truth files.
+>
+> **Delivered vs plan.** Q&A uses a deterministic intent classifier over fixed query templates (duration, delays, rate, late, count, status, freshness) plus cited IDF retrieval over knowledge entries and hold reports for everything else; no LLM or embeddings (no on-premise model chosen; no free-form SQL). Delay mining aggregates the Phase 2 taxonomy (glossary reasons → material / manpower / weather / permit / design / equipment); an LLM categoriser for free remarks is not needed by the synthetic data and is not built. Knowledge entries are computed on demand (no `knowledge_entry` table). Dataset export is CSV only (Parquet would add pyarrow). Not done: React dashboard / memory pages (frontend scope).
+>
+> Run: `scripts\phase6\evaluate_qa.py`, `scripts\phase3\link_events.py --okf exports\okf`, `pytest`.
+
 
 **Features**
 - Dashboard: plan vs actual by discipline/area, activities started/finished late, data freshness per discipline (who has not reported), review backlog.
