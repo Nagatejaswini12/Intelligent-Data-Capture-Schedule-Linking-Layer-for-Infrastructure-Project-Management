@@ -45,6 +45,48 @@ Phase 1 is read-only, so there is no auth yet. Role API keys arrive with the fir
 .venv\Scripts\python -m uvicorn p2e.main:app --port 8000            # API; interactive docs at http://localhost:8000/docs
 ```
 
+## 0b. Implemented in Phase 2 (ingestion & extraction)
+
+```
+p2e/ingest/service.py   upload checks (type, size, UTF-8, xlsx zip/macro/zip-bomb checks), content-addressed raw store,
+                        SHA-256 dedupe, process_document (extract → validate → persist, idempotent), process_batch, evidence
+p2e/extract/dpr.py      deterministic DPR grammar (structured + informal layouts, multi-item lines, relative dates)
+p2e/extract/xlsx.py     header synonyms → template (spool tracker | cable log | instrument register) → one event per fact
+p2e/extract/rules.py    normalization: dates, times, canonical tags, area; vocabulary from the project glossary
+p2e/extract/pipeline.py extractor dispatch + validate_item (rules an event must pass to be `valid`)
+p2e/api/auth.py         role API keys (X-API-Key, from P2E_API_KEYS; fail closed with 503 if unset)
+p2e/api/documents.py    Phase 2 routes
+scripts/phase2/ingest_documents.py     batch ingest + process files/folders (default: the 84 synthetic documents)
+scripts/phase2/evaluate_extraction.py  evaluation vs ground truth → eval/phase2_extraction.json
+```
+
+All Phase 2 routes need `X-API-Key` (any role: supervisor, planner, admin). Phase 1 routes stay public and unchanged.
+
+| Method | Path (under `/api/v1/projects/{code}`) | Returns |
+|---|---|---|
+| POST | `/documents` (multipart `file`) | `DocumentOut` 201, status `received`; 409 duplicate (with `existing_document_id`), 413, 415, 422 |
+| GET | `/documents` | `DocumentPage`; filters `kind`, `status`, `limit`, `offset` |
+| GET | `/documents/{id}` | `DocumentOut` with `latest_run` |
+| POST | `/documents/{id}/process` | `ProcessOut` `processed`\|`unchanged`\|`failed` (same parser version never re-creates events) |
+| POST | `/documents/process` | batch: optional body `{"document_ids": [...]}` (≤ 1000; omitted = all reports/sheets); per-document outcome (`processed`, `unchanged`, `failed`, `rejected`, `not_found`) + counts; each document committed separately |
+| GET | `/documents/{id}/status` | status, error, run count, latest run, extraction issues |
+| GET | `/events` | `EventPage`; filters `document_id`, `source_type`, `discipline`, `event_type`, `validation_status`, `date_from`, `date_to`, `limit`, `offset` |
+| GET | `/events/{id}` | `EventOut` (canonical event + validation errors) |
+| GET | `/events/{id}/evidence` | re-reads the stored original (hash-checked): line text, offsets and context lines, or sheet/row/cells with the value in the file; `found_in_source` |
+
+**Tests (104 = 40 Phase 1 + 64 Phase 2):** normalization (dates, times, tags), DPR grammar (multi-item lines, `&` inside activities, relative dates, unknown report date, unparseable lines kept as issues), all 81 synthetic DPRs, the 3 sheets with cell-level evidence, renamed headers, 13 validation rules, 10 rejected upload cases, persistence + evidence for every event, idempotency (duplicate upload, re-process, parser-version bump), tampered store, batch, API (auth 401/503, upload, process, status, filters, pagination, evidence, 404/409/415/422), evaluation gate and ground-truth-gap rules.
+
+**Run**
+
+```
+.venv\Scripts\python -m pip install -r requirements-dev.txt
+.venv\Scripts\python scripts\phase1\init_database.py
+.venv\Scripts\python scripts\phase2\ingest_documents.py         # 84 documents → 433 events (re-run: all 'unchanged')
+.venv\Scripts\python scripts\phase2\evaluate_extraction.py
+.venv\Scripts\python -m pytest
+$env:P2E_API_KEYS = "supervisor:<your key, 16+ chars>"; .venv\Scripts\python -m uvicorn p2e.main:app --port 8000
+```
+
 ## 1. Stack
 
 | Layer | Choice | Status |
@@ -56,7 +98,7 @@ Phase 1 is read-only, so there is no auth yet. Role API keys arrive with the fir
 | Agents | LangGraph + langchain-core | installed |
 | Model access | langchain-huggingface | installed |
 | Matching | rapidfuzz, NumPy | to add |
-| Files | defusedxml (installed, Phase 1); openpyxl, python-multipart | to add (Phase 2) |
+| Files | defusedxml (Phase 1); openpyxl, python-multipart (Phase 2) | installed |
 | Tests | pytest | installed (dev, `requirements-dev.txt`) |
 
 Justification per dependency: [Technology decisions](../decisions/TECHNOLOGY_DECISIONS.md).

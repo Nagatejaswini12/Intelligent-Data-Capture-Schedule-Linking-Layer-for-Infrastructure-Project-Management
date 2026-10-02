@@ -48,6 +48,17 @@ Database constraints mirror importer validation: level 1–6; `activity` only at
 
 **Differences from the design below (decided 2026-10-02, see D30):** integer surrogate primary keys instead of UUIDs; the business key is (`project_id`, `code`). `tags` is a side table rather than a JSON column. `name_norm`, `status`, `percent_complete`, `is_new` and `embedding` are not created yet; they arrive with the phases that compute them.
 
+### 3.0b Implemented in Phase 2 (same file; Phase 1 tables unchanged)
+
+| Table | Purpose | Key columns / constraints |
+|---|---|---|
+| `source_document` (extended) | Also uploaded DPRs and sheets | `kind` schedule_import\|dpr_text\|spreadsheet, `format` csv\|mspdi\|txt\|xlsx, `status` imported\|received\|extracted\|failed, `storage_uri` (`<sha256>.<fmt>` in the upload store), `uploaded_by` (role), `report_date`, `discipline_group`, `error`; (`project_id`, `sha256`) unique → an identical file is never stored twice |
+| `extraction_run` | One extraction pass over one document with one parser version | `extractor`, `parser_version`, `status` succeeded\|failed, event/valid/invalid/issue/non-event-line counts, `error`, `started_at`/`finished_at` |
+| `progress_event` | Canonical progress event (not linked to a plan node yet) | `source_document_id`, `extraction_run_id`, `locator_key` + `source_ref` (`{line,index}` or `{sheet,row,field}`), `source_text` (verbatim), `span_start`/`span_end`, `source_cells` (A1 refs + values), `report_date`, `discipline`, `activity_text`, `event_type` start\|finish\|progress\|hold\|resume, `event_date`, `date_text`, `event_time`, `quantity`/`unit`, `area`, `tags`, `delay_reason`/`delay_category`, `extraction_method`, `parser_version`, `validation_status` valid\|invalid + `validation_errors`; (`source_document_id`, `locator_key`) unique → re-processing never duplicates an event |
+| `extraction_issue` | Item-section text that could not be parsed at all | `extraction_run_id`, `source_ref`, `source_text`, `message` (kept for review, never dropped) |
+
+Actual start/finish are not separate columns: the API exposes `reported_actual_start`/`reported_actual_finish` = `event_date` of `start`/`finish` events. Invalid events are stored with their reasons, never dropped. A database created before Phase 2 is detected (`SchemaOutdated`) and must be rebuilt with `init_database.py --rebuild` until Alembic arrives in Phase 5.
+
 The design below is the full target schema.
 
 

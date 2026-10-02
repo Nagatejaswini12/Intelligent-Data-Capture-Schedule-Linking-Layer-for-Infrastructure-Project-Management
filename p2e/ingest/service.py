@@ -148,7 +148,8 @@ def process_document(session: Session, doc: SourceDocument, upload_dir: Path, pv
     latest = doc.runs[-1] if doc.runs else None
     if latest and latest.status == "succeeded" and latest.parser_version == module.PARSER_VERSION:
         return latest, "unchanged"
-    run = ExtractionRun(source_document_id=doc.id, extractor=module.EXTRACTOR, parser_version=module.PARSER_VERSION, status="failed")
+    # document=doc (not just the id) keeps doc.runs current in this session, so a repeat call sees this run
+    run = ExtractionRun(document=doc, extractor=module.EXTRACTOR, parser_version=module.PARSER_VERSION, status="failed")
     session.add(run)
     try:
         data = read_blob(upload_dir, doc)
@@ -182,6 +183,32 @@ def process_document(session: Session, doc: SourceDocument, upload_dir: Path, pv
     doc.report_date, doc.discipline_group = result.report_date, result.discipline_group
     session.flush()
     return run, "processed"
+
+
+def process_batch(session: Session, project: Project, upload_dir: Path, pv: ProjectVocab,
+                  document_ids: list[int] | None = None) -> list[dict]:
+    """Process many documents, committing after each so one failure never rolls back the others.
+    No ids -> every uploaded report/sheet of the project (already-processed ones come back 'unchanged')."""
+    if document_ids is None:
+        document_ids = list(session.scalars(select(SourceDocument.id).where(
+            SourceDocument.project_id == project.id, SourceDocument.kind.in_(("dpr_text", "spreadsheet"))).order_by(SourceDocument.id)))
+    out = []
+    for doc_id in dict.fromkeys(document_ids):    # de-duplicated, order kept
+        doc = session.scalar(select(SourceDocument).where(SourceDocument.id == doc_id, SourceDocument.project_id == project.id))
+        if doc is None:
+            out.append({"document_id": doc_id, "outcome": "not_found", "run": None, "error": f"document {doc_id} not in project"})
+            continue
+        try:
+            run, outcome = process_document(session, doc, upload_dir, pv)
+            session.commit()
+            out.append({"document_id": doc_id, "outcome": outcome, "run": run, "error": run.error})
+        except IngestError as e:
+            session.rollback()
+            out.append({"document_id": doc_id, "outcome": "rejected", "run": None, "error": e.detail})
+        except Exception as e:     # e.g. a database error: report it for this document, keep the rest of the batch
+            session.rollback()
+            out.append({"document_id": doc_id, "outcome": "failed", "run": None, "error": f"{type(e).__name__}: {e}"})
+    return out
 
 
 def evidence(doc: SourceDocument, ev: ProgressEvent, upload_dir: Path, context: int = 2) -> dict:

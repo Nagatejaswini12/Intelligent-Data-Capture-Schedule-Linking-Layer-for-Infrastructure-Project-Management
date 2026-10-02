@@ -143,7 +143,7 @@
     "time": 21
   },
   "ground_truth_gaps": {
-    "note": "field mismatches caused by incomplete expected_extraction.json, not by the extractor (ground truth left unchanged): `time` is always null there (Phase 0 wrote it under another key; truth times are in truth_events.csv); `area` is omitted although stated in the text or the Loc column; two cable rows' expected cells omit the Pulled? cell",
+    "note": "field mismatches caused by incomplete expected_extraction.json, not by the extractor (ground truth left unchanged). Each one is confirmed by independent evidence, otherwise it counts as an extractor error: `time` is null there but the predicted time equals the truth_events.csv event_time; `area` is null there but the predicted area is written in the source text or the row's Area/Loc cell; two cable rows' expected cells omit the Pulled? cell (the prediction is a superset of the expected evidence)",
     "count": 36,
     "by_field": {
       "area": 13,

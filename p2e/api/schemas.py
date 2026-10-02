@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 NodeType = Literal["wbs", "summary", "activity"]
 Discipline = Literal["civil", "piping", "static_eq", "rotating_eq", "electrical", "instrumentation", "hse", "other"]
@@ -189,6 +189,22 @@ class ProcessOut(Out):
     document_id: int
     outcome: Literal["processed", "unchanged", "failed"]
     run: RunOut
+
+
+class BatchProcessIn(BaseModel):
+    document_ids: list[int] | None = Field(None, max_length=1000, description="omit = every uploaded report/sheet of the project")
+
+
+class BatchItemOut(Out):
+    document_id: int
+    outcome: Literal["processed", "unchanged", "failed", "rejected", "not_found"]
+    run: RunOut | None
+    error: str | None
+
+
+class BatchProcessOut(Out):
+    items: list[BatchItemOut]
+    counts: dict[str, int]
 
 
 class EventOut(Out):

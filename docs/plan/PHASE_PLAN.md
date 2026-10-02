@@ -86,6 +86,12 @@ Phase 0 ─► 1 ─► 2 ─► 3 ─┬─► 5 ─► 7 ─► 8
 
 ## Phase 2: Ingestion & extraction
 
+> **Status: done (2026-10-02).** Upload (`.txt` DPR, `.xlsx`) with type/size/content checks, SHA-256 dedupe and a content-addressed raw store; deterministic DPR and spreadsheet extractors; validation (invalid events kept with reasons); `extraction_run` / `progress_event` / `extraction_issue` tables; authenticated API incl. batch processing and evidence; batch CLI; 104 tests. All 84 synthetic documents → 433 events, 0 issues, every event traced back to its source line/cells. Evaluation (dev / test / all): precision, recall and F1 = 1.000; field exact match ≥ 0.95 raw, 1.000 after 36 ground-truth gaps (each confirmed by independent evidence: truth_events.csv times, area written in the source).
+>
+> **Delivered vs plan.** The extractor is deterministic (grammar + header synonyms + project glossary). The LLM extractor, LLM header fallback and `rapidfuzz` matching are **deferred**: the synthetic data does not need them, and the final model is not chosen yet. These are parser-conformance numbers on synthetic data, not real-world accuracy. Also deferred: `.csv`/image upload (OCR is out of scope), the review screen (frontend), and DPR + sheet evidence merging (Phase 3 linking).
+>
+> Run: `scripts\phase2\ingest_documents.py`, `scripts\phase2\evaluate_extraction.py`, `pytest` (see [Backend](../architecture/BACKEND_API.md) §0b).
+
 **Purpose.** Turn heterogeneous field inputs into one structured, validated event format.
 
 **Features**

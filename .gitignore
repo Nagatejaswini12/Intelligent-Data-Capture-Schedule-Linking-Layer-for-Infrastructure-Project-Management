@@ -2,6 +2,7 @@
 __pycache__/
 .env
 data/*.db
+data/uploads/
 .pytest_cache/
 
 docs.zip

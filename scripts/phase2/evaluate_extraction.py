@@ -11,13 +11,17 @@ from __future__ import annotations
 
 import argparse
 import csv
+import io
 import json
+import re
 import sys
 from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
+
+from openpyxl import load_workbook  # noqa: E402
 
 from p2e.extract.pipeline import extract_bytes, load_project_vocab  # noqa: E402
 
@@ -39,7 +43,11 @@ def predicted_fields(it) -> dict:
 def evaluate(data_dir: Path) -> dict:
     gt = json.loads((data_dir / "ground_truth" / "expected_extraction.json").read_text(encoding="utf-8"))["documents"]
     with open(data_dir / "ground_truth" / "labels.csv", newline="", encoding="utf-8") as f:
-        split_of = {r["item_id"]: r["split"] for r in csv.DictReader(f)}
+        labels = list(csv.DictReader(f))
+    split_of = {r["item_id"]: r["split"] for r in labels}
+    with open(data_dir / "ground_truth" / "truth_events.csv", newline="", encoding="utf-8") as f:
+        event_time = {r["event_key"]: r["event_time"] or None for r in csv.DictReader(f)}
+    truth_time = {r["item_id"]: event_time.get(r["event_key"]) for r in labels}   # independent truth for `time`
     splits = json.loads((data_dir / "ground_truth" / "splits.json").read_text(encoding="utf-8"))
     day_split = {d: "dev" for d in splits["dev_days"]} | {d: "test" for d in splits["test_days"]}
     vocab = load_project_vocab(data_dir / "glossary.json")
@@ -48,7 +56,9 @@ def evaluate(data_dir: Path) -> dict:
     misses: dict[str, list] = {"missing": [], "extra": [], "field": []}
     docs_out = {"report_date_ok": 0, "group_ok": 0, "dpr_docs": 0, "sheets": {}, "noise_line_extractions": 0, "issues": 0}
     for doc in gt:
-        res = extract_bytes((data_dir / doc["path"]).read_bytes(), Path(doc["path"]).suffix.lower(), vocab)
+        raw = (data_dir / doc["path"]).read_bytes()
+        res = extract_bytes(raw, Path(doc["path"]).suffix.lower(), vocab)
+        row_area = sheet_area_cells(raw, doc) if doc["source_type"] != "dpr" else {}
         docs_out["issues"] += len(res.issues)
         pred = {i.locator_key: i for i in res.items}
         exp = {key(i["locator"]): i for i in doc["items"]}
@@ -76,7 +86,8 @@ def evaluate(data_dir: Path) -> dict:
             for f in FIELDS:
                 ev = sorted(e["tags"]) if f == "tags" else e[f]
                 ok = pf[f] == ev
-                gap = not ok and gt_gap(f, ev, pf[f], pf["source_span"], e["source_span"])
+                stated_area = row_area.get(e["locator"].get("row"), "") or e["source_span"]
+                gap = not ok and gt_gap(f, ev, pf[f], pf["source_span"], e["source_span"], truth_time[e["item_id"]], stated_area)
                 for s in (split_of[e["item_id"]], "all"):
                     stats[s]["field_ok"][f] += ok
                     stats[s]["field_gap"][f] += gap
@@ -106,20 +117,34 @@ def evaluate(data_dir: Path) -> dict:
     gaps = [m for m in misses["field"] if m[5] == "gt_gap"]
     report["ground_truth_gaps"] = {
         "note": "field mismatches caused by incomplete expected_extraction.json, not by the extractor (ground truth left "
-                "unchanged): `time` is always null there (Phase 0 wrote it under another key; truth times are in "
-                "truth_events.csv); `area` is omitted although stated in the text or the Loc column; two cable rows' "
-                "expected cells omit the Pulled? cell",
+                "unchanged). Each one is confirmed by independent evidence, otherwise it counts as an extractor error: "
+                "`time` is null there but the predicted time equals the truth_events.csv event_time; `area` is null there "
+                "but the predicted area is written in the source text or the row's Area/Loc cell; two cable rows' expected "
+                "cells omit the Pulled? cell (the prediction is a superset of the expected evidence)",
         "count": len(gaps), "by_field": dict(sorted(_count(m[2] for m in gaps).items()))}
     report["misses"] = {k: [list(map(str, x)) for x in v] for k, v in misses.items()}
     return report
 
 
-def gt_gap(field: str, expected, got, span: str, exp_span: str) -> bool:
-    """Ground truth is null/narrower where the source clearly states the value."""
+def sheet_area_cells(raw: bytes, doc: dict) -> dict[int, str]:
+    """row -> text of the column the ground truth maps to `area` (evidence the area is written in the sheet)."""
+    col = next((h for h, f in doc["column_mapping"].items() if f == "area"), None)
+    if col is None:
+        return {}
+    wb = load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
+    rows = list(wb[doc["sheet"]].iter_rows(values_only=True))
+    wb.close()
+    j = list(rows[doc["header_row"] - 1]).index(col)
+    return {i: str(r[j] or "") for i, r in enumerate(rows, 1) if i > doc["header_row"] and j < len(r)}
+
+
+def gt_gap(field: str, expected, got, span: str, exp_span: str, truth_time: str | None = None, stated_area: str = "") -> bool:
+    """Ground truth is null/narrower where independent evidence confirms the predicted value."""
     if field == "time":
-        return expected is None and got is not None and str(int(got[:2])) in span
+        return expected is None and got is not None and got == truth_time
     if field == "area":
-        return expected is None and got is not None
+        return expected is None and got is not None and bool(
+            re.search(rf"\b(?:area[- ]?|A-?){got[1:]}\b", stated_area, re.IGNORECASE))
     if field == "source_span":
         return set(exp_span.split(" | ")) < set(span.split(" | "))
     return False

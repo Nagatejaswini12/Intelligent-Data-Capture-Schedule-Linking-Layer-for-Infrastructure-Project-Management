@@ -1,6 +1,7 @@
 """Phase 2 routes: authenticated ingestion + processing; document / event / evidence reads (any valid role)."""
 from __future__ import annotations
 
+from collections import Counter
 from datetime import date
 from typing import Annotated
 
@@ -108,6 +109,16 @@ def process_document(project_code: str, document_id: int, request: Request, sess
         raise ingest_error(e) from None
     session.commit()
     return s.ProcessOut(document_id=doc.id, outcome=outcome, run=run_out(run))
+
+
+@router.post("/documents/process", response_model=s.BatchProcessOut, responses={**AUTH, **NOT_FOUND, 422: P})
+def process_documents(project_code: str, request: Request, session: SessionDep, _: Uploader, body: s.BatchProcessIn | None = None):
+    """Batch processing. Each document is committed on its own and reported with its outcome; idempotent like the single call."""
+    project = project_or_404(session, project_code)
+    items = service.process_batch(session, project, request.app.state.upload_dir, request.app.state.vocab,
+                                  body.document_ids if body else None)
+    out = [s.BatchItemOut(document_id=i["document_id"], outcome=i["outcome"], run=run_out(i["run"]), error=i["error"]) for i in items]
+    return s.BatchProcessOut(items=out, counts=dict(Counter(i.outcome for i in out)))
 
 
 @router.get("/documents/{document_id}/status", response_model=s.DocumentStatusOut, responses={**AUTH, **NOT_FOUND})
