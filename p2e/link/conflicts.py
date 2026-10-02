@@ -146,7 +146,7 @@ def apply_conflicts(session: Session, project: Project, shift_days: int) -> dict
                 if l.conflict != record:
                     l.conflict = record
             elif l.conflict is not None:
-                if l.state == "pending":                    # contradiction gone (e.g. other report rejected): restore
+                if l.state == "pending" and not l.decided_by:   # contradiction gone (e.g. other report rejected): restore
                     counts["restored_auto_match"] += 1
                     l.decision, l.plan_node_id, l.state = "matched", l.conflict["plan_node_id"], "auto"
                     l.reasons = [r for r in l.reasons if not r.startswith(CONFLICT_TYPE)]

@@ -49,6 +49,15 @@ def dataset_csv(project_code: str, session: SessionDep, _: AnyRole, as_of: date 
                     headers={"Content-Disposition": f'attachment; filename="{project.code}-actual-progress.csv"'})
 
 
+@router.get("/analytics/dataset", responses={**AUTH, **NOT_FOUND})
+def dataset_json(project_code: str, session: SessionDep, _: AnyRole, as_of: date | None = None) -> dict:
+    """The actual-progress dataset as JSON (same rows as dataset.csv) for the schedule view."""
+    project = project_or_404(session, project_code)
+    as_of = as_of or today(project)
+    rows = [{k: r[k] for k in metrics.DATASET_COLUMNS} for r in metrics.dataset(session, project, as_of)]
+    return {"as_of": as_of, "items": rows}
+
+
 @router.get("/analytics/productivity", responses={**AUTH, **NOT_FOUND})
 def productivity(project_code: str, session: SessionDep, _: AnyRole, as_of: date | None = None) -> dict:
     """Actual / planned duration per activity type (completed activities) and reported quantity per day per type."""

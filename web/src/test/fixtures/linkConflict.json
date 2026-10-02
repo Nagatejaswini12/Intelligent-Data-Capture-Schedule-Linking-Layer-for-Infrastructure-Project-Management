@@ -1,0 +1,205 @@
+{
+ "event_id": 35,
+ "document_id": 13,
+ "activity_text": "Spool erection 16 inch line 1211",
+ "event_type": "progress",
+ "event_date": "2026-09-02",
+ "decision": "review",
+ "state": "pending",
+ "plan_node_code": null,
+ "confidence": 0.8571,
+ "margin": 0.35,
+ "unmatched_type": null,
+ "method": "tag",
+ "retrieval_used": false,
+ "reasons": [
+  "cross_source_date_conflict: spools: one source reports the work on 2026-09-02, the other on 2026-09-03",
+  "tag LINE-1211",
+  "action erection ('spool')",
+  "words line"
+ ],
+ "llm_suggestion": null,
+ "linker_version": "1.0.0",
+ "context_version": "f04f33700f43",
+ "mag_version": "1-e3b0c44298",
+ "decided_by": null,
+ "decided_at": null,
+ "conflict": {
+  "type": "cross_source_date_conflict",
+  "plan_node_id": 318,
+  "plan_node_code": "PIP-A3-1211-ERC",
+  "base_decision": "matched",
+  "dates": [
+   "2026-09-02",
+   "2026-09-03"
+  ],
+  "findings": [
+   {
+    "rule": "quantity_date_shift",
+    "detail": "spools: one source reports the work on 2026-09-02, the other on 2026-09-03",
+    "event_ids": [
+     35,
+     383
+    ]
+   }
+  ],
+  "events": [
+   {
+    "event_id": 35,
+    "document_id": 13,
+    "document": "dpr_2026-09-02_piping.txt",
+    "source_type": "dpr_text",
+    "event_type": "progress",
+    "event_date": "2026-09-02",
+    "quantity": 1.0,
+    "unit": "spools",
+    "source_text": "Spool erection 16 inch line 1211 – 1 spool erected today"
+   },
+   {
+    "event_id": 383,
+    "document_id": 85,
+    "document": "piping_spool_erection_tracker.xlsx",
+    "source_type": "spreadsheet",
+    "event_type": "progress",
+    "event_date": "2026-09-03",
+    "quantity": 1.0,
+    "unit": "spools",
+    "source_text": "16\"-P-1211-A1A | 1211-SP-02 | 2026-09-03 | Erected"
+   }
+  ]
+ },
+ "source_text": "Spool erection 16 inch line 1211 – 1 spool erected today",
+ "source_ref": {
+  "line": 11,
+  "index": 0
+ },
+ "candidates": [
+  {
+   "rank": 1,
+   "plan_node_code": "PIP-A3-1211-ERC",
+   "activity_name": "Erect piping line 16\"-P-1211-A1A",
+   "level": 5,
+   "discipline": "piping",
+   "area": "A3",
+   "score": 0.8571,
+   "retrieval_methods": [
+    "tag"
+   ],
+   "matched_tags": [
+    "LINE-1211"
+   ],
+   "matched_terms": [],
+   "features": {
+    "object": 1.0,
+    "object_by": [
+     "tag"
+    ],
+    "action": 1.0,
+    "action_by": [
+     "erection"
+    ],
+    "lexical": 0.3804,
+    "area": 0,
+    "discipline": 1
+   },
+   "reasons": [
+    "tag LINE-1211",
+    "action erection ('spool')",
+    "words line"
+   ]
+  },
+  {
+   "rank": 2,
+   "plan_node_code": "PIP-A3-1211-HT",
+   "activity_name": "Hydrotest line 16\"-P-1211-A1A (TP-020)",
+   "level": 5,
+   "discipline": "piping",
+   "area": "A3",
+   "score": 0.5071,
+   "retrieval_methods": [
+    "tag"
+   ],
+   "matched_tags": [
+    "LINE-1211"
+   ],
+   "matched_terms": [],
+   "features": {
+    "object": 1.0,
+    "object_by": [
+     "tag"
+    ],
+    "action": 0.0,
+    "action_by": [],
+    "lexical": 0.3804,
+    "area": 0,
+    "discipline": 1
+   },
+   "reasons": [
+    "tag LINE-1211",
+    "words line"
+   ]
+  },
+  {
+   "rank": 3,
+   "plan_node_code": "PIP-A3-1211-RST",
+   "activity_name": "Reinstatement line 16\"-P-1211-A1A",
+   "level": 5,
+   "discipline": "piping",
+   "area": "A3",
+   "score": 0.5071,
+   "retrieval_methods": [
+    "tag"
+   ],
+   "matched_tags": [
+    "LINE-1211"
+   ],
+   "matched_terms": [],
+   "features": {
+    "object": 1.0,
+    "object_by": [
+     "tag"
+    ],
+    "action": 0.0,
+    "action_by": [],
+    "lexical": 0.3804,
+    "area": 0,
+    "discipline": 1
+   },
+   "reasons": [
+    "tag LINE-1211",
+    "words line"
+   ]
+  },
+  {
+   "rank": 4,
+   "plan_node_code": "PIP-A3-1211-WLD",
+   "activity_name": "Welding & NDT line 16\"-P-1211-A1A",
+   "level": 5,
+   "discipline": "piping",
+   "area": "A3",
+   "score": 0.5071,
+   "retrieval_methods": [
+    "tag"
+   ],
+   "matched_tags": [
+    "LINE-1211"
+   ],
+   "matched_terms": [],
+   "features": {
+    "object": 1.0,
+    "object_by": [
+     "tag"
+    ],
+    "action": 0.0,
+    "action_by": [],
+    "lexical": 0.3804,
+    "area": 0,
+    "discipline": 1
+   },
+   "reasons": [
+    "tag LINE-1211",
+    "words line"
+   ]
+  }
+ ]
+}

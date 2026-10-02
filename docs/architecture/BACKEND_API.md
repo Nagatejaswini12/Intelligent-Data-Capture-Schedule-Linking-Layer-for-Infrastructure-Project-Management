@@ -152,6 +152,15 @@ Rules and evaluation: [Phase plan, Phase 5](../plan/PHASE_PLAN.md). Reject stays
 | GET | `/knowledge` (`as_of`) | knowledge entries (activity-type durations, delay patterns) with citations |
 | POST | `/memory/ask` `{question, as_of?}` | `{intent, filters, answer, values, citations}`; every answer cites activities / reports / documents; an unidentified subject or no matching record gives no answer rather than a guess |
 
+## 0g. Phase 7 additions (for the web UI)
+
+| Method | Path (under `/api/v1/projects/{code}`) | Role | Returns |
+|---|---|---|---|
+| GET | `/analytics/dataset` (`as_of`) | any | the actual-progress dataset as JSON `{as_of, items}` (same rows/columns as `dataset.csv`) |
+| POST | `/links/{event_id}/hold` | planner, admin | "send to review": decision → review / pending, held by the planner; the linker (and the conflict layer) no longer override it; 409 if a planner already confirmed / rejected |
+
+`create_app` serves `web/dist` at `/` when it exists (after every API route; `/docs`, `/health`, `/api/...` unchanged). Frontend: [Frontend](FRONTEND.md).
+
 ## 1. Stack
 
 | Layer | Choice | Status |

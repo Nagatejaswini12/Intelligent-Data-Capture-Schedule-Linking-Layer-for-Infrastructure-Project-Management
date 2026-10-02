@@ -2,6 +2,65 @@
 
 [← Master plan](../PROJECT_MASTER_PLAN.md) · Related: [Backend API](BACKEND_API.md) · [End-to-end workflow](../plan/END_TO_END_WORKFLOW.md)
 
+## 0. Implemented (Phase 7)
+
+React 19 + TypeScript + Vite in `web/`, served by FastAPI from `web/dist` after `npm run build` (one origin, no CORS). Dependencies: `react`, `react-dom`; dev only: `vite`, `@vitejs/plugin-react`, `typescript`, `@types/react`, `@types/react-dom`, `vitest`. No router, chart, state or CSS library: hash routing (~20 lines), CSS-only bars from real counts, plain CSS tokens (dark default, light toggle), `fetch` wrapper. Recharts and React Router from the plan below were not needed.
+
+```
+web/src/
+├── api/client.ts      fetch wrapper: base URL (VITE_API_BASE_URL, default same origin), X-API-Key, problem+json -> ApiError
+├── api/p2e.ts         typed calls to the existing API (the backend contract test parses this file)
+├── hooks/useApi.ts    load / error / reload; hooks/useStream.ts  live snapshot from the Phase 5 SSE stream via fetch
+├── components/        ui.tsx (Card, Kpi, Badge, Bars, StackBars, CompareBars, Flow, Modal, Async states), Evidence.tsx
+├── pages/             Overview, Reports, Linking, Agent, Schedule, Watch, Analytics, Memory, Audit, Demo
+├── state.tsx          project, as-of date, live snapshot      utils/  format.ts, route.ts
+├── styles/app.css     tokens + layout                         test/fixtures/  real API responses (synthetic project)
+```
+
+| Screen | Route | Backend used |
+|---|---|---|
+| Overview | `#/overview` | analytics/dashboard, analytics/dataset, links totals, documents, events, analytics/delays |
+| Field Reports | `#/reports` | documents (+ upload → process → link run), document status, events, links, events/{id}/evidence |
+| Activity Linking | `#/linking` | links (filters), links/{id}, events/{id}; approve / choose another, reject, hold (send to review), new activity; tab "Blocked actuals": review + override |
+| Time Agent | `#/agent` | agent/messages (interpretation, clarification answers, link result, checklist) |
+| Schedule | `#/schedule` | hierarchy, analytics/dataset, links (conflicts); apply (dry run → apply), export CSV / MSPDI |
+| Silent Activity Watch | `#/watch` | watch/silent (days, discipline, area); link to the Time Agent checklist |
+| Analytics | `#/analytics` | analytics/dashboard, productivity, delays, dataset.csv |
+| Project Memory | `#/memory` | memory/ask (clickable citations: activity → schedule, report → evidence, document → reports), knowledge |
+| Audit Trail | `#/audit` | audit (filters), audit/{id}/undo, evidence of the source reports |
+| Demo Flow | `#/demo` | agent → approve (confirm + apply) → dataset row → audit → memory/ask, all live |
+
+**Auth.** Sign-in asks for a role API key (from `P2E_API_KEYS` on the server) and keeps it in `sessionStorage` for the tab only; nothing secret is in the build or in `.env` files (`web/.env.example`). Role errors (403) are shown as such.
+
+**States.** Every view has loading / error (with retry) / empty states; a failed call is shown as an error, never replaced by sample data. Phase 3.2 "source unavailable" evidence is shown with its stored metadata. The top bar shows a live/offline indicator; pages refetch when the backend snapshot changes.
+
+**Run**
+
+```
+# 1. backend (once): environment + data
+.venv\Scripts\python -m pip install -r requirements-dev.txt
+.venv\Scripts\python scripts\phase1\init_database.py
+.venv\Scripts\python scripts\phase2\ingest_documents.py
+.venv\Scripts\python scripts\phase3\link_events.py
+
+# 2. frontend (once): install + build -> web\dist (served by FastAPI at /)
+cd web; npm install; npm run build; cd ..
+
+# 3. run: choose your own keys (16+ characters), never commit them
+$env:P2E_API_KEYS = "planner:<planner key>,supervisor:<supervisor key>"
+.venv\Scripts\python -m uvicorn p2e.main:app --port 8000
+# open http://localhost:8000 , sign in with one of the keys, set "As of" to 2026-09-16 for the synthetic project
+
+# development with hot reload instead of step 2 (proxies /api to :8000)
+cd web; npm run dev        # http://localhost:5173
+```
+
+**Demo (≈ 3 minutes, synthetic project, As of = 2026-09-16).** Overview (flow strip and KPIs) → Demo Flow: send "PT-1102 loop check started today at 9 am" (instrumentation) → extraction + matched `INS-A1-PT1102-LCK` + confidence → Confirm and apply → schedule row now in progress → audit entry with the source report → ask "What is the status of PT-1102 loop check?" → answer with citation. Then show Activity Linking (a conflict case with both reports and evidence), Silent Activity Watch, Analytics and the Audit undo.
+
+**Tests.** `cd web; npm test` (Vitest: API client, error mapping, routing, SSE parsing, formatting, component rendering with captured real responses). `npm run build` type-checks (strict) and builds. Backend: `tests/test_phase7.py` (new endpoints, static serving, contract: every route in `api/p2e.ts` exists).
+
+**Limitations.** No browser end-to-end test in CI (pages were checked against a running backend during development); no virtualised tables (fine at 317 activities); no voice input; single project selector (first project); live updates are snapshot-triggered refetches (the stream is polled server-side every second).
+
 ## 1. Stack
 
 | Concern | Choice | Why |

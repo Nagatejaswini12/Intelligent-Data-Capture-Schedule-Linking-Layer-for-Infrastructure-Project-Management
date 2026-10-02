@@ -1,0 +1,145 @@
+{
+ "as_of": "2026-09-16",
+ "by_discipline": {
+  "civil": {
+   "activities": 88,
+   "completed": 75,
+   "started_late": 75,
+   "finished_late": 73,
+   "due_not_started": 5,
+   "not_started": 6,
+   "in_progress": 7
+  },
+  "electrical": {
+   "activities": 34,
+   "in_progress": 11,
+   "started_late": 9,
+   "finished_late": 2,
+   "due_not_started": 8,
+   "not_started": 16,
+   "completed": 7
+  },
+  "hse": {
+   "activities": 13,
+   "not_started": 12,
+   "started_late": 1,
+   "finished_late": 0,
+   "due_not_started": 8,
+   "in_progress": 1
+  },
+  "instrumentation": {
+   "activities": 48,
+   "completed": 16,
+   "started_late": 13,
+   "finished_late": 12,
+   "due_not_started": 11,
+   "not_started": 28,
+   "in_progress": 4
+  },
+  "piping": {
+   "activities": 76,
+   "not_started": 50,
+   "started_late": 19,
+   "finished_late": 11,
+   "due_not_started": 13,
+   "in_progress": 14,
+   "completed": 12
+  },
+  "rotating_eq": {
+   "activities": 29,
+   "completed": 2,
+   "started_late": 3,
+   "finished_late": 1,
+   "due_not_started": 11,
+   "in_progress": 2,
+   "not_started": 25
+  },
+  "static_eq": {
+   "activities": 29,
+   "completed": 9,
+   "started_late": 9,
+   "finished_late": 7,
+   "due_not_started": 6,
+   "not_started": 18,
+   "in_progress": 2
+  }
+ },
+ "by_area": {
+  "A1": {
+   "activities": 93,
+   "completed": 32,
+   "started_late": 32,
+   "finished_late": 27,
+   "due_not_started": 15,
+   "not_started": 51,
+   "in_progress": 10
+  },
+  "A2": {
+   "activities": 31,
+   "completed": 11,
+   "started_late": 10,
+   "finished_late": 9,
+   "due_not_started": 9,
+   "in_progress": 6,
+   "not_started": 14
+  },
+  "A3": {
+   "activities": 117,
+   "completed": 44,
+   "started_late": 49,
+   "finished_late": 39,
+   "due_not_started": 26,
+   "in_progress": 15,
+   "not_started": 58
+  },
+  "A4": {
+   "activities": 76,
+   "completed": 34,
+   "started_late": 38,
+   "finished_late": 31,
+   "due_not_started": 12,
+   "in_progress": 10,
+   "not_started": 32
+  }
+ },
+ "freshness": {
+  "civil": {
+   "last_report": "2026-09-16",
+   "days_since": 0
+  },
+  "electrical": {
+   "last_report": "2026-09-16",
+   "days_since": 0
+  },
+  "hse": {
+   "last_report": "2026-09-16",
+   "days_since": 0
+  },
+  "instrumentation": {
+   "last_report": "2026-09-16",
+   "days_since": 0
+  },
+  "mechanical": {
+   "last_report": "2026-09-16",
+   "days_since": 0
+  },
+  "piping": {
+   "last_report": "2026-09-16",
+   "days_since": 0
+  }
+ },
+ "silent_activities_by_discipline": {
+  "civil": 10,
+  "electrical": 7,
+  "hse": 8,
+  "instrumentation": 15,
+  "piping": 15,
+  "rotating_eq": 12,
+  "static_eq": 8
+ },
+ "review_backlog": {
+  "pending_events": 132,
+  "pending_conflicts": 17,
+  "blocked_activities": 24
+ }
+}

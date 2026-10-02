@@ -4,6 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -17,7 +18,7 @@ from p2e.api.documents import router as documents_router
 from p2e.api.links import router as links_router
 from p2e.api.review import router as review_router
 from p2e.api.routes import health_router, router
-from p2e.config import get_settings
+from p2e.config import REPO_ROOT, get_settings
 from p2e.db.session import make_engine, make_sessionmaker
 from p2e.extract.pipeline import load_project_vocab
 from p2e.link import adjudicate
@@ -28,7 +29,7 @@ TITLES = {401: "Unauthorized", 403: "Forbidden", 404: "Not Found", 409: "Conflic
 
 
 def create_app(db_url: str | None = None, *, api_keys: dict[str, str] | None = None, upload_dir: Path | None = None,
-               glossary_path: Path | None = None, llm=None) -> FastAPI:
+               glossary_path: Path | None = None, llm=None, web_dist: Path | None = None) -> FastAPI:
     settings = get_settings()
     app = FastAPI(title="P2E Bridge API (SIH26122)", version=__version__)
     app.state.engine = make_engine(db_url or settings.db_url)
@@ -57,6 +58,9 @@ def create_app(db_url: str | None = None, *, api_keys: dict[str, str] | None = N
         return JSONResponse({"type": "about:blank", "title": "Invalid request", "status": 422, "detail": detail},
                             status_code=HTTP_422_UNPROCESSABLE_CONTENT, media_type=PROBLEM)
 
+    dist = Path(web_dist or REPO_ROOT / "web" / "dist")
+    if (dist / "index.html").exists():                 # built frontend (Phase 7): served at / after every API route
+        app.mount("/", StaticFiles(directory=dist, html=True), name="web")
     return app
 
 

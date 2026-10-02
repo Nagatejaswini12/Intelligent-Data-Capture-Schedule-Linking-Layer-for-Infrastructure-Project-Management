@@ -1,0 +1,45 @@
+{
+ "question": "What delayed piping work?",
+ "intent": "delays",
+ "filters": {
+  "as_of": "2026-09-16",
+  "disciplines": [
+   "piping"
+  ],
+  "area": null,
+  "actions": [],
+  "tags": [],
+  "size": null
+ },
+ "answer": "3 hold reports: material 2x (bolts short supply, spools not delivered from fab shop); design 1x (clash with cable tray, RFI raised).",
+ "values": {
+  "holds": 3,
+  "by_category": {
+   "design": 1,
+   "material": 2
+  }
+ },
+ "citations": [
+  {
+   "kind": "event",
+   "id": 15,
+   "text": "Joint welding and radiography line 1407 stopped – spools not delivered from fab shop",
+   "date": "2026-09-01",
+   "activity": "PIP-A4-1407-WLD"
+  },
+  {
+   "kind": "event",
+   "id": 56,
+   "text": "Wldg/NDT L-1217 held up, bolts short supply",
+   "date": "2026-09-03",
+   "activity": "PIP-A3-1217-WLD"
+  },
+  {
+   "kind": "event",
+   "id": 209,
+   "text": "L-1405 erctn hold – clash with cable tray, RFI raised",
+   "date": "2026-09-11",
+   "activity": "PIP-A4-1405-ERC"
+  }
+ ]
+}

@@ -1,0 +1,157 @@
+{
+ "status": "recorded",
+ "reply": "Recorded and linked to INS-A4-LT4011-LCK (Loop check LT-4011).",
+ "question": null,
+ "interpretation": {
+  "activity_text": "LT-4011 loop check",
+  "event_type": "finish",
+  "actual_start": null,
+  "actual_finish": "2026-09-15",
+  "event_date": "2026-09-15",
+  "date_text": "yesterday",
+  "event_time": "16:00",
+  "quantity": null,
+  "unit": null,
+  "discipline": "instrumentation",
+  "area": null,
+  "tags": [
+   "LT-4011"
+  ],
+  "interpreted_by": "rules",
+  "extraction_confidence": 1.0,
+  "notes": [],
+  "missing": []
+ },
+ "event_id": 434,
+ "document_id": 86,
+ "reference_datetime": "2026-09-16T18:00:00+05:30",
+ "link": {
+  "event_id": 434,
+  "document_id": 86,
+  "activity_text": "LT-4011 loop check",
+  "event_type": "finish",
+  "event_date": "2026-09-15",
+  "decision": "matched",
+  "state": "auto",
+  "plan_node_code": "INS-A4-LT4011-LCK",
+  "confidence": 0.95,
+  "margin": 0.5,
+  "unmatched_type": null,
+  "method": "tag",
+  "retrieval_used": false,
+  "reasons": [
+   "tag LT-4011",
+   "action loop_check ('loop check')",
+   "words loop, check"
+  ],
+  "llm_suggestion": null,
+  "linker_version": "1.0.0",
+  "context_version": "f04f33700f43",
+  "mag_version": "1-e3b0c44298",
+  "decided_by": null,
+  "decided_at": null,
+  "conflict": null,
+  "source_text": "LT-4011 loop check finished yesterday at 4 pm",
+  "source_ref": {
+   "line": 3,
+   "index": 0
+  },
+  "candidates": [
+   {
+    "rank": 1,
+    "plan_node_code": "INS-A4-LT4011-LCK",
+    "activity_name": "Loop check LT-4011",
+    "level": 5,
+    "discipline": "instrumentation",
+    "area": "A4",
+    "score": 0.95,
+    "retrieval_methods": [
+     "tag"
+    ],
+    "matched_tags": [
+     "LT-4011"
+    ],
+    "matched_terms": [],
+    "features": {
+     "object": 1.0,
+     "object_by": [
+      "tag"
+     ],
+     "action": 1.0,
+     "action_by": [
+      "loop_check"
+     ],
+     "lexical": 1.0,
+     "area": 0,
+     "discipline": 1
+    },
+    "reasons": [
+     "tag LT-4011",
+     "action loop_check ('loop check')",
+     "words loop, check"
+    ]
+   },
+   {
+    "rank": 2,
+    "plan_node_code": "INS-A4-LT4011-INS",
+    "activity_name": "Installation of level transmitter LT-4011",
+    "level": 5,
+    "discipline": "instrumentation",
+    "area": "A4",
+    "score": 0.45,
+    "retrieval_methods": [
+     "tag"
+    ],
+    "matched_tags": [
+     "LT-4011"
+    ],
+    "matched_terms": [],
+    "features": {
+     "object": 1.0,
+     "object_by": [
+      "tag"
+     ],
+     "action": 0.0,
+     "action_by": [],
+     "lexical": 0.0,
+     "area": 0,
+     "discipline": 1
+    },
+    "reasons": [
+     "tag LT-4011"
+    ]
+   },
+   {
+    "rank": 3,
+    "plan_node_code": "INS-A4-LT4011-TUB",
+    "activity_name": "Impulse tubing LT-4011",
+    "level": 5,
+    "discipline": "instrumentation",
+    "area": "A4",
+    "score": 0.45,
+    "retrieval_methods": [
+     "tag"
+    ],
+    "matched_tags": [
+     "LT-4011"
+    ],
+    "matched_terms": [],
+    "features": {
+     "object": 1.0,
+     "object_by": [
+      "tag"
+     ],
+     "action": 0.0,
+     "action_by": [],
+     "lexical": 0.0,
+     "area": 0,
+     "discipline": 1
+    },
+    "reasons": [
+     "tag LT-4011"
+    ]
+   }
+  ]
+ },
+ "checklist": null
+}

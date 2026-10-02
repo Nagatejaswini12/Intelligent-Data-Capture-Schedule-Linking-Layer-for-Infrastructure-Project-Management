@@ -1,0 +1,32 @@
+{
+ "status": "needs_clarification",
+ "reply": "What date was it completed? (for example 'today', 'yesterday' or 2026-09-24)",
+ "question": "What date was it completed? (for example 'today', 'yesterday' or 2026-09-24)",
+ "interpretation": {
+  "activity_text": "Line 1211 reinstatement",
+  "event_type": "finish",
+  "actual_start": null,
+  "actual_finish": null,
+  "event_date": null,
+  "date_text": null,
+  "event_time": null,
+  "quantity": null,
+  "unit": null,
+  "discipline": "piping",
+  "area": null,
+  "tags": [
+   "LINE-1211"
+  ],
+  "interpreted_by": "rules",
+  "extraction_confidence": 1.0,
+  "notes": [],
+  "missing": [
+   "date"
+  ]
+ },
+ "event_id": null,
+ "document_id": null,
+ "reference_datetime": "2026-09-16T18:00:00+05:30",
+ "link": null,
+ "checklist": null
+}

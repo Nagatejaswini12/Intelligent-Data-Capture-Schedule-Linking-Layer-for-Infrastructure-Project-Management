@@ -125,6 +125,19 @@ def reject_link(project_code: str, event_id: int, request: Request, session: Ses
     return detail_out(link_or_404(session, project, event_id))
 
 
+@router.post("/links/{event_id}/hold", response_model=s.LinkDetailOut, responses={**AUTH, **NOT_FOUND, 409: P})
+def hold_link(project_code: str, event_id: int, session: SessionDep, role: Planner):
+    """Send a decision back to planner review ("send to review"). The linker will not override it."""
+    project = project_or_404(session, project_code)
+    link = link_or_404(session, project, event_id)
+    try:
+        service.hold(session, link, f"human:{role}")
+    except service.LinkError as e:
+        raise HTTPException(e.status, e.detail) from None
+    session.commit()
+    return detail_out(link_or_404(session, project, event_id))
+
+
 @router.get("/context", responses={**AUTH, **NOT_FOUND})
 def get_project_context(project_code: str, request: Request, session: SessionDep, _: AnyRole) -> dict:
     """CAG: what the cached project context contains, its version and sources."""

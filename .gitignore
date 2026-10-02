@@ -7,3 +7,6 @@ exports/
 .pytest_cache/
 
 docs.zip
+web/node_modules/
+web/dist/
+web/.env.local

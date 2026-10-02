@@ -264,6 +264,8 @@ Phase 0 ─► 1 ─► 2 ─► 3 ─┬─► 5 ─► 7 ─► 8
 ---
 
 ## Phase 7: Evaluation, testing & hardening
+> **Status: delivered as the web application (2026-10-02, scope redefined by the team).** Phase 7 was used to build the frontend over the Phase 0–6 APIs: `web/` (React + Vite + TypeScript, 10 screens, Demo Flow), served by FastAPI. Backend additions only where the UI needed them: `GET …/analytics/dataset` (JSON), `POST …/links/{event_id}/hold` (planner "send to review"), static serving of `web/dist`. 5 backend + 15 frontend tests. Details: [Frontend](../architecture/FRONTEND.md). The evaluation / hardening items below remain open.
+
 
 **Purpose.** Prove the claims with numbers, and remove demo-breaking failures.
 

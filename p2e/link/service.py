@@ -45,7 +45,7 @@ def link_events(session: Session, project: Project, glossary_path: Path, event_i
     used: set[int] = set()
     for ev in session.scalars(stmt.order_by(ProgressEvent.id)):
         link = existing.get(ev.id)
-        if link is not None and link.state in ("confirmed", "rejected"):
+        if link is not None and (link.state in ("confirmed", "rejected") or link.decided_by):   # planner decided / held
             counts["kept_planner_decision"] += 1
             continue
         if link is not None and (link.linker_version, link.context_version, link.mag_version) == (LINKER_VERSION, ctx.version, mag_version):
@@ -107,6 +107,20 @@ def confirm(session: Session, project: Project, link: EventLink, node_code: str,
     session.flush()
     apply_conflicts(session, project, ctx.thresholds["conflict_date_shift_days"])   # the confirmed report still counts as evidence
     return learned
+
+
+HELD_REASON = "held for planner review"
+
+
+def hold(session: Session, link: EventLink, actor: str) -> None:
+    """Planner sends a decision back to review (e.g. doubts an automatic match). The linker keeps it held until a planner
+    confirms or rejects it; actuals already applied from it are not changed here (undo them in the audit trail)."""
+    if link.state in ("confirmed", "rejected"):
+        raise LinkError(409, "the link already has a planner decision; confirm or reject it again instead")
+    link.decision, link.plan_node_id, link.state = "review", None, "pending"
+    link.decided_by, link.decided_at = actor, datetime.now(timezone.utc)
+    link.reasons = [HELD_REASON] + [r for r in (link.reasons or []) if r != HELD_REASON]
+    session.flush()
 
 
 def reject(session: Session, project: Project, link: EventLink, actor: str, glossary_path: Path) -> None:
