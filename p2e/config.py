@@ -4,6 +4,8 @@ P2E_DB_URL        database URL (default sqlite:///data/p2e.db)
 P2E_UPLOAD_DIR    raw upload store (default data/uploads)
 P2E_GLOSSARY      project vocabulary used by the extractors (default data/synthetic/glossary.json)
 P2E_API_KEYS      "role:key,role:key" with role in supervisor|planner|admin; keys >= 16 characters. Unset = writes disabled.
+P2E_LLM_ENDPOINT  optional self-hosted text-generation endpoint for the Phase 3 tie-breaker (unset = off; non-private
+                  hosts refused unless P2E_LLM_ALLOW_REMOTE=1)
 """
 from __future__ import annotations
 

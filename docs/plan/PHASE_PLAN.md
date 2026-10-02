@@ -120,6 +120,14 @@ Phase 0 ─► 1 ─► 2 ─► 3 ─┬─► 5 ─► 7 ─► 8
 
 ## Phase 3: Schedule-linking engine (core value)
 
+> **Status: done (2026-10-02).** `p2e/link/` (CAG context, RAG retrieval, gated decision, optional LLM tie-breaker, service), `p2e/memory/` (MAG alias memory, OKF v0.2 export), tables `event_link` / `link_candidate` / `alias`, 10 API endpoints, CLI, 20 tests (124 total). Synthetic eval, test split held out: outcome agreement 0.918, 152 automatic matches with **0 wrong activities**, top-3 0.963, unmatched precision 1.0. Without RAG retrieval 0.705; without CAG glossary 0.864. Details: [Linking layer](../ai/LINKING_LAYER.md).
+>
+> **Delivered vs plan.** Retrieval is tag + alias + IDF-weighted lexical + attribute (discipline/area/action) instead of rapidfuzz + embeddings (no new dependency; no local embedding server; codes and abbreviations dominate). Weights are fixed and documented, not a fitted logistic model; the eval reports precision per confidence band instead. The LLM tie-breaker is implemented but off (no on-premise model chosen) and advisory only. MAG adds a trust ladder (≥ 2 confirmations before an alias may drive an automatic match). OKF moved from Phase 6 stretch to Phase 3 as an export. JEV investigated and not implemented. Not done: sub-progress roll-up for finer-than-plan items and cross-source date-conflict checks (Phase 5 apply engine).
+>
+> Run: `scripts\phase3\link_events.py [--okf exports\okf]`, `scripts\phase3\evaluate_linking.py`, `pytest`.
+>
+> **Phase 3.1 hardening (2026-10-02).** Cross-source date-conflict layer: contradictory dates for the same activity from different documents hold the automatic match for review with both sources' evidence (`event_link.conflict`). 8 of the 11 synthetic conflicts detected (the other 3 have no contradicting second document), 3 strict false conflicts, 0 wrong automatic links; tests 124 → 137. See [Linking layer §6](../ai/LINKING_LAYER.md).
+
 **Purpose.** Resolve "what the field said" to "which L5/L6 activity it is", with a trustworthy confidence score.
 
 **Features**
@@ -155,6 +163,8 @@ Phase 0 ─► 1 ─► 2 ─► 3 ─┬─► 5 ─► 7 ─► 8
 ---
 
 ## Phase 4: Time agent (conversational & voice capture)
+
+> **Status: text core done (2026-10-02).** `POST /api/v1/projects/{code}/agent/messages`: supervisor message → deterministic interpreter (optional validated on-premise LLM) → clarifying question if activity / status / date / discipline is missing → Phase 2 validation → stored with the message verbatim as evidence → existing Phase 3 linker (match / review / unmatched, incl. the conflict layer). 26 tests (169 total). Not done yet: voice (STT/TTS), LangGraph session memory, supervisor profile. See [Time Agent](../ai/TIME_AGENT.md).
 
 **Purpose.** Capture progress at the source with less friction than a form, while still producing structured events.
 

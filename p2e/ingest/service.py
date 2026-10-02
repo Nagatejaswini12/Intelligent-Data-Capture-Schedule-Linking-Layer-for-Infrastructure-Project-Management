@@ -51,6 +51,16 @@ class StoredFileMismatch(IngestError):
     status = 500
 
 
+class SourceUnavailable(IngestError):
+    """The stored raw file is missing/unreadable. The database records (document, events, links) are untouched; callers get
+    a controlled 404 that carries what the database still knows. Never includes filesystem paths or OS error text."""
+    status = 404
+
+    def __init__(self, doc: SourceDocument, reason: str):
+        super().__init__(f"raw source file for document {doc.id} is unavailable; the stored evidence metadata is still available",
+                         status="source_unavailable", reason=reason, document_id=doc.id)
+
+
 def safe_filename(name: str | None) -> str:
     """Original name for display only (never used as a path): last path component, printable, <= 255 chars."""
     base = re.split(r"[\\/]", name or "")[-1]
@@ -114,7 +124,12 @@ def store_blob(upload_dir: Path, sha256: str, fmt: str, data: bytes) -> str:
 
 
 def read_blob(upload_dir: Path, doc: SourceDocument) -> bytes:
-    data = _blob_path(upload_dir, doc.storage_uri).read_bytes()
+    try:
+        data = _blob_path(upload_dir, doc.storage_uri).read_bytes()
+    except FileNotFoundError:
+        raise SourceUnavailable(doc, "raw_source_file_missing") from None
+    except OSError:                                  # permissions, a directory in its place, I/O error
+        raise SourceUnavailable(doc, "raw_source_file_unreadable") from None
     if hashlib.sha256(data).hexdigest() != doc.sha256:
         raise StoredFileMismatch(f"stored file for document {doc.id} does not match its recorded hash")
     return data
@@ -148,6 +163,8 @@ def process_document(session: Session, doc: SourceDocument, upload_dir: Path, pv
     latest = doc.runs[-1] if doc.runs else None
     if latest and latest.status == "succeeded" and latest.parser_version == module.PARSER_VERSION:
         return latest, "unchanged"
+    if latest and latest.status == "succeeded" and latest.extractor != module.EXTRACTOR:
+        return latest, "unchanged"      # produced by another component (e.g. the Time Agent): never re-parsed here
     # document=doc (not just the id) keeps doc.runs current in this session, so a repeat call sees this run
     run = ExtractionRun(document=doc, extractor=module.EXTRACTOR, parser_version=module.PARSER_VERSION, status="failed")
     session.add(run)
@@ -211,9 +228,21 @@ def process_batch(session: Session, project: Project, upload_dir: Path, pv: Proj
     return out
 
 
+def evidence_metadata(doc: SourceDocument, ev: ProgressEvent) -> dict:
+    """What the database holds about an event's evidence (no raw file needed)."""
+    return {"event_id": ev.id, "document_id": doc.id, "filename": doc.filename, "kind": doc.kind, "sha256": doc.sha256,
+            "source_ref": ev.source_ref, "source_text": ev.source_text, "span_start": ev.span_start, "span_end": ev.span_end,
+            "source_cells": ev.source_cells}
+
+
 def evidence(doc: SourceDocument, ev: ProgressEvent, upload_dir: Path, context: int = 2) -> dict:
-    """Re-read the stored original and show exactly where the event came from."""
-    data = read_blob(upload_dir, doc)
+    """Re-read the stored original and show exactly where the event came from.
+    Raw file gone -> SourceUnavailable carrying the database-side evidence metadata (nothing is modified)."""
+    try:
+        data = read_blob(upload_dir, doc)
+    except SourceUnavailable as e:
+        e.extra["evidence"] = evidence_metadata(doc, ev)
+        raise
     out = {"document_id": doc.id, "filename": doc.filename, "kind": doc.kind, "sha256": doc.sha256,
            "source_ref": ev.source_ref, "source_text": ev.source_text}
     if doc.format == "txt":

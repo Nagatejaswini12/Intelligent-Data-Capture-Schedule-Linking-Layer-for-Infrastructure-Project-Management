@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import Engine, create_engine, event, inspect
+from sqlalchemy import Engine, create_engine, event, inspect, text
 from sqlalchemy.orm import Session, sessionmaker
 
 from p2e.db.models import Base
@@ -29,6 +29,9 @@ def init_db(engine: Engine) -> None:
         raise SchemaOutdated("database was created before Phase 2 (missing source_document.status); rebuild it with "
                              "scripts/phase1/init_database.py --rebuild")
     Base.metadata.create_all(engine)
+    if "conflict" not in {c["name"] for c in inspect(engine).get_columns("event_link")}:
+        with engine.begin() as conn:    # Phase 3.1 additive, nullable column: existing Phase 3 databases keep their decisions
+            conn.execute(text("ALTER TABLE event_link ADD COLUMN conflict JSON"))
 
 
 def make_sessionmaker(engine: Engine) -> sessionmaker[Session]:

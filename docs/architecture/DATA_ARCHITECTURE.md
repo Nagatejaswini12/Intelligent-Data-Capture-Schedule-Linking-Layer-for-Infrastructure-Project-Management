@@ -59,6 +59,18 @@ Database constraints mirror importer validation: level 1–6; `activity` only at
 
 Actual start/finish are not separate columns: the API exposes `reported_actual_start`/`reported_actual_finish` = `event_date` of `start`/`finish` events. Invalid events are stored with their reasons, never dropped. A database created before Phase 2 is detected (`SchemaOutdated`) and must be rebuilt with `init_database.py --rebuild` until Alembic arrives in Phase 5.
 
+### 3.0c Implemented in Phase 3 (Phase 1/2 tables unchanged; new tables are created by `init_db` on an existing database)
+
+| Table | Purpose | Key columns / constraints |
+|---|---|---|
+| `event_link` | Current link decision per progress event | `progress_event_id` unique, `decision` matched\|review\|unmatched, `plan_node_id` (set iff matched), `confidence` 0–1, `margin`, `unmatched_type`, `method`, `retrieval_used`, `reasons`, `llm_suggestion` (advisory), `linker_version` / `context_version` (CAG) / `mag_version` (MAG), `state` auto\|pending\|confirmed\|rejected, `decided_by` / `decided_at` |
+| `link_candidate` | Every retrieved candidate | `link_id`, `rank` (unique per link), `plan_node_id`, `score`, `methods`, `matched_tags`, `matched_terms`, `features`, `reasons` |
+| `alias` | MAG alias memory | (`project_id`, `kind` object\|action, `phrase`) unique, `target`, `plan_node_id` + `source_event_id` (provenance), `confirmed_by` (actor), `confirmations` ≥ 1, `use_count`, `last_used_at`, `status` active\|revoked, `mag_version`, timestamps |
+
+Phase 3.1 added one nullable column, `event_link.conflict` (JSON: cross-source date conflict with the activity, both events/documents/dates and the rules that fired; set ⇒ the automatic match is held for review). `init_db` adds it to an existing database with `ALTER TABLE … ADD COLUMN` (no rebuild, decisions kept).
+
+Differences from the design below: the link lives in `event_link` (not columns on `progress_event`), so Phase 2 rows are never rewritten; `alias` targets tags or an action rather than one node, so a confirmed object name generalises to every step of that object.
+
 The design below is the full target schema.
 
 

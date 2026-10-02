@@ -259,3 +259,126 @@ class EvidenceOut(Out):
     sheet: str | None = None
     row: int | None = None
     cells: list[dict] | None = None
+
+
+# ----------------------------------------------------------------------------- Phase 3: linking, context (CAG), aliases (MAG)
+
+LinkDecision = Literal["matched", "review", "unmatched"]
+LinkState = Literal["auto", "pending", "confirmed", "rejected"]
+
+
+class LinkRunIn(BaseModel):
+    event_ids: list[int] | None = Field(None, max_length=5000, description="omit = every valid event of the project")
+
+
+class LinkRunOut(Out):
+    context_version: str
+    mag_version: str
+    linker_version: str
+    counts: dict[str, int]
+    conflicts: dict[str, int]
+    llm_tiebreaker: bool
+
+
+class CandidateOut(Out):
+    rank: int
+    plan_node_code: str
+    activity_name: str
+    level: int
+    discipline: Discipline | None
+    area: str | None
+    score: float
+    retrieval_methods: list[str]
+    matched_tags: list[str]
+    matched_terms: list[str]
+    features: dict
+    reasons: list[str]
+
+
+class LinkOut(Out):
+    event_id: int
+    document_id: int
+    activity_text: str
+    event_type: EventType | None
+    event_date: date | None
+    decision: LinkDecision
+    state: LinkState
+    plan_node_code: str | None
+    confidence: float
+    margin: float
+    unmatched_type: str | None
+    method: str
+    retrieval_used: bool
+    reasons: list[str]
+    llm_suggestion: dict | None
+    linker_version: str
+    context_version: str
+    mag_version: str
+    decided_by: str | None
+    decided_at: datetime | None
+    conflict: dict | None = None      # cross-source date conflict: activity, both events/documents/dates, rules
+
+
+class LinkDetailOut(LinkOut):
+    source_text: str
+    source_ref: dict
+    candidates: list[CandidateOut]
+
+
+class LinkPage(Out):
+    items: list[LinkOut]
+    total: int
+    limit: int
+    offset: int
+
+
+class ConfirmIn(BaseModel):
+    plan_node_code: str = Field(min_length=1, max_length=64, description="the L5/L6 activity the event belongs to")
+
+
+class ConfirmOut(Out):
+    link: LinkDetailOut
+    learned: list[dict]
+    skipped: list[dict]
+
+
+class AliasOut(Out):
+    id: int
+    kind: Literal["object", "action"]
+    phrase: str
+    target: str
+    learned_from_activity: str
+    source_event_id: int
+    confirmed_by: str
+    confirmations: int
+    use_count: int
+    status: Literal["active", "revoked"]
+    mag_version: str
+    created_at: datetime
+    updated_at: datetime
+    last_used_at: datetime | None
+
+
+# ----------------------------------------------------------------------------- Phase 4: text Time Agent
+
+class AgentAnswers(BaseModel):
+    date: str | None = Field(None, max_length=40, description="answer to a date question: today, yesterday or a date")
+    discipline: Discipline | None = None
+
+
+class AgentMessageIn(BaseModel):
+    message: str = Field(min_length=1, max_length=1000, pattern=r"^[^\r\n]+$", description="one line, as typed by the supervisor")
+    reference_datetime: datetime | None = Field(None, description="resolves today/yesterday; default: now in the project timezone")
+    discipline: Discipline | None = Field(None, description="the supervisor's discipline when the message does not say it")
+    answers: AgentAnswers | None = Field(None, description="answers to a previous clarification (resend the same message)")
+
+
+class AgentReplyOut(Out):
+    status: Literal["recorded", "duplicate", "needs_clarification", "rejected"]
+    reply: str
+    question: str | None
+    interpretation: dict
+    event_id: int | None
+    document_id: int | None
+    reference_datetime: datetime
+    link: LinkDetailOut | None

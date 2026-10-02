@@ -3,6 +3,7 @@ __pycache__/
 .env
 data/*.db
 data/uploads/
+exports/
 .pytest_cache/
 
 docs.zip

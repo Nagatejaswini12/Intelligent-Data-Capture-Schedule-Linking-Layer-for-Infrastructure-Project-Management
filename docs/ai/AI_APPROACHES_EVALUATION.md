@@ -4,6 +4,8 @@
 
 **Method.** Verify what each term actually means (several of these acronyms are overloaded or very new). Then ask one question: *does it measurably help capture, link, apply or remember progress for SIH26122?* If not, it stays out. Verification done 2026-10-02 from the sources in §8.
 
+> **Phase 3 update (2026-10-02).** RAG, CAG, MAG and OKF are now implemented in the linking layer and each is evaluated separately; JEV was re-investigated and is still not implemented. See [Linking layer](LINKING_LAYER.md). Re-verification: OKF is **v0.2** with an official spec in [GoogleCloudPlatform/knowledge-catalog](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md); its frontmatter fields are `type` (required), `title`, `description`, `resource`, `tags`, `generated`, `sources`, `verified`, `status`, `stale_after` (the `id`/`category`/`updated`/`confidence` example in §4 below predates the spec check and is not what the export writes). Jev: the official TypeSafe announcement and docs describe hosted early access only, with vendor-reported benchmarks; the release date and the Jev-Mem paper cited in §5/§8 come from secondary sources and were not re-verified.
+
 ---
 
 ## 1. RAG: Retrieval-Augmented Generation

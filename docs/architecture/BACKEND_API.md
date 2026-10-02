@@ -72,7 +72,7 @@ All Phase 2 routes need `X-API-Key` (any role: supervisor, planner, admin). Phas
 | GET | `/documents/{id}/status` | status, error, run count, latest run, extraction issues |
 | GET | `/events` | `EventPage`; filters `document_id`, `source_type`, `discipline`, `event_type`, `validation_status`, `date_from`, `date_to`, `limit`, `offset` |
 | GET | `/events/{id}` | `EventOut` (canonical event + validation errors) |
-| GET | `/events/{id}/evidence` | re-reads the stored original (hash-checked): line text, offsets and context lines, or sheet/row/cells with the value in the file; `found_in_source` |
+| GET | `/events/{id}/evidence` | re-reads the stored original (hash-checked): line text, offsets and context lines, or sheet/row/cells with the value in the file; `found_in_source`. Raw file missing/unreadable (Phase 3.2): `404` problem with `detail = {status: "source_unavailable", reason: "raw_source_file_missing" \| "raw_source_file_unreadable", message, document_id, evidence: {event_id, document_id, filename, kind, sha256, source_ref, source_text, span_start, span_end, source_cells}}`; no paths or OS errors; nothing in the database changes (an unknown event is a `404` with a plain-string `detail`) |
 
 **Tests (104 = 40 Phase 1 + 64 Phase 2):** normalization (dates, times, tags), DPR grammar (multi-item lines, `&` inside activities, relative dates, unknown report date, unparseable lines kept as issues), all 81 synthetic DPRs, the 3 sheets with cell-level evidence, renamed headers, 13 validation rules, 10 rejected upload cases, persistence + evidence for every event, idempotency (duplicate upload, re-process, parser-version bump), tampered store, batch, API (auth 401/503, upload, process, status, filters, pagination, evidence, 404/409/415/422), evaluation gate and ground-truth-gap rules.
 
@@ -86,6 +86,42 @@ All Phase 2 routes need `X-API-Key` (any role: supervisor, planner, admin). Phas
 .venv\Scripts\python -m pytest
 $env:P2E_API_KEYS = "supervisor:<your key, 16+ chars>"; .venv\Scripts\python -m uvicorn p2e.main:app --port 8000
 ```
+
+## 0c. Implemented in Phase 3 (schedule linking)
+
+```
+p2e/link/context.py     CAG: cached, versioned project context (glossary + rules.json + schedule vocabulary), normalization
+p2e/link/retrieve.py    RAG retrieval: stage 1 tags + MAG aliases, stage 2 lexical + attribute retrieval, candidate evidence
+p2e/link/decide.py      scoring + gates -> matched | review | unmatched
+p2e/link/adjudicate.py  optional LLM tie-breaker (self-hosted endpoint only, advisory)
+p2e/link/service.py     link runs (idempotent), planner confirm / reject
+p2e/memory/aliases.py   MAG alias memory (learn on confirmation, trust ladder, revoke)
+p2e/memory/okf.py       OKF v0.2 bundle export + conformance check
+p2e/api/links.py        Phase 3 routes
+scripts/phase3/link_events.py        link the database (+ --okf DIR)
+scripts/phase3/evaluate_linking.py   evaluation vs labels -> eval/phase3_linking.json
+```
+
+| Method | Path (under `/api/v1/projects/{code}`) | Role | Returns |
+|---|---|---|---|
+| POST | `/links/run` (optional `{"event_ids": [...]}`, ≤ 5000) | any | versions (linker, CAG, MAG) + outcome counts; idempotent |
+| GET | `/links` | any | `LinkPage`; filters `decision`, `state`, `plan_node_code`, `document_id`, paging |
+| GET | `/links/{event_id}` | any | decision + candidates (score, retrieval methods, matched tags/terms, features, reasons) + source text |
+| POST | `/links/{event_id}/confirm` `{"plan_node_code"}` | planner, admin | confirmed link + aliases learned / skipped (with reasons) |
+| POST | `/links/{event_id}/reject` | planner, admin | link marked unmatched by the planner (nothing learned) |
+| GET | `/context` | any | CAG context: version, sources, cached contents, thresholds |
+| POST | `/context/refresh` | admin | rebuild the cached context |
+| GET | `/aliases` (`status`) | any | MAG aliases with provenance and use counts |
+| POST | `/aliases/{id}/revoke` | planner, admin | alias no longer used |
+| GET | `/knowledge/okf.zip` | planner, admin | OKF v0.2 bundle |
+
+Phase 3.1: `LinkOut`/`LinkDetailOut` carry `conflict` (null, or the cross-source date conflict: activity, dates, findings, both events with document ids); `GET /links?conflict=true|false` filters on it; `POST /links/run` also returns `conflicts` counts. Conflicted links are `decision=review`, `state=pending`.
+
+Optional env: `P2E_LLM_ENDPOINT` (self-hosted text-generation endpoint; non-private hosts refused unless `P2E_LLM_ALLOW_REMOTE=1`).
+
+## 0d. Phase 4 (text Time Agent)
+
+`POST /api/v1/projects/{code}/agent/messages` (any role) `{message (one line), reference_datetime?, discipline?, answers?: {date, discipline}}` → `AgentReplyOut {status: recorded | duplicate | needs_clarification | rejected, reply, question, interpretation, event_id, document_id, reference_datetime, link (LinkDetailOut)}`. Details: [Time Agent](../ai/TIME_AGENT.md).
 
 ## 1. Stack
 

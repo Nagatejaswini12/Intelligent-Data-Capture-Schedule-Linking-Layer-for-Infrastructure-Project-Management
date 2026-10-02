@@ -169,7 +169,9 @@ def get_event(project_code: str, event_id: int, session: SessionDep, _: AnyRole)
 
 @router.get("/events/{event_id}/evidence", response_model=s.EvidenceOut, responses={**AUTH, **NOT_FOUND})
 def get_evidence(project_code: str, event_id: int, request: Request, session: SessionDep, _: AnyRole):
-    """Re-reads the stored original file and returns the exact line/offsets or cells the event was taken from."""
+    """Re-reads the stored original file and returns the exact line/offsets or cells the event was taken from.
+    Raw file missing/unreadable: 404 problem with detail.status = "source_unavailable", detail.reason and the evidence
+    metadata still held in the database (detail.evidence); the event, document and link are left unchanged."""
     e = event_or_404(session, project_or_404(session, project_code), event_id)
     try:
         return service.evidence(e.document, e, request.app.state.upload_dir)

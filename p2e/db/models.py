@@ -1,4 +1,5 @@
 """Phase 1 schema: project, schedule import provenance, the L1–L6 plan tree, tags and logic links.
+Phase 2: extraction runs, progress events, extraction issues. Phase 3: event links, link candidates, alias memory (MAG).
 
 Portable SQLAlchemy types only, so the same models run on SQLite (prototype) and PostgreSQL (production).
 Database constraints mirror the importer's validation so bad data cannot get in by another path.
@@ -217,3 +218,97 @@ class ExtractionIssue(Base):
     message: Mapped[str] = mapped_column(Text)
 
     run: Mapped[ExtractionRun] = relationship(back_populates="issues")
+
+
+# ----------------------------------------------------------------------------- Phase 3: schedule linking + alias memory
+
+LINK_DECISIONS = ("matched", "review", "unmatched")
+LINK_STATES = ("auto", "pending", "confirmed", "rejected")   # auto = linker decided alone; confirmed/rejected = a planner did
+ALIAS_KINDS = ("object", "action")
+ALIAS_STATUSES = ("active", "revoked")
+
+
+class EventLink(Base):
+    """Current link decision for one progress event (re-linking replaces it unless a planner already decided)."""
+    __tablename__ = "event_link"
+    __table_args__ = (
+        UniqueConstraint("progress_event_id"),
+        CheckConstraint(_in("decision", LINK_DECISIONS)),
+        CheckConstraint(_in("state", LINK_STATES)),
+        CheckConstraint("decision != 'matched' OR plan_node_id IS NOT NULL"),
+        CheckConstraint("decision = 'matched' OR plan_node_id IS NULL"),
+        CheckConstraint("confidence BETWEEN 0 AND 1"),
+        Index("ix_link_filter", "project_id", "decision", "state"),
+    )
+    id: Mapped[int] = mapped_column(primary_key=True)
+    project_id: Mapped[int] = mapped_column(ForeignKey("project.id"))
+    progress_event_id: Mapped[int] = mapped_column(ForeignKey("progress_event.id"))
+    plan_node_id: Mapped[int | None] = mapped_column(ForeignKey("plan_node.id"), index=True)
+    decision: Mapped[str] = mapped_column(String(16))
+    confidence: Mapped[float] = mapped_column(Float)
+    margin: Mapped[float] = mapped_column(Float)
+    unmatched_type: Mapped[str | None] = mapped_column(String(32))     # new_activity | unknown_reference | no_candidate | planner
+    method: Mapped[str] = mapped_column(String(16))                    # how the top candidate was found
+    retrieval_used: Mapped[bool] = mapped_column(default=False)        # stage-2 (RAG) retrieval ran
+    reasons: Mapped[list] = mapped_column(JSON, default=list)
+    llm_suggestion: Mapped[dict | None] = mapped_column(JSON(none_as_null=True))   # tie-breaker output (advisory only)
+    # Phase 3.1: cross-source date conflict (activity, both events/documents/dates, rules) - set => automatic match held for review
+    conflict: Mapped[dict | None] = mapped_column(JSON(none_as_null=True))
+    linker_version: Mapped[str] = mapped_column(String(16))
+    context_version: Mapped[str] = mapped_column(String(16))           # CAG context the decision used
+    mag_version: Mapped[str] = mapped_column(String(16))               # alias-memory state the decision used
+    state: Mapped[str] = mapped_column(String(16))
+    decided_by: Mapped[str | None] = mapped_column(String(32))
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+    event: Mapped[ProgressEvent] = relationship()
+    node: Mapped[PlanNode | None] = relationship()
+    candidates: Mapped[list[LinkCandidate]] = relationship(back_populates="link", cascade="all, delete-orphan",
+                                                           order_by="LinkCandidate.rank")
+
+
+class LinkCandidate(Base):
+    """A retrieved activity with its score and the evidence behind it (explainability + evaluation)."""
+    __tablename__ = "link_candidate"
+    __table_args__ = (UniqueConstraint("link_id", "rank"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    link_id: Mapped[int] = mapped_column(ForeignKey("event_link.id"), index=True)
+    rank: Mapped[int] = mapped_column(Integer)
+    plan_node_id: Mapped[int] = mapped_column(ForeignKey("plan_node.id"))
+    score: Mapped[float] = mapped_column(Float)
+    methods: Mapped[list] = mapped_column(JSON)                        # tag | alias | lexical | attribute
+    matched_tags: Mapped[list] = mapped_column(JSON, default=list)
+    matched_terms: Mapped[list] = mapped_column(JSON, default=list)
+    features: Mapped[dict] = mapped_column(JSON)
+    reasons: Mapped[list] = mapped_column(JSON, default=list)
+
+    link: Mapped[EventLink] = relationship(back_populates="candidates")
+    node: Mapped[PlanNode] = relationship()
+
+
+class Alias(Base):
+    """MAG alias memory: field wording learned from planner-confirmed links only.
+    object: phrase -> the object (its tags, or the activity when it has none); action: phrase -> a work action."""
+    __tablename__ = "alias"
+    __table_args__ = (UniqueConstraint("project_id", "kind", "phrase"), CheckConstraint(_in("kind", ALIAS_KINDS)),
+                      CheckConstraint(_in("status", ALIAS_STATUSES)), CheckConstraint("confirmations >= 1"))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    project_id: Mapped[int] = mapped_column(ForeignKey("project.id"), index=True)
+    kind: Mapped[str] = mapped_column(String(16))
+    phrase: Mapped[str] = mapped_column(String(255))                   # normalised field wording
+    target: Mapped[str] = mapped_column(String(255))                   # object: "LINE-1407" / "node:CIV-A3-SWD3-SWD"; action: "erection"
+    plan_node_id: Mapped[int] = mapped_column(ForeignKey("plan_node.id"))   # the confirmed activity it was learned from
+    source_event_id: Mapped[int] = mapped_column(ForeignKey("progress_event.id"))
+    confirmed_by: Mapped[str] = mapped_column(String(32))
+    confirmations: Mapped[int] = mapped_column(Integer, default=1)
+    use_count: Mapped[int] = mapped_column(Integer, default=0)
+    status: Mapped[str] = mapped_column(String(16), default="active")
+    mag_version: Mapped[str] = mapped_column(String(16))               # learning-rule version that created it
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+    last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    node: Mapped[PlanNode] = relationship()
+    source_event: Mapped[ProgressEvent] = relationship()

@@ -24,6 +24,7 @@ This document is the entry point. Every other planning document is linked from h
 | 4 | [Phase-by-phase development plan](plan/PHASE_PLAN.md) | Phases 0–8 with purpose, features, components, workflow, tech, I/O, dependencies, expected result |
 | 5 | [AI / agent architecture](ai/AI_AGENT_ARCHITECTURE.md) | Extraction, linking, confidence, time agent, memory, guardrails |
 | 6 | [JEV / OKF / RAG / MAG / CAG evaluation](ai/AI_APPROACHES_EVALUATION.md) | What each term really means, verified, and whether we use it |
+| 6b | [Schedule-linking layer (Phase 3)](ai/LINKING_LAYER.md) | How RAG, CAG, MAG and OKF are implemented and evaluated; JEV decision |
 | 7 | [Data & database architecture](architecture/DATA_ARCHITECTURE.md) | Entities, schema, event model, audit trail, synthetic data |
 | 8 | [Backend / API architecture](architecture/BACKEND_API.md) | Modules, endpoints, pipelines, security at trust boundaries |
 | 9 | [Frontend architecture](architecture/FRONTEND.md) | Screens, users, components, voice, real-time updates |
