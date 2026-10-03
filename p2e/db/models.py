@@ -338,6 +338,7 @@ class AuditLog(Base):
     warnings: Mapped[list] = mapped_column(JSON, default=list)
     reverts_id: Mapped[int | None] = mapped_column(ForeignKey("audit_log.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    entry_hash: Mapped[str | None] = mapped_column(String(64))  # Phase 7: sha256(previous entry_hash + this entry), tamper-evident
 
     node: Mapped[PlanNode] = relationship()
 

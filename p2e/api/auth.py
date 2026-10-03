@@ -15,16 +15,25 @@ MIN_KEY_LENGTH = 16
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False, description="role API key (supervisor | planner | admin)")
 
 
+DISCIPLINES = ("civil", "piping", "static_eq", "rotating_eq", "electrical", "instrumentation", "hse", "other")
+
+
 def parse_api_keys(spec: str | None) -> dict[str, str]:
-    """'role:key,role:key' -> {key: role}."""
+    """'role:key,role:key' -> {key: role}. A supervisor key may be limited to one discipline, 'supervisor@piping:key';
+    the Time Agent then refuses to log another discipline's progress with it."""
     keys: dict[str, str] = {}
     for part in filter(None, (p.strip() for p in (spec or "").split(","))):
         role, sep, key = part.partition(":")
-        if not sep or role not in ROLES or len(key) < MIN_KEY_LENGTH:
-            raise ValueError(f"P2E_API_KEYS entries must look like role:key with role in {ROLES} and keys of "
-                             f">= {MIN_KEY_LENGTH} characters")
+        base, _, scope = role.partition("@")
+        if not sep or base not in ROLES or len(key) < MIN_KEY_LENGTH or (scope and (base != "supervisor" or scope not in DISCIPLINES)):
+            raise ValueError(f"P2E_API_KEYS entries must look like role:key (or supervisor@discipline:key) with role in {ROLES} "
+                             f"and keys of >= {MIN_KEY_LENGTH} characters")
         keys[key] = role
     return keys
+
+
+def discipline_scope(role: str) -> str | None:
+    return role.partition("@")[2] or None
 
 
 def require_role(*allowed: str):
@@ -35,7 +44,7 @@ def require_role(*allowed: str):
         role = next((r for k, r in keys.items() if key and hmac.compare_digest(k.encode(), key.encode())), None)
         if role is None:
             raise HTTPException(401, "missing or invalid API key", headers={"WWW-Authenticate": "ApiKey"})
-        if role not in allowed:
+        if role.partition("@")[0] not in allowed:
             raise HTTPException(403, f"role {role!r} may not perform this action")
         return role
     return dependency

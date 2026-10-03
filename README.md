@@ -28,6 +28,8 @@ Docs: [Master plan](docs/PROJECT_MASTER_PLAN.md) · [Phase plan](docs/plan/PHASE
 ## Checks
 
 ```
+.venv\Scripts\python -m eval.run          # one-command evaluation -> eval/report.md
+.venv\Scripts\python scripts\smoke.py      # end-to-end smoke over the HTTP API
 .venv\Scripts\python -m pytest
 .venv\Scripts\python scripts\phase0\validate_dataset.py
 .venv\Scripts\python scripts\phase3\evaluate_linking.py

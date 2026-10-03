@@ -19,7 +19,7 @@ from p2e.api.links import Planner, detail_out, link_or_404
 from p2e.api.routes import NOT_FOUND, SessionDep, project_or_404
 from p2e.db.models import AuditLog, EventLink, LinkCandidate, PlanNode, Project
 from p2e.decide import apply as engine
-from p2e.decide import watch
+from p2e.decide import audit, watch
 from p2e.link import service as linking
 from p2e.plan import exporters
 
@@ -163,6 +163,12 @@ def list_audit(project_code: str, session: SessionDep, _: AnyRole, plan_node_cod
     rows = session.scalars(stmt.options(selectinload(AuditLog.node)).order_by(AuditLog.id).limit(limit).offset(offset)).all()
     undone = dict(session.execute(select(AuditLog.reverts_id, AuditLog.id).where(AuditLog.reverts_id.in_([e.id for e in rows]))).all())
     return s.AuditPage(items=[audit_out(e, undone.get(e.id)) for e in rows], total=total, limit=limit, offset=offset)
+
+
+@router.get("/audit/verify", responses={**AUTH, **NOT_FOUND})
+def verify_audit(project_code: str, session: SessionDep, _: AnyRole) -> dict:
+    """Recompute the audit hash chain; any edited or removed row breaks it from that entry on."""
+    return audit.verify(session, project_or_404(session, project_code))
 
 
 @router.post("/audit/{entry_id}/undo", response_model=s.AuditOut, responses={**AUTH, **NOT_FOUND, 409: P})

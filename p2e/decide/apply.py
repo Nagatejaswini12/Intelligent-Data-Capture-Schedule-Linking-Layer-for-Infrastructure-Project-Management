@@ -24,6 +24,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from p2e.db.models import AuditLog, EventLink, PlanDependency, PlanNode, PlanTag, ProgressEvent, Project
+from p2e.decide import audit
 from p2e.link.conflicts import stream_of
 from p2e.plan.tags import extract_tags
 
@@ -189,6 +190,7 @@ def _write(session, project, node: PlanNode, changes: dict, actor, rule, confide
         setattr(node, f, _value(f, after))
     entry = AuditLog(project_id=project.id, plan_node_id=node.id, action=action, changes=changes, actor=actor, rule=rule,
                      confidence=confidence, evidence_event_ids=evidence, warnings=warnings, reverts_id=reverts_id)
+    audit.seal(session, entry)
     session.add(entry)
     session.flush()                                  # plan_node CHECK constraints run here
     return entry
@@ -266,7 +268,9 @@ def create_activity(session: Session, project: Project, parent_code: str, code: 
     node.tags = [PlanTag(tag=t) for t in extract_tags(name)]
     session.add(node)
     session.flush()
-    session.add(AuditLog(project_id=project.id, plan_node_id=node.id, action="create_activity", actor=actor, rule="new_activity",
-                         changes={"activity": [None, code], "parent": [None, parent_code]}, evidence_event_ids=[event.id]))
+    entry = AuditLog(project_id=project.id, plan_node_id=node.id, action="create_activity", actor=actor, rule="new_activity",
+                     changes={"activity": [None, code], "parent": [None, parent_code]}, evidence_event_ids=[event.id], warnings=[])
+    audit.seal(session, entry)
+    session.add(entry)
     session.flush()
     return node

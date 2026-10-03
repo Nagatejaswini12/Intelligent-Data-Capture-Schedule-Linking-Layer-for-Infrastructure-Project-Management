@@ -1,0 +1,32 @@
+{
+  "_note": "Phase 7 scripted Time Agent dialogues (testing plan section 3). Reference time 2026-09-16T18:00 (project timezone). Activities were chosen from the synthetic schedule; each expected outcome follows from the schedule and the documented agent/linker rules, written before running the agent. A dialogue is a list of turns; a turn with 'answers' resends the same message with clarification answers.",
+  "reference_datetime": "2026-09-16T18:00:00",
+  "dialogues": [
+    {"id": "D01", "turns": [{"message": "PT-1102 impulse tubing started today", "discipline": "instrumentation"}], "expect": {"status": "recorded", "decision": "matched", "plan_node_code": "INS-A1-PT1102-TUB"}},
+    {"id": "D02", "turns": [{"message": "LT-1103 loop check started yesterday at 10 am", "discipline": "instrumentation"}], "expect": {"status": "recorded", "decision": "matched", "plan_node_code": "INS-A1-LT1103-LCK"}},
+    {"id": "D03", "turns": [{"message": "JB-101 installation completed today", "discipline": "instrumentation"}], "expect": {"status": "recorded", "decision": "matched", "plan_node_code": "INS-A1-JB101-INS"}},
+    {"id": "D04", "turns": [{"message": "Grouting of pump P-101A started today", "discipline": "rotating_eq"}], "expect": {"status": "recorded", "decision": "matched", "plan_node_code": "ROT-A3-P101A-GRT"}},
+    {"id": "D05", "turns": [{"message": "K-301 alignment started on 15/09/2026", "discipline": "rotating_eq"}], "expect": {"status": "recorded", "decision": "matched", "plan_node_code": "ROT-A1-K301-ALN"}},
+    {"id": "D06", "turns": [{"message": "Transformer TR-1 placement started today", "discipline": "electrical"}], "expect": {"status": "recorded", "decision": "matched", "plan_node_code": "ELE-A2-TR1-PLC"}},
+    {"id": "D07", "turns": [{"message": "Gas detector GD-101 installation started yesterday", "discipline": "hse"}], "expect": {"status": "recorded", "decision": "matched", "plan_node_code": "HSE-A1-GD101-INS"}},
+    {"id": "D08", "turns": [{"message": "Welding of line 1101 started today", "discipline": "piping"}], "expect": {"status": "recorded", "decision": "matched", "plan_node_code": "PIP-A1-1101-WLD"}},
+    {"id": "D09", "turns": [{"message": "V-102 alignment and grouting started today", "discipline": "static_eq"}], "expect": {"status": "recorded", "decision": "matched", "plan_node_code": "SEQ-A1-V102-GRT"}},
+    {"id": "D10", "turns": [{"message": "Backfilling around V-101 foundation started today", "discipline": "civil"}], "expect": {"status": "recorded", "decision": "matched", "plan_node_code": "CIV-A1-V101-BKF"}},
+    {"id": "D11", "turns": [{"message": "Line 1102 erection - 2 spools erected today", "discipline": "piping"}], "expect": {"status": "recorded", "decision": "matched", "plan_node_code": "PIP-A1-1102-ERC"}},
+    {"id": "D12", "turns": [{"message": "K-301 mechanical run test completed on 2026-09-30", "discipline": "rotating_eq"}], "expect": {"status": "rejected"}},
+    {"id": "D13", "turns": [{"message": "PT-1104 loop check completed.", "discipline": "instrumentation"},
+                            {"message": "PT-1104 loop check completed.", "discipline": "instrumentation", "answers": {"date": "yesterday"}}],
+     "expect": {"status": "recorded", "decision": "matched", "plan_node_code": "INS-A1-PT1104-LCK"}},
+    {"id": "D14", "turns": [{"message": "Termination of HT cable to TR-2 started today"},
+                            {"message": "Termination of HT cable to TR-2 started today", "answers": {"discipline": "electrical"}}],
+     "expect": {"status": "recorded", "decision": "matched", "plan_node_code": "ELE-A2-CHTTR2-TRM"}},
+    {"id": "D15", "turns": [{"message": "Motor solo run P-101A started", "discipline": "rotating_eq"},
+                            {"message": "Motor solo run P-101A started", "discipline": "rotating_eq", "answers": {"date": "today"}}],
+     "expect": {"status": "recorded", "decision": "matched", "plan_node_code": "ROT-A3-P101A-SOL"}},
+    {"id": "D16", "turns": [{"message": "P-101A work started today", "discipline": "rotating_eq"}], "expect": {"status": "recorded", "decision": "review"}},
+    {"id": "D17", "turns": [{"message": "Electrical works in Area 2 going on today", "discipline": "electrical"}], "expect": {"status": "recorded", "decision": "review"}},
+    {"id": "D18", "turns": [{"message": "Erection of tank T-405 started today", "discipline": "static_eq"}], "expect": {"status": "recorded", "decision": "unmatched"}},
+    {"id": "D19", "turns": [{"message": "Temporary scaffolding near V-101 started today", "discipline": "static_eq"}], "expect": {"status": "recorded", "decision": "unmatched"}},
+    {"id": "D20", "turns": [{"message": "What should I report today?", "discipline": "piping"}], "expect": {"status": "checklist"}}
+  ]
+}

@@ -92,6 +92,23 @@ Full system vs: −tags, −aliases, −embeddings, −LLM adjudication, −glos
 | Accessibility | Keyboard-only pass of agent and review. Lighthouse a11y | No blockers, score ≥ 90 |
 | Browser | Chrome (voice), Firefox/Safari (text) | Works, voice degrades gracefully |
 
+## 5b. Implementation status (2026-10-03)
+
+| Item | Status | Where |
+|---|---|---|
+| Unit / component / integration tests | done | `tests/` (pytest, fake LLM, temp SQLite, `TestClient`) |
+| Agent scenarios | done as 20 scripted dialogues (stateless agent, no LangGraph) | `eval/time_agent_dialogues.json`, harness |
+| End-to-end smoke | done | `scripts/smoke.py` (in-process or `--base-url`) |
+| Must-have cases: data loss, wrong auto-update, overwriting actuals, hallucinated activity / event, prompt injection, XML attacks, spreadsheet attacks + CSV escaping, AuthZ (role + discipline-scoped supervisor), audit hash chain, idempotency, undo | done | phases 1–7 tests, `tests/test_phase7_hardening.py` |
+| AI evaluation harness, one command | done (`python -m eval.run [--split test|dev|all]`) | `eval/run.py` → `eval/report.md` |
+| Calibration: threshold | done (sweep on dev, reported on test; configured value kept, identical decisions) | report §Threshold calibration |
+| Calibration: ECE ≤ 0.05 | raw 0.172 → calibrated **0.058** on test (isotonic fitted on dev; just above target; evaluation only) | `eval/calibration_report.md`, [Calibration](CALIBRATION.md) |
+| Ablations | done (−tags, −RAG, −CAG, −conflict layer; −aliases via learning curve; −embeddings / −LLM not applicable) | report §Ablations |
+| Non-functional: latency | done (0.4 s single DPR → applied actual) | report §Latency |
+| Non-functional: fresh machine, offline replay, Lighthouse | open (Phase 8) | — |
+
+Audit chain: every `audit_log` row stores `entry_hash` = sha256(previous entry_hash + its own content); `GET …/audit/verify` recomputes it.
+
 ## 6. Production validation (beyond hackathon)
 
 - Shadow mode on a real project: system proposes, planners decide, and agreement is measured before enabling auto-apply.

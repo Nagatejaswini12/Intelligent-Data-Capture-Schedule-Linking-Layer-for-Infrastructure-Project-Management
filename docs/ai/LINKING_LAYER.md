@@ -69,14 +69,14 @@ Fresh temporary DB per run; rules tuned on **dev** only, **test** held out. Figu
 
 | Metric | dev | test | all |
 |---|---|---|---|
-| Outcome agreement (matched / review / unmatched) | 0.934 | 0.927 | 0.931 |
+| Outcome agreement (matched / review / unmatched) | 0.948 | 0.932 | 0.940 |
 | Automatic matches | 119 | 142 | 261 |
 | … to a **wrong** activity | **0** | **0** | **0** |
 | Gold auto-apply items auto-matched correctly | 0.935 | 0.910 | 0.921 |
 | Top-1 / top-3 activity (items with a true activity) | 0.897 / 0.945 | 0.921 / 0.963 | 0.910 / 0.955 |
-| Unmatched recall / precision | 0.903 / 1.0 | 0.923 / 1.0 | 0.909 / 1.0 |
+| Unmatched recall / precision | 1.0 / 1.0 | 1.0 / 1.0 | 1.0 / 1.0 |
 
-Layer contributions on test (outcome agreement): full **0.927**; without the conflict layer **0.918**; without stage-2 retrieval (RAG) **0.705**; without glossary/synonyms (CAG) **0.864**. MAG replay (planner confirmations of the 46 dev items not auto-matched correctly): 7 aliases learned, 27 phrases refused by the safety rules; test top-1 0.921 → 0.926, wrong automatic matches stay 0. These are results on synthetic data built for this project, not field accuracy.
+Layer contributions on test (outcome agreement): full **0.932**; without the conflict layer **0.923**; without stage-2 retrieval (RAG) **0.709**; without glossary/synonyms (CAG) **0.864**; without tags **0.318**. Figures include the Phase 7 new-work rule: a report that names a known object (tag) but describes work that none of that object's scheduled activities mention ("pt-2042 stand shifting") is unmatched / new_activity; tag letters and 1–2 letter abbreviations do not count. Threshold calibration, reliability (ECE) and the one-command report: `python -m eval.run` (see [Phase plan, Phase 7](../plan/PHASE_PLAN.md)). MAG replay (planner confirmations of the 46 dev items not auto-matched correctly): 7 aliases learned, 27 phrases refused by the safety rules; test top-1 0.921 → 0.926, wrong automatic matches stay 0. These are results on synthetic data built for this project, not field accuracy.
 
 Conflict-detection numbers are in §6. Some gold auto-apply items without any work verb ("Hydrants A-3") go to review, which is the safe direction.
 

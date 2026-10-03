@@ -1,0 +1,2355 @@
+{
+  "generated": "2026-10-03T20:41:15",
+  "headline_split": "test",
+  "dataset": {
+    "checks": 26,
+    "passed": 26,
+    "failed": []
+  },
+  "extraction": {
+    "method": "deterministic rule/template extraction; items matched on (document, locator)",
+    "splits": {
+      "dev": {
+        "expected_items": 213,
+        "predicted_items": 213,
+        "matched": 213,
+        "missing": 0,
+        "extra": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "field_exact": {
+          "event_type": 1.0,
+          "date": 1.0,
+          "time": 0.9531,
+          "quantity": 1.0,
+          "unit": 1.0,
+          "discipline": 1.0,
+          "area": 0.9718,
+          "tags": 1.0,
+          "delay_reason": 1.0,
+          "delay_category": 1.0,
+          "activity_text": 1.0,
+          "source_span": 0.9953
+        },
+        "field_exact_excluding_gt_gaps": {
+          "event_type": 1.0,
+          "date": 1.0,
+          "time": 1.0,
+          "quantity": 1.0,
+          "unit": 1.0,
+          "discipline": 1.0,
+          "area": 1.0,
+          "tags": 1.0,
+          "delay_reason": 1.0,
+          "delay_category": 1.0,
+          "activity_text": 1.0,
+          "source_span": 1.0
+        }
+      },
+      "test": {
+        "expected_items": 220,
+        "predicted_items": 220,
+        "matched": 220,
+        "missing": 0,
+        "extra": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "field_exact": {
+          "event_type": 1.0,
+          "date": 1.0,
+          "time": 0.95,
+          "quantity": 1.0,
+          "unit": 1.0,
+          "discipline": 1.0,
+          "area": 0.9682,
+          "tags": 1.0,
+          "delay_reason": 1.0,
+          "delay_category": 1.0,
+          "activity_text": 1.0,
+          "source_span": 0.9955
+        },
+        "field_exact_excluding_gt_gaps": {
+          "event_type": 1.0,
+          "date": 1.0,
+          "time": 1.0,
+          "quantity": 1.0,
+          "unit": 1.0,
+          "discipline": 1.0,
+          "area": 1.0,
+          "tags": 1.0,
+          "delay_reason": 1.0,
+          "delay_category": 1.0,
+          "activity_text": 1.0,
+          "source_span": 1.0
+        }
+      },
+      "all": {
+        "expected_items": 433,
+        "predicted_items": 433,
+        "matched": 433,
+        "missing": 0,
+        "extra": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "field_exact": {
+          "event_type": 1.0,
+          "date": 1.0,
+          "time": 0.9515,
+          "quantity": 1.0,
+          "unit": 1.0,
+          "discipline": 1.0,
+          "area": 0.97,
+          "tags": 1.0,
+          "delay_reason": 1.0,
+          "delay_category": 1.0,
+          "activity_text": 1.0,
+          "source_span": 0.9954
+        },
+        "field_exact_excluding_gt_gaps": {
+          "event_type": 1.0,
+          "date": 1.0,
+          "time": 1.0,
+          "quantity": 1.0,
+          "unit": 1.0,
+          "discipline": 1.0,
+          "area": 1.0,
+          "tags": 1.0,
+          "delay_reason": 1.0,
+          "delay_category": 1.0,
+          "activity_text": 1.0,
+          "source_span": 1.0
+        }
+      }
+    },
+    "documents": {
+      "report_date_ok": 81,
+      "group_ok": 81,
+      "dpr_docs": 81,
+      "sheets": {
+        "XLS-piping-spool-tracker": {
+          "header_row_ok": true,
+          "column_mapping_ok": true
+        },
+        "XLS-electrical-cable-log": {
+          "header_row_ok": true,
+          "column_mapping_ok": true
+        },
+        "XLS-instrument-register": {
+          "header_row_ok": true,
+          "column_mapping_ok": true
+        }
+      },
+      "noise_line_extractions": 0,
+      "issues": 0
+    },
+    "field_mismatch_counts": {
+      "area": 13,
+      "source_span": 2,
+      "time": 21
+    },
+    "ground_truth_gaps": {
+      "note": "field mismatches caused by incomplete expected_extraction.json, not by the extractor (ground truth left unchanged). Each one is confirmed by independent evidence, otherwise it counts as an extractor error: `time` is null there but the predicted time equals the truth_events.csv event_time; `area` is null there but the predicted area is written in the source text or the row's Area/Loc cell; two cable rows' expected cells omit the Pulled? cell (the prediction is a superset of the expected evidence)",
+      "count": 36,
+      "by_field": {
+        "area": 13,
+        "source_span": 2,
+        "time": 21
+      }
+    },
+    "misses": {
+      "missing": [],
+      "extra": [],
+      "field": [
+        [
+          "DPR-2026-09-01-electrical",
+          "line=2;index=1",
+          "time",
+          "None",
+          "10:00",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-01-instrumentation",
+          "line=3;index=0",
+          "time",
+          "None",
+          "08:30",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-02-civil",
+          "line=13;index=0",
+          "time",
+          "None",
+          "09:30",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-02-electrical",
+          "line=11;index=0",
+          "area",
+          "None",
+          "A3",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-03-mechanical",
+          "line=3;index=0",
+          "time",
+          "None",
+          "10:00",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-03-instrumentation",
+          "line=2;index=0",
+          "time",
+          "None",
+          "09:30",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-04-civil",
+          "line=3;index=0",
+          "time",
+          "None",
+          "10:00",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-04-instrumentation",
+          "line=2;index=0",
+          "time",
+          "None",
+          "10:00",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-05-electrical",
+          "line=3;index=0",
+          "area",
+          "None",
+          "A3",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-05-instrumentation",
+          "line=9;index=0",
+          "time",
+          "None",
+          "14:00",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-07-piping",
+          "line=3;index=0",
+          "time",
+          "None",
+          "14:00",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-07-electrical",
+          "line=4;index=0",
+          "time",
+          "None",
+          "10:00",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-09-civil",
+          "line=3;index=0",
+          "time",
+          "None",
+          "10:00",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-10-instrumentation",
+          "line=2;index=1",
+          "time",
+          "None",
+          "10:00",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-11-civil",
+          "line=10;index=0",
+          "time",
+          "None",
+          "10:00",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-11-instrumentation",
+          "line=9;index=0",
+          "time",
+          "None",
+          "10:00",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-12-civil",
+          "line=9;index=0",
+          "time",
+          "None",
+          "14:00",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-15-civil",
+          "line=10;index=0",
+          "time",
+          "None",
+          "08:30",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-15-piping",
+          "line=10;index=0",
+          "time",
+          "None",
+          "08:30",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-15-electrical",
+          "line=14;index=0",
+          "time",
+          "None",
+          "08:30",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-16-mechanical",
+          "line=2;index=1",
+          "time",
+          "None",
+          "10:00",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-16-electrical",
+          "line=13;index=0",
+          "time",
+          "None",
+          "14:00",
+          "gt_gap"
+        ],
+        [
+          "DPR-2026-09-16-instrumentation",
+          "line=13;index=1",
+          "time",
+          "None",
+          "14:00",
+          "gt_gap"
+        ],
+        [
+          "XLS-electrical-cable-log",
+          "sheet=Cable Log;row=28;field=pull",
+          "source_span",
+          "C-MCC3-002 | MCC-3 | 65 | 2026-09-12",
+          "C-MCC3-002 | MCC-3 | 65 | Yes | 2026-09-12",
+          "gt_gap"
+        ],
+        [
+          "XLS-electrical-cable-log",
+          "sheet=Cable Log;row=34;field=pull",
+          "source_span",
+          "C-MCC3-001 | MCC-3 | 55 | 2026-09-14",
+          "C-MCC3-001 | MCC-3 | 55 | Y | 2026-09-14",
+          "gt_gap"
+        ],
+        [
+          "XLS-instrument-register",
+          "sheet=Register;row=3;field=install",
+          "area",
+          "None",
+          "A1",
+          "gt_gap"
+        ],
+        [
+          "XLS-instrument-register",
+          "sheet=Register;row=3;field=tubing",
+          "area",
+          "None",
+          "A1",
+          "gt_gap"
+        ],
+        [
+          "XLS-instrument-register",
+          "sheet=Register;row=4;field=install",
+          "area",
+          "None",
+          "A4",
+          "gt_gap"
+        ],
+        [
+          "XLS-instrument-register",
+          "sheet=Register;row=4;field=tubing",
+          "area",
+          "None",
+          "A4",
+          "gt_gap"
+        ],
+        [
+          "XLS-instrument-register",
+          "sheet=Register;row=5;field=install",
+          "area",
+          "None",
+          "A3",
+          "gt_gap"
+        ],
+        [
+          "XLS-instrument-register",
+          "sheet=Register;row=6;field=install",
+          "area",
+          "None",
+          "A1",
+          "gt_gap"
+        ],
+        [
+          "XLS-instrument-register",
+          "sheet=Register;row=7;field=install",
+          "area",
+          "None",
+          "A1",
+          "gt_gap"
+        ],
+        [
+          "XLS-instrument-register",
+          "sheet=Register;row=7;field=tubing",
+          "area",
+          "None",
+          "A1",
+          "gt_gap"
+        ],
+        [
+          "XLS-instrument-register",
+          "sheet=Register;row=8;field=install",
+          "area",
+          "None",
+          "A1",
+          "gt_gap"
+        ],
+        [
+          "XLS-instrument-register",
+          "sheet=Register;row=9;field=install",
+          "area",
+          "None",
+          "A3",
+          "gt_gap"
+        ],
+        [
+          "XLS-instrument-register",
+          "sheet=Register;row=10;field=install",
+          "area",
+          "None",
+          "A4",
+          "gt_gap"
+        ]
+      ]
+    }
+  },
+  "linking": {
+    "method": "deterministic evidence + stage-2 lexical/attribute retrieval + gated decision; no LLM",
+    "linker_run": {
+      "context_version": "f04f33700f43",
+      "mag_version": "1-e3b0c44298",
+      "linker_version": "1.1.0",
+      "counts": {
+        "unmatched": 44,
+        "review": 111,
+        "matched": 278
+      },
+      "conflicts": {
+        "activities_in_conflict": 5,
+        "events_in_conflict": 17,
+        "routed_to_review": 17,
+        "restored_auto_match": 0
+      }
+    },
+    "splits": {
+      "dev": {
+        "items": 213,
+        "matched": 119,
+        "review": 63,
+        "unmatched": 31,
+        "outcome_accuracy": 0.9484,
+        "confusion_gold_to_predicted": {
+          "matched->matched": 116,
+          "matched->review": 8,
+          "review->matched": 3,
+          "review->review": 55,
+          "unmatched->unmatched": 31
+        },
+        "auto_matched": 119,
+        "auto_precision_correct_activity": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "auto_coverage_of_gold_auto": 0.9355,
+        "gold_auto_sent_to_review": 8,
+        "gold_review_auto_matched_correct_activity": 3,
+        "top1_activity": 0.897,
+        "top3_activity": 0.9455,
+        "topk_activity_recall": 0.9818,
+        "ambiguous_candidate_recall": 0.6591,
+        "unmatched_recall": 1.0,
+        "unmatched_precision": 1.0
+      },
+      "test": {
+        "items": 220,
+        "matched": 142,
+        "review": 65,
+        "unmatched": 13,
+        "outcome_accuracy": 0.9318,
+        "confusion_gold_to_predicted": {
+          "matched->matched": 141,
+          "matched->review": 14,
+          "review->matched": 1,
+          "review->review": 51,
+          "unmatched->unmatched": 13
+        },
+        "auto_matched": 142,
+        "auto_precision_correct_activity": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "auto_coverage_of_gold_auto": 0.9097,
+        "gold_auto_sent_to_review": 14,
+        "gold_review_auto_matched_correct_activity": 1,
+        "top1_activity": 0.9211,
+        "top3_activity": 0.9632,
+        "topk_activity_recall": 0.9895,
+        "ambiguous_candidate_recall": 0.6863,
+        "unmatched_recall": 1.0,
+        "unmatched_precision": 1.0
+      },
+      "all": {
+        "items": 433,
+        "matched": 261,
+        "review": 128,
+        "unmatched": 44,
+        "outcome_accuracy": 0.94,
+        "confusion_gold_to_predicted": {
+          "matched->matched": 257,
+          "matched->review": 22,
+          "review->matched": 4,
+          "review->review": 106,
+          "unmatched->unmatched": 44
+        },
+        "auto_matched": 261,
+        "auto_precision_correct_activity": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "auto_coverage_of_gold_auto": 0.9211,
+        "gold_auto_sent_to_review": 22,
+        "gold_review_auto_matched_correct_activity": 4,
+        "top1_activity": 0.9099,
+        "top3_activity": 0.9549,
+        "topk_activity_recall": 0.9859,
+        "ambiguous_candidate_recall": 0.6737,
+        "unmatched_recall": 1.0,
+        "unmatched_precision": 1.0
+      }
+    },
+    "conflicts": {
+      "layer": {
+        "activities_in_conflict": 5,
+        "events_in_conflict": 17,
+        "routed_to_review": 17,
+        "restored_auto_match": 0
+      },
+      "gold_conflict_items": 11,
+      "detected": 8,
+      "detected_routed_to_review": 8,
+      "missed": [
+        {
+          "item_id": "IT-0316",
+          "text": "W-1105",
+          "decision": "matched"
+        },
+        {
+          "item_id": "IT-0347",
+          "text": "16\"-P-1403-A1A",
+          "decision": "matched"
+        },
+        {
+          "item_id": "IT-0350",
+          "text": "L1405",
+          "decision": "matched"
+        }
+      ],
+      "flagged_events": 17,
+      "same_fact_counterparts": 6,
+      "false_conflicts": [
+        {
+          "item_id": "IT-0082",
+          "text": "L1217 erctn",
+          "rules": [
+            "work_after_reported_finish"
+          ]
+        },
+        {
+          "item_id": "IT-0311",
+          "text": "8\"-P-1217-A1A",
+          "rules": [
+            "quantity_date_shift"
+          ]
+        },
+        {
+          "item_id": "IT-0333",
+          "text": "10\"-W-1405-A1A",
+          "rules": [
+            "quantity_date_shift"
+          ]
+        }
+      ],
+      "flagged_auto_matched": 0,
+      "by_rule": {
+        "quantity_date_shift": 15,
+        "work_after_reported_finish": 2
+      }
+    },
+    "by_hard_case": {
+      "(none)": {
+        "items": 19,
+        "outcome_accuracy": 0.9474,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "matched": 18,
+          "review": 1
+        }
+      },
+      "abbreviation": {
+        "items": 85,
+        "outcome_accuracy": 0.8471,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "matched": 71,
+          "review": 14
+        }
+      },
+      "conflicting_date": {
+        "items": 11,
+        "outcome_accuracy": 0.7273,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "review": 8,
+          "matched": 3
+        }
+      },
+      "duplicate_cross_source": {
+        "items": 104,
+        "outcome_accuracy": 0.9327,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "matched": 85,
+          "review": 19
+        }
+      },
+      "explicit_date": {
+        "items": 18,
+        "outcome_accuracy": 0.8889,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "review": 10,
+          "matched": 6,
+          "unmatched": 2
+        }
+      },
+      "granularity_coarser": {
+        "items": 34,
+        "outcome_accuracy": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "review": 34
+        }
+      },
+      "granularity_finer": {
+        "items": 150,
+        "outcome_accuracy": 0.9333,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "review": 19,
+          "matched": 127,
+          "unmatched": 4
+        }
+      },
+      "hinglish": {
+        "items": 14,
+        "outcome_accuracy": 0.9286,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "matched": 13,
+          "review": 1
+        }
+      },
+      "late_report": {
+        "items": 30,
+        "outcome_accuracy": 0.9,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "matched": 14,
+          "review": 16
+        }
+      },
+      "multi_item_line": {
+        "items": 113,
+        "outcome_accuracy": 0.9381,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "review": 42,
+          "matched": 50,
+          "unmatched": 21
+        }
+      },
+      "new_activity": {
+        "items": 25,
+        "outcome_accuracy": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "unmatched": 25
+        }
+      },
+      "partial_description": {
+        "items": 25,
+        "outcome_accuracy": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "review": 25
+        }
+      },
+      "relative_date": {
+        "items": 14,
+        "outcome_accuracy": 0.9286,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "matched": 8,
+          "review": 6
+        }
+      },
+      "tag_only": {
+        "items": 10,
+        "outcome_accuracy": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "review": 10
+        }
+      },
+      "terminology_variant": {
+        "items": 36,
+        "outcome_accuracy": 0.8611,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "matched": 31,
+          "review": 5
+        }
+      },
+      "type_ambiguous": {
+        "items": 20,
+        "outcome_accuracy": 0.95,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "review": 19,
+          "matched": 1
+        }
+      },
+      "typo": {
+        "items": 19,
+        "outcome_accuracy": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "matched": 19
+        }
+      },
+      "unknown_reference": {
+        "items": 19,
+        "outcome_accuracy": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "unmatched": 19
+        }
+      },
+      "wrong_area": {
+        "items": 10,
+        "outcome_accuracy": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "predicted": {
+          "review": 10
+        }
+      }
+    },
+    "by_method": {
+      "attribute": {
+        "review": 36,
+        "matched": 37,
+        "unmatched": 6
+      },
+      "lexical": {
+        "unmatched": 22,
+        "review": 36
+      },
+      "tag": {
+        "matched": 224,
+        "review": 56,
+        "unmatched": 16
+      }
+    },
+    "retrieval_used": {
+      "stage2->unmatched": 39,
+      "stage2->review": 100,
+      "deterministic_only->matched": 224,
+      "stage2->matched": 37,
+      "deterministic_only->review": 28,
+      "deterministic_only->unmatched": 5
+    },
+    "auto_precision_by_confidence": {
+      "[0.7, 0.8]": {
+        "auto_matched": 22,
+        "correct_activity": 22
+      },
+      "[0.8, 0.9]": {
+        "auto_matched": 135,
+        "correct_activity": 135
+      },
+      "[0.9, 1.0]": {
+        "auto_matched": 104,
+        "correct_activity": 104
+      }
+    },
+    "unmatched_type_vs_gold": {
+      "unknown_reference->unknown_reference": 19,
+      "new_activity->new_activity": 25
+    },
+    "ablations_test_split": {
+      "full": {
+        "outcome_accuracy": 0.9318,
+        "matched": 142,
+        "review": 65,
+        "unmatched": 13,
+        "auto_matched": 142,
+        "auto_precision_correct_activity": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "auto_coverage_of_gold_auto": 0.9097,
+        "top1_activity": 0.9211,
+        "top3_activity": 0.9632,
+        "unmatched_recall": 1.0
+      },
+      "without_conflict_layer": {
+        "outcome_accuracy": 0.9227,
+        "matched": 152,
+        "review": 55,
+        "unmatched": 13,
+        "auto_matched": 152,
+        "auto_precision_correct_activity": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "auto_coverage_of_gold_auto": 0.9355,
+        "top1_activity": 0.9211,
+        "top3_activity": 0.9632,
+        "unmatched_recall": 1.0
+      },
+      "without_stage2_retrieval_RAG": {
+        "outcome_accuracy": 0.7091,
+        "matched": 133,
+        "review": 19,
+        "unmatched": 68,
+        "auto_matched": 133,
+        "auto_precision_correct_activity": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "auto_coverage_of_gold_auto": 0.8129,
+        "top1_activity": 0.7632,
+        "top3_activity": 0.7947,
+        "unmatched_recall": 1.0
+      },
+      "without_glossary_and_synonyms_CAG": {
+        "outcome_accuracy": 0.8636,
+        "matched": 140,
+        "review": 56,
+        "unmatched": 24,
+        "auto_matched": 140,
+        "auto_precision_correct_activity": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "auto_coverage_of_gold_auto": 0.8581,
+        "top1_activity": 0.8684,
+        "top3_activity": 0.9474,
+        "unmatched_recall": 1.0
+      },
+      "without_tags": {
+        "outcome_accuracy": 0.3182,
+        "matched": 21,
+        "review": 183,
+        "unmatched": 16,
+        "auto_matched": 21,
+        "auto_precision_correct_activity": 0.9524,
+        "auto_matched_wrong_activity": 1,
+        "auto_coverage_of_gold_auto": 0.129,
+        "top1_activity": 0.2263,
+        "top3_activity": 0.3737,
+        "unmatched_recall": 0.5385
+      }
+    },
+    "calibration": {
+      "rule": "T_auto = lowest auto_min_score with dev auto-link precision >= 0.95 (other gates unchanged)",
+      "configured_auto_min_score": 0.7,
+      "calibrated_T_auto": 0.3,
+      "thresholds_with_identical_dev_decisions_to_configured": [
+        0.3,
+        0.4,
+        0.5,
+        0.55,
+        0.6,
+        0.65,
+        0.7
+      ],
+      "test_at_calibrated": {
+        "auto": 152,
+        "coverage": 0.6909,
+        "precision": 1.0,
+        "wrong": 0
+      },
+      "test_at_configured": {
+        "auto": 152,
+        "coverage": 0.6909,
+        "precision": 1.0,
+        "wrong": 0
+      },
+      "precision_coverage_curve": [
+        {
+          "threshold": 0.3,
+          "dev": {
+            "auto": 126,
+            "coverage": 0.5915,
+            "precision": 1.0,
+            "wrong": 0
+          },
+          "test": {
+            "auto": 152,
+            "coverage": 0.6909,
+            "precision": 1.0,
+            "wrong": 0
+          }
+        },
+        {
+          "threshold": 0.4,
+          "dev": {
+            "auto": 126,
+            "coverage": 0.5915,
+            "precision": 1.0,
+            "wrong": 0
+          },
+          "test": {
+            "auto": 152,
+            "coverage": 0.6909,
+            "precision": 1.0,
+            "wrong": 0
+          }
+        },
+        {
+          "threshold": 0.5,
+          "dev": {
+            "auto": 126,
+            "coverage": 0.5915,
+            "precision": 1.0,
+            "wrong": 0
+          },
+          "test": {
+            "auto": 152,
+            "coverage": 0.6909,
+            "precision": 1.0,
+            "wrong": 0
+          }
+        },
+        {
+          "threshold": 0.55,
+          "dev": {
+            "auto": 126,
+            "coverage": 0.5915,
+            "precision": 1.0,
+            "wrong": 0
+          },
+          "test": {
+            "auto": 152,
+            "coverage": 0.6909,
+            "precision": 1.0,
+            "wrong": 0
+          }
+        },
+        {
+          "threshold": 0.6,
+          "dev": {
+            "auto": 126,
+            "coverage": 0.5915,
+            "precision": 1.0,
+            "wrong": 0
+          },
+          "test": {
+            "auto": 152,
+            "coverage": 0.6909,
+            "precision": 1.0,
+            "wrong": 0
+          }
+        },
+        {
+          "threshold": 0.65,
+          "dev": {
+            "auto": 126,
+            "coverage": 0.5915,
+            "precision": 1.0,
+            "wrong": 0
+          },
+          "test": {
+            "auto": 152,
+            "coverage": 0.6909,
+            "precision": 1.0,
+            "wrong": 0
+          }
+        },
+        {
+          "threshold": 0.7,
+          "dev": {
+            "auto": 126,
+            "coverage": 0.5915,
+            "precision": 1.0,
+            "wrong": 0
+          },
+          "test": {
+            "auto": 152,
+            "coverage": 0.6909,
+            "precision": 1.0,
+            "wrong": 0
+          }
+        },
+        {
+          "threshold": 0.75,
+          "dev": {
+            "auto": 125,
+            "coverage": 0.5869,
+            "precision": 1.0,
+            "wrong": 0
+          },
+          "test": {
+            "auto": 151,
+            "coverage": 0.6864,
+            "precision": 1.0,
+            "wrong": 0
+          }
+        },
+        {
+          "threshold": 0.8,
+          "dev": {
+            "auto": 115,
+            "coverage": 0.5399,
+            "precision": 1.0,
+            "wrong": 0
+          },
+          "test": {
+            "auto": 141,
+            "coverage": 0.6409,
+            "precision": 1.0,
+            "wrong": 0
+          }
+        },
+        {
+          "threshold": 0.85,
+          "dev": {
+            "auto": 89,
+            "coverage": 0.4178,
+            "precision": 1.0,
+            "wrong": 0
+          },
+          "test": {
+            "auto": 104,
+            "coverage": 0.4727,
+            "precision": 1.0,
+            "wrong": 0
+          }
+        },
+        {
+          "threshold": 0.9,
+          "dev": {
+            "auto": 51,
+            "coverage": 0.2394,
+            "precision": 1.0,
+            "wrong": 0
+          },
+          "test": {
+            "auto": 54,
+            "coverage": 0.2455,
+            "precision": 1.0,
+            "wrong": 0
+          }
+        },
+        {
+          "threshold": 0.95,
+          "dev": {
+            "auto": 45,
+            "coverage": 0.2113,
+            "precision": 1.0,
+            "wrong": 0
+          },
+          "test": {
+            "auto": 49,
+            "coverage": 0.2227,
+            "precision": 1.0,
+            "wrong": 0
+          }
+        }
+      ]
+    },
+    "reliability_test": {
+      "buckets": [
+        {
+          "bucket": "[0.0, 0.2)",
+          "items": 6,
+          "mean_confidence": 0.133,
+          "top1_accuracy": 0.0
+        },
+        {
+          "bucket": "[0.2, 0.4)",
+          "items": 14,
+          "mean_confidence": 0.261,
+          "top1_accuracy": 0.643
+        },
+        {
+          "bucket": "[0.4, 0.6)",
+          "items": 35,
+          "mean_confidence": 0.488,
+          "top1_accuracy": 0.257
+        },
+        {
+          "bucket": "[0.6, 0.8)",
+          "items": 24,
+          "mean_confidence": 0.674,
+          "top1_accuracy": 0.667
+        },
+        {
+          "bucket": "[0.8, 1.0)",
+          "items": 141,
+          "mean_confidence": 0.877,
+          "top1_accuracy": 1.0
+        }
+      ],
+      "ece": 0.144,
+      "note": "confidence = linker score of the top candidate (a fixed weighting, not a fitted probability)"
+    },
+    "mag_learning_curve": {
+      "replayed_dev_confirmations": 46,
+      "aliases_learned": 7,
+      "alias_learning_skipped": {
+        "phrase must have 1..6 content words": 13,
+        "too generic": 10,
+        "activity has no single work action": 4
+      },
+      "aliases": [
+        {
+          "kind": "object",
+          "phrase": "fire water main",
+          "target": "LINE-1407",
+          "use_count": 0
+        },
+        {
+          "kind": "object",
+          "phrase": "gas scrubber foundation",
+          "target": "V-103",
+          "use_count": 0
+        },
+        {
+          "kind": "object",
+          "phrase": "pump discharge line",
+          "target": "LINE-1211",
+          "use_count": 0
+        },
+        {
+          "kind": "object",
+          "phrase": "pipe rack casting",
+          "target": "PR-3",
+          "use_count": 0
+        },
+        {
+          "kind": "object",
+          "phrase": "gas compressor",
+          "target": "K-301",
+          "use_count": 0
+        },
+        {
+          "kind": "object",
+          "phrase": "produced water line",
+          "target": "LINE-1105",
+          "use_count": 0
+        },
+        {
+          "kind": "object",
+          "phrase": "recirculation line",
+          "target": "LINE-1217",
+          "use_count": 0
+        }
+      ],
+      "relink_run": {
+        "context_version": "f04f33700f43",
+        "mag_version": "1-23b49ee379",
+        "linker_version": "1.1.0",
+        "counts": {
+          "unmatched": 44,
+          "review": 72,
+          "kept_planner_decision": 46,
+          "matched": 271
+        },
+        "conflicts": {
+          "activities_in_conflict": 5,
+          "events_in_conflict": 17,
+          "routed_to_review": 10,
+          "restored_auto_match": 0
+        }
+      },
+      "test_before": {
+        "outcome_accuracy": 0.9318,
+        "matched": 142,
+        "review": 65,
+        "unmatched": 13,
+        "auto_matched": 142,
+        "auto_precision_correct_activity": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "auto_coverage_of_gold_auto": 0.9097,
+        "top1_activity": 0.9211,
+        "top3_activity": 0.9632,
+        "unmatched_recall": 1.0
+      },
+      "test_after": {
+        "outcome_accuracy": 0.9318,
+        "matched": 142,
+        "review": 65,
+        "unmatched": 13,
+        "auto_matched": 142,
+        "auto_precision_correct_activity": 1.0,
+        "auto_matched_wrong_activity": 0,
+        "auto_coverage_of_gold_auto": 0.9097,
+        "top1_activity": 0.9263,
+        "top3_activity": 0.9684,
+        "unmatched_recall": 1.0
+      }
+    }
+  },
+  "apply": {
+    "as_of": "2026-09-16",
+    "applied_activities": 63,
+    "applied_fields": {
+      "actual_start": 48,
+      "actual_finish": 31,
+      "percent_complete": 45
+    },
+    "blocked_activities": 23,
+    "blocked_by_rule": {
+      "finish reported without any known actual start": 13,
+      "actual start not reported": 11
+    },
+    "unchanged": 4,
+    "applied_vs_truth": {
+      "actual_start": {
+        "exact": 48
+      },
+      "actual_finish": {
+        "exact": 31
+      }
+    },
+    "applied_not_matching_truth": [],
+    "truth_actuals_in_window_not_applied": {
+      "actual_start": 41,
+      "actual_finish": 41
+    },
+    "warnings": {
+      "predecessor": 16
+    },
+    "exit_gate": {
+      "audit_entries": 63,
+      "audit_complete": true,
+      "undo_restored_state": true,
+      "undone_changes_reapplied": 0
+    },
+    "export_round_trip": {
+      "csv": true,
+      "xml": true
+    }
+  },
+  "qa": {
+    "passed": 10,
+    "total": 10,
+    "results": [
+      {
+        "question": "How many civil activities were completed by 2026-08-31?",
+        "intent": "count",
+        "passed": true,
+        "detail": "ok",
+        "answer": "68 completed as of 2026-08-31 (completed 68, in progress 5, not started 15).",
+        "citations": 68,
+        "expected": {
+          "count": 68
+        }
+      },
+      {
+        "question": "Which piping activities started late by 2026-08-31?",
+        "intent": "late",
+        "passed": true,
+        "detail": "ok",
+        "answer": "9 started late as of 2026-08-31; largest: PIP-A3-PS2-FAB (+10 d), PIP-A1-PS1-PSE (+4 d), PIP-A3-PS3-PSE (+4 d), PIP-A3-PS3-FAB (+2 d), PIP-A3-1217-ERC (+1 d).",
+        "citations": 9,
+        "expected": {
+          "started_late": [
+            "PIP-A1-PS1-PSE",
+            "PIP-A3-1217-ERC",
+            "PIP-A3-1217-WLD",
+            "PIP-A3-PS2-FAB",
+            "PIP-A3-PS3-FAB",
+            "PIP-A3-PS3-PSE",
+            "PIP-A4-1407-ERC",
+            "PIP-A4-1407-WLD",
+            "PIP-A4-PS4-PSE"
+          ]
+        }
+      },
+      {
+        "question": "Which civil activities in Area 3 finished late by 2026-08-31?",
+        "intent": "late",
+        "passed": true,
+        "detail": "ok",
+        "answer": "26 finished late as of 2026-08-31; largest: CIV-A3-PR3-FTG (+12 d), CIV-A3-E101-BKF (+11 d), CIV-A3-E101-REB (+9 d), CIV-A3-E101-RCC (+9 d), CIV-A3-P101B-RCC (+6 d).",
+        "citations": 26,
+        "expected": {
+          "finished_late": [
+            "CIV-A3-E101-BKF",
+            "CIV-A3-E101-EXC",
+            "CIV-A3-E101-PCC",
+            "CIV-A3-E101-RCC",
+            "CIV-A3-E101-REB",
+            "CIV-A3-P101A-BKF",
+            "CIV-A3-P101A-EXC",
+            "CIV-A3-P101A-PCC",
+            "CIV-A3-P101A-RCC",
+            "CIV-A3-P101A-REB",
+            "CIV-A3-P101B-BKF",
+            "CIV-A3-P101B-EXC",
+            "CIV-A3-P101B-PCC",
+            "CIV-A3-P101B-RCC",
+            "CIV-A3-P101B-REB",
+            "CIV-A3-P102A-EXC",
+            "CIV-A3-P102A-PCC",
+            "CIV-A3-P102A-RCC",
+            "CIV-A3-P102A-REB",
+            "CIV-A3-P102B-PCC",
+            "CIV-A3-P102B-RCC",
+            "CIV-A3-P102B-REB",
+            "CIV-A3-PR2-FTG",
+            "CIV-A3-PR2-PED",
+            "CIV-A3-PR2-STL",
+            "CIV-A3-PR3-FTG"
+          ]
+        }
+      },
+      {
+        "question": "How long did backfilling take by 2026-08-31?",
+        "intent": "duration",
+        "passed": true,
+        "detail": "ok",
+        "answer": "8 completed activities took 3.38 days on average (range 3-5) against 3.0 days planned, as of 2026-08-31.",
+        "citations": 8,
+        "expected": {
+          "n": 8,
+          "mean_actual_days": 3.38,
+          "mean_planned_days": 3.0
+        }
+      },
+      {
+        "question": "How many instrumentation activities were in progress on 2026-08-31?",
+        "intent": "count",
+        "passed": true,
+        "detail": "ok",
+        "answer": "3 in progress as of 2026-08-31 (completed 5, in progress 3, not started 40).",
+        "citations": 3,
+        "expected": {
+          "count": 3
+        }
+      },
+      {
+        "question": "What was the status of P-101A excavation on 2026-08-31?",
+        "intent": "status",
+        "passed": true,
+        "detail": "ok",
+        "answer": "As of 2026-08-31: CIV-A3-P101A-EXC: completed, started 2026-07-24, finished 2026-07-27.",
+        "citations": 1,
+        "expected": {
+          "CIV-A3-P101A-EXC": "completed"
+        }
+      },
+      {
+        "question": "What delayed electrical cable pulling in Area 3?",
+        "intent": "delays",
+        "passed": true,
+        "detail": "ok",
+        "answer": "1 hold reports: material 1x (cable drums not received).",
+        "citations": 1,
+        "expected": {
+          "by_category": {
+            "material": 1
+          }
+        }
+      },
+      {
+        "question": "What delayed piping work?",
+        "intent": "delays",
+        "passed": true,
+        "detail": "ok",
+        "answer": "3 hold reports: material 2x (bolts short supply, spools not delivered from fab shop); design 1x (clash with cable tray, RFI raised).",
+        "citations": 3,
+        "expected": {
+          "by_category": {
+            "design": 1,
+            "material": 2
+          }
+        }
+      },
+      {
+        "question": "Why was HT-SWBD-1 installation held up?",
+        "intent": "delays",
+        "passed": true,
+        "detail": "ok",
+        "answer": "1 hold reports: design 1x (drawing revision awaited).",
+        "citations": 1,
+        "expected": {
+          "by_category": {
+            "design": 1
+          }
+        }
+      },
+      {
+        "question": "When did each discipline last report by 2026-09-10?",
+        "intent": "freshness",
+        "passed": true,
+        "detail": "ok",
+        "answer": "As of 2026-09-10: civil last reported 2026-09-10 (0 d ago); electrical last reported 2026-09-10 (0 d ago); hse last reported 2026-09-10 (0 d ago); instrumentation last reported 2026-09-10 (0 d ago); mechanical last reported 2026-09-10 (0 d ago); piping last reported 2026-09-10 (0 d ago). 60 activities expected to be active have no report in 3 days.",
+        "citations": 6,
+        "expected": {
+          "last_report": {
+            "civil": "2026-09-10",
+            "electrical": "2026-09-10",
+            "hse": "2026-09-10",
+            "instrumentation": "2026-09-10",
+            "mechanical": "2026-09-10",
+            "piping": "2026-09-10"
+          }
+        }
+      }
+    ]
+  },
+  "confidence_calibration": {
+    "definition": "confidence = top-candidate linker score; correct = top candidate is the true L5/L6 activity",
+    "fit_split": "dev",
+    "evaluation_split": "test (used once, never for fitting or method choice)",
+    "predictions": 433,
+    "with_candidate": 433,
+    "without_candidate": 0,
+    "excluded_planner_decisions": {},
+    "prediction_states": {
+      "unmatched": 44,
+      "review": 111,
+      "auto_matched": 261,
+      "conflict_held": 17
+    },
+    "method_selection_dev_cv_ece": {
+      "identity": 0.1729,
+      "platt": 0.1019,
+      "isotonic": 0.0534
+    },
+    "method": "isotonic",
+    "calibration_map": [
+      {
+        "raw_up_to": 0.6,
+        "calibrated": 0.2
+      },
+      {
+        "raw_up_to": 0.8,
+        "calibrated": 0.9333
+      },
+      {
+        "raw_up_to": 0.8542,
+        "calibrated": 0.9355
+      },
+      {
+        "raw_up_to": 0.95,
+        "calibrated": 1.0
+      }
+    ],
+    "dev": {
+      "raw": {
+        "n": 213,
+        "accuracy": 0.6948,
+        "mean_confidence": 0.7126,
+        "ece": 0.1574,
+        "mce": 0.4571,
+        "brier": 0.1117,
+        "bins": [
+          {
+            "range": "[0.0, 0.1)",
+            "n": 1,
+            "mean_confidence": 0.0845,
+            "accuracy": 0.0,
+            "gap": 0.0845
+          },
+          {
+            "range": "[0.1, 0.2)",
+            "n": 6,
+            "mean_confidence": 0.1327,
+            "accuracy": 0.0,
+            "gap": 0.1327
+          },
+          {
+            "range": "[0.2, 0.3)",
+            "n": 9,
+            "mean_confidence": 0.2389,
+            "accuracy": 0.3333,
+            "gap": 0.0944
+          },
+          {
+            "range": "[0.3, 0.4)",
+            "n": 0
+          },
+          {
+            "range": "[0.4, 0.5)",
+            "n": 31,
+            "mean_confidence": 0.4566,
+            "accuracy": 0.1935,
+            "gap": 0.263
+          },
+          {
+            "range": "[0.5, 0.6)",
+            "n": 21,
+            "mean_confidence": 0.5439,
+            "accuracy": 0.2381,
+            "gap": 0.3058
+          },
+          {
+            "range": "[0.6, 0.7)",
+            "n": 7,
+            "mean_confidence": 0.6,
+            "accuracy": 0.1429,
+            "gap": 0.4571
+          },
+          {
+            "range": "[0.7, 0.8)",
+            "n": 17,
+            "mean_confidence": 0.7303,
+            "accuracy": 1.0,
+            "gap": 0.2697
+          },
+          {
+            "range": "[0.8, 0.9)",
+            "n": 69,
+            "mean_confidence": 0.8327,
+            "accuracy": 0.9275,
+            "gap": 0.0949
+          },
+          {
+            "range": "[0.9, 1.0]",
+            "n": 52,
+            "mean_confidence": 0.9443,
+            "accuracy": 1.0,
+            "gap": 0.0557
+          }
+        ]
+      },
+      "calibrated": {
+        "n": 213,
+        "accuracy": 0.6948,
+        "mean_confidence": 0.6948,
+        "ece": 0.0,
+        "mce": 0.0,
+        "brier": 0.0783,
+        "bins": [
+          {
+            "range": "[0.0, 0.1)",
+            "n": 0
+          },
+          {
+            "range": "[0.1, 0.2)",
+            "n": 0
+          },
+          {
+            "range": "[0.2, 0.3)",
+            "n": 75,
+            "mean_confidence": 0.2,
+            "accuracy": 0.2,
+            "gap": 0.0
+          },
+          {
+            "range": "[0.3, 0.4)",
+            "n": 0
+          },
+          {
+            "range": "[0.4, 0.5)",
+            "n": 0
+          },
+          {
+            "range": "[0.5, 0.6)",
+            "n": 0
+          },
+          {
+            "range": "[0.6, 0.7)",
+            "n": 0
+          },
+          {
+            "range": "[0.7, 0.8)",
+            "n": 0
+          },
+          {
+            "range": "[0.8, 0.9)",
+            "n": 0
+          },
+          {
+            "range": "[0.9, 1.0]",
+            "n": 138,
+            "mean_confidence": 0.9638,
+            "accuracy": 0.9638,
+            "gap": 0.0
+          }
+        ]
+      }
+    },
+    "test": {
+      "raw": {
+        "n": 220,
+        "accuracy": 0.7955,
+        "mean_confidence": 0.7337,
+        "ece": 0.172,
+        "mce": 0.625,
+        "brier": 0.0963,
+        "bins": [
+          {
+            "range": "[0.0, 0.1)",
+            "n": 0
+          },
+          {
+            "range": "[0.1, 0.2)",
+            "n": 6,
+            "mean_confidence": 0.1333,
+            "accuracy": 0.0,
+            "gap": 0.1333
+          },
+          {
+            "range": "[0.2, 0.3)",
+            "n": 13,
+            "mean_confidence": 0.2519,
+            "accuracy": 0.6154,
+            "gap": 0.3635
+          },
+          {
+            "range": "[0.3, 0.4)",
+            "n": 1,
+            "mean_confidence": 0.375,
+            "accuracy": 1.0,
+            "gap": 0.625
+          },
+          {
+            "range": "[0.4, 0.5)",
+            "n": 21,
+            "mean_confidence": 0.4525,
+            "accuracy": 0.3333,
+            "gap": 0.1192
+          },
+          {
+            "range": "[0.5, 0.6)",
+            "n": 14,
+            "mean_confidence": 0.5401,
+            "accuracy": 0.1429,
+            "gap": 0.3972
+          },
+          {
+            "range": "[0.6, 0.7)",
+            "n": 12,
+            "mean_confidence": 0.6052,
+            "accuracy": 0.3333,
+            "gap": 0.2718
+          },
+          {
+            "range": "[0.7, 0.8)",
+            "n": 12,
+            "mean_confidence": 0.7433,
+            "accuracy": 1.0,
+            "gap": 0.2567
+          },
+          {
+            "range": "[0.8, 0.9)",
+            "n": 87,
+            "mean_confidence": 0.8353,
+            "accuracy": 1.0,
+            "gap": 0.1647
+          },
+          {
+            "range": "[0.9, 1.0]",
+            "n": 54,
+            "mean_confidence": 0.9454,
+            "accuracy": 1.0,
+            "gap": 0.0546
+          }
+        ]
+      },
+      "calibrated": {
+        "n": 220,
+        "accuracy": 0.7955,
+        "mean_confidence": 0.738,
+        "ece": 0.0575,
+        "mce": 0.1077,
+        "brier": 0.068,
+        "bins": [
+          {
+            "range": "[0.0, 0.1)",
+            "n": 0
+          },
+          {
+            "range": "[0.1, 0.2)",
+            "n": 0
+          },
+          {
+            "range": "[0.2, 0.3)",
+            "n": 65,
+            "mean_confidence": 0.2,
+            "accuracy": 0.3077,
+            "gap": 0.1077
+          },
+          {
+            "range": "[0.3, 0.4)",
+            "n": 0
+          },
+          {
+            "range": "[0.4, 0.5)",
+            "n": 0
+          },
+          {
+            "range": "[0.5, 0.6)",
+            "n": 0
+          },
+          {
+            "range": "[0.6, 0.7)",
+            "n": 0
+          },
+          {
+            "range": "[0.7, 0.8)",
+            "n": 0
+          },
+          {
+            "range": "[0.8, 0.9)",
+            "n": 0
+          },
+          {
+            "range": "[0.9, 1.0]",
+            "n": 155,
+            "mean_confidence": 0.9636,
+            "accuracy": 1.0,
+            "gap": 0.0364
+          }
+        ]
+      }
+    },
+    "test_by_prediction_state": {
+      "auto_matched": {
+        "raw": {
+          "n": 142,
+          "accuracy": 1.0,
+          "mean_confidence": 0.8701,
+          "ece": 0.1299,
+          "mce": 0.2528,
+          "brier": 0.0214
+        },
+        "calibrated": {
+          "n": 142,
+          "accuracy": 1.0,
+          "mean_confidence": 0.9658,
+          "ece": 0.0342,
+          "mce": 0.0342,
+          "brier": 0.0022
+        }
+      },
+      "conflict_held": {
+        "raw": {
+          "n": 10,
+          "accuracy": 1.0,
+          "mean_confidence": 0.838,
+          "ece": 0.162,
+          "mce": 0.162,
+          "brier": 0.0267
+        },
+        "calibrated": {
+          "n": 10,
+          "accuracy": 1.0,
+          "mean_confidence": 0.9415,
+          "ece": 0.0585,
+          "mce": 0.0585,
+          "brier": 0.0038
+        }
+      },
+      "review": {
+        "raw": {
+          "n": 55,
+          "accuracy": 0.4182,
+          "mean_confidence": 0.427,
+          "ece": 0.2248,
+          "mce": 0.625,
+          "brier": 0.2707
+        },
+        "calibrated": {
+          "n": 55,
+          "accuracy": 0.4182,
+          "mean_confidence": 0.24,
+          "ece": 0.1782,
+          "mce": 0.1846,
+          "brier": 0.2562
+        }
+      },
+      "unmatched": {
+        "raw": {
+          "n": 13,
+          "accuracy": 0.0,
+          "mean_confidence": 0.461,
+          "ece": 0.461,
+          "mce": 0.6,
+          "brier": 0.2304
+        },
+        "calibrated": {
+          "n": 13,
+          "accuracy": 0.0,
+          "mean_confidence": 0.2,
+          "ece": 0.2,
+          "mce": 0.2,
+          "brier": 0.04
+        }
+      }
+    },
+    "thresholds": {
+      "configured": {
+        "auto_min_score": 0.7,
+        "auto_min_margin": 0.15,
+        "lexical_top_k": 10,
+        "alias_auto_min_confirmations": 2,
+        "conflict_date_shift_days": 1
+      },
+      "auto_min_score_raw": 0.7,
+      "auto_min_score_calibrated": 0.933333,
+      "near_auto_threshold_test": {
+        "[0.60, 0.70)": {
+          "n": 12,
+          "accuracy": 0.3333,
+          "mean_raw": 0.6052,
+          "mean_calibrated": 0.3222,
+          "auto_matched": 0
+        },
+        "[0.70, 0.80)": {
+          "n": 12,
+          "accuracy": 1.0,
+          "mean_raw": 0.7433,
+          "mean_calibrated": 0.9333,
+          "auto_matched": 11
+        },
+        "[0.80, 1.00)": {
+          "n": 141,
+          "accuracy": 1.0,
+          "mean_raw": 0.8774,
+          "mean_calibrated": 0.9666,
+          "auto_matched": 131
+        }
+      }
+    },
+    "base_rate": {
+      "dev_accuracy": 0.6948,
+      "test_accuracy": 0.7955,
+      "dev_unmatched_or_ambiguous": 48,
+      "test_unmatched_or_ambiguous": 30
+    }
+  },
+  "linking_runtime": {
+    "events": 433,
+    "link_ms_per_event": 4.35,
+    "llm_calls": 0,
+    "llm_call_ratio": 0.0,
+    "llm": "disabled (no on-premise model configured)"
+  },
+  "watch": {
+    "as_of": "2026-09-16",
+    "window_days": 3,
+    "silent": 99,
+    "truly_worked_but_unreported": 13,
+    "no_truth_work_in_window": 86,
+    "deterministic": true,
+    "note": "silent = expected active without a linked report; 'no truth work' items are idle / slipping, not errors"
+  },
+  "time_agent": {
+    "dialogues": 20,
+    "passed": 20,
+    "task_success": 1.0,
+    "mean_turns_to_log": 1.17,
+    "wrong_activity_logs": 0,
+    "results": [
+      {
+        "id": "D01",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "INS-A1-PT1102-TUB"
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "INS-A1-PT1102-TUB"
+        },
+        "reply": "Recorded and linked to INS-A1-PT1102-TUB (Impulse tubing PT-1102)."
+      },
+      {
+        "id": "D02",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "INS-A1-LT1103-LCK"
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "INS-A1-LT1103-LCK"
+        },
+        "reply": "Recorded and linked to INS-A1-LT1103-LCK (Loop check LT-1103)."
+      },
+      {
+        "id": "D03",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "INS-A1-JB101-INS"
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "INS-A1-JB101-INS"
+        },
+        "reply": "Recorded and linked to INS-A1-JB101-INS (Installation of junction box JB-101)."
+      },
+      {
+        "id": "D04",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "ROT-A3-P101A-GRT"
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "ROT-A3-P101A-GRT"
+        },
+        "reply": "Recorded and linked to ROT-A3-P101A-GRT (Grouting pump P-101A)."
+      },
+      {
+        "id": "D05",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "ROT-A1-K301-ALN"
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "ROT-A1-K301-ALN"
+        },
+        "reply": "Recorded and linked to ROT-A1-K301-ALN (Alignment compressor-driver K-301)."
+      },
+      {
+        "id": "D06",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "ELE-A2-TR1-PLC"
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "ELE-A2-TR1-PLC"
+        },
+        "reply": "Recorded and linked to ELE-A2-TR1-PLC (Placement of transformer TR-1 on plinth)."
+      },
+      {
+        "id": "D07",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "HSE-A1-GD101-INS"
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "HSE-A1-GD101-INS"
+        },
+        "reply": "Recorded and linked to HSE-A1-GD101-INS (Installation of gas detector GD-101)."
+      },
+      {
+        "id": "D08",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "PIP-A1-1101-WLD"
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "PIP-A1-1101-WLD"
+        },
+        "reply": "Recorded and linked to PIP-A1-1101-WLD (Welding & NDT line 24\"-P-1101-A1A)."
+      },
+      {
+        "id": "D09",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "SEQ-A1-V102-GRT"
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "SEQ-A1-V102-GRT"
+        },
+        "reply": "Recorded and linked to SEQ-A1-V102-GRT (Alignment & grouting V-102)."
+      },
+      {
+        "id": "D10",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "CIV-A1-V101-BKF"
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "CIV-A1-V101-BKF"
+        },
+        "reply": "Recorded and linked to CIV-A1-V101-BKF (Backfilling around foundation V-101)."
+      },
+      {
+        "id": "D11",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "PIP-A1-1102-ERC"
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "PIP-A1-1102-ERC"
+        },
+        "reply": "Recorded and linked to PIP-A1-1102-ERC (Erect piping line 18\"-P-1102-A1A)."
+      },
+      {
+        "id": "D12",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "rejected",
+          "decision": null,
+          "plan_node_code": null
+        },
+        "expected": {
+          "status": "rejected"
+        },
+        "reply": "Not recorded: event date 2026-09-30 is after the report date 2026-09-16. Please correct and resend."
+      },
+      {
+        "id": "D13",
+        "turns": 2,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "INS-A1-PT1104-LCK"
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "INS-A1-PT1104-LCK"
+        },
+        "reply": "Recorded and linked to INS-A1-PT1104-LCK (Loop check PT-1104)."
+      },
+      {
+        "id": "D14",
+        "turns": 2,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "ELE-A2-CHTTR2-TRM"
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "ELE-A2-CHTTR2-TRM"
+        },
+        "reply": "Recorded and linked to ELE-A2-CHTTR2-TRM (Glanding & termination \u2013 11 kV HT cable to TR-2)."
+      },
+      {
+        "id": "D15",
+        "turns": 2,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "ROT-A3-P101A-SOL"
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "matched",
+          "plan_node_code": "ROT-A3-P101A-SOL"
+        },
+        "reply": "Recorded and linked to ROT-A3-P101A-SOL (Motor solo run P-101A)."
+      },
+      {
+        "id": "D16",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "review",
+          "plan_node_code": null
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "review"
+        },
+        "reply": "Recorded, but planner review is required."
+      },
+      {
+        "id": "D17",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "review",
+          "plan_node_code": null
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "review"
+        },
+        "reply": "Recorded, but planner review is required."
+      },
+      {
+        "id": "D18",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "unmatched",
+          "plan_node_code": null
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "unmatched"
+        },
+        "reply": "Recorded, but it could not be safely linked to an existing activity."
+      },
+      {
+        "id": "D19",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "recorded",
+          "decision": "unmatched",
+          "plan_node_code": null
+        },
+        "expected": {
+          "status": "recorded",
+          "decision": "unmatched"
+        },
+        "reply": "Recorded, but it could not be safely linked to an existing activity."
+      },
+      {
+        "id": "D20",
+        "turns": 1,
+        "passed": true,
+        "wrong_activity": false,
+        "got": {
+          "status": "checklist",
+          "decision": null,
+          "plan_node_code": null
+        },
+        "expected": {
+          "status": "checklist"
+        },
+        "reply": "34 piping activities are expected to be active today; 9 already reported. Not reported yet: PIP-A1-1104-WLD Welding & NDT line 8\"-P-1104-A1A; PIP-A1-1105-ERC Erect piping line 6\"-W-1105-A1A; PIP-A1-1105-WLD Welding & NDT line 6\"-W-1105-A1A; PIP-A1-PS1-PSE Erection of pipe supports \u2013 pipe rack PR-1; PIP-A3-1203-ERC Erect piping line 24\"-P-1203-A1A; PIP-A3-1203-WLD Welding & NDT line 24\"-P-1203-A1A; PIP-A3-1205-ERC Erect piping line 18\"-P-1205-A1A; PIP-A3-1205-WLD Welding & NDT line 18\"-P-1205-A1A; PIP-A3-1207-WLD Welding & NDT line 16\"-P-1207-A1A; PIP-A3-1211-ERC Erect piping line 16\"-P-1211-A1A; PIP-A3-1211-WLD Welding & NDT line 16\"-P-1211-A1A; PIP-A3-1213-ERC Erect piping line 12\"-"
+      }
+    ]
+  },
+  "latency": {
+    "extraction_ms_per_document": 1.6,
+    "single_dpr_upload_to_actual_s": 0.74,
+    "link_ms_per_event": 4.35
+  },
+  "targets": [
+    {
+      "metric": "Dataset checks",
+      "target": "all pass",
+      "value": "26/26",
+      "met": true
+    },
+    {
+      "metric": "Extraction item recall",
+      "target": ">= 0.92",
+      "value": 1.0,
+      "met": true
+    },
+    {
+      "metric": "Extraction item precision",
+      "target": ">= 0.90",
+      "value": 1.0,
+      "met": true
+    },
+    {
+      "metric": "Extraction field accuracy (type, date, qty; excl. ground-truth gaps)",
+      "target": ">= 0.90 each",
+      "value": 1.0,
+      "met": true
+    },
+    {
+      "metric": "Linking top-1 (items with a true activity)",
+      "target": ">= 0.85",
+      "value": 0.9211,
+      "met": true
+    },
+    {
+      "metric": "Linking top-3 recall",
+      "target": ">= 0.95",
+      "value": 0.9632,
+      "met": true
+    },
+    {
+      "metric": "Auto-apply precision",
+      "target": ">= 0.95",
+      "value": 1.0,
+      "met": true
+    },
+    {
+      "metric": "Auto-apply coverage (all events)",
+      "target": "report (aim >= 0.60)",
+      "value": 0.6455,
+      "met": null
+    },
+    {
+      "metric": "NEW detection recall (all splits)",
+      "target": ">= 0.90",
+      "value": 1.0,
+      "met": true
+    },
+    {
+      "metric": "Unmatched never auto-applied to a wrong node",
+      "target": "100%",
+      "value": true,
+      "met": true
+    },
+    {
+      "metric": "Calibration ECE (top-candidate score)",
+      "target": "<= 0.05",
+      "value": 0.144,
+      "met": false
+    },
+    {
+      "metric": "Calibrated confidence ECE (isotonic fitted on dev, evaluated on test)",
+      "target": "<= 0.05",
+      "value": "0.172 -> 0.0575",
+      "met": false
+    },
+    {
+      "metric": "LLM call ratio",
+      "target": "<= 0.30",
+      "value": 0.0,
+      "met": true
+    },
+    {
+      "metric": "Alias learning curve (test top-1)",
+      "target": "uplift",
+      "value": "0.9211 -> 0.9263",
+      "met": true
+    },
+    {
+      "metric": "Time Agent task success (20 dialogues)",
+      "target": ">= 0.90",
+      "value": 1.0,
+      "met": true
+    },
+    {
+      "metric": "Time Agent mean turns to log",
+      "target": "<= 3",
+      "value": 1.17,
+      "met": true
+    },
+    {
+      "metric": "Time Agent wrong-activity logs",
+      "target": "0",
+      "value": 0,
+      "met": true
+    },
+    {
+      "metric": "Memory Q&A benchmark (correct + cited)",
+      "target": ">= 8/10",
+      "value": "10/10",
+      "met": true
+    },
+    {
+      "metric": "Applied actuals with audit + source evidence",
+      "target": "100%",
+      "value": true,
+      "met": true
+    },
+    {
+      "metric": "Applied dates equal ground truth",
+      "target": "report",
+      "value": "0 mismatches",
+      "met": null
+    },
+    {
+      "metric": "Report -> schedule actual (single DPR)",
+      "target": "<= 10 s",
+      "value": 0.74,
+      "met": true
+    }
+  ]
+}

@@ -129,11 +129,11 @@ def evaluate(data_dir: Path) -> dict:
                                    l.method, l.retrieval_used, l.confidence, l.unmatched_type, l.conflict))
                 return out
 
-            def memory_rows(c, idx, retrieval=True) -> list[dict]:
+            def memory_rows(c, idx, retrieval=True, tags=True) -> list[dict]:
                 out = []
                 for lab in labels:
                     ev = events[(lab["source_path"].split("/")[-1], lab["locator"])]
-                    q = make_query(c, ev.activity_text, ev.tags or [], ev.area, ev.discipline, ev.source_ref, ev.unit, {})
+                    q = make_query(c, ev.activity_text, (ev.tags or []) if tags else [], ev.area, ev.discipline, ev.source_ref, ev.unit, {})
                     d = decide(q, idx, c, [], retrieval=retrieval)
                     out.append(row(lab, ev, d.decision, idx.nodes_by_id[d.node_id].code if d.node_id else None,
                                    [s.cand.node.code for s in d.ranked], d.method, d.used_retrieval, d.confidence, d.unmatched_type))
@@ -158,12 +158,16 @@ def evaluate(data_dir: Path) -> dict:
             bare_index.nodes_by_id = {n.id: n for n in bare_index.nodes}
             no_cag = memory_rows(bare, bare_index)
             no_conflict_layer = memory_rows(ctx, index)        # same decisions, conflict layer not applied
+            no_tags = memory_rows(ctx, index, tags=False)      # Phase 7 ablation: tag evidence removed from every report
             report["ablations_test_split"] = {
                 "full": pick(report["splits"]["test"]),
                 "without_conflict_layer": pick(score_split([r for r in no_conflict_layer if r["split"] == "test"])),
                 "without_stage2_retrieval_RAG": pick(score_split([r for r in no_rag if r["split"] == "test"])),
                 "without_glossary_and_synonyms_CAG": pick(score_split([r for r in no_cag if r["split"] == "test"])),
+                "without_tags": pick(score_split([r for r in no_tags if r["split"] == "test"])),
             }
+            report["calibration"] = calibrate(ctx, index, memory_rows)
+            report["reliability_test"] = reliability([r for r in full if r["split"] == "test"])
 
             # MAG learning curve: a planner confirms the gold activity for every dev item the linker did not auto-match
             # correctly; alias memory learns from those confirmations only; then everything not confirmed is re-linked.
@@ -199,6 +203,52 @@ def row(lab, ev, decision, node, cands, method, retrieval, confidence, unmatched
             "node": node, "cands": cands, "method": method, "retrieval": retrieval, "confidence": confidence,
             "unmatched_type": unmatched_type, "item_id": lab["item_id"], "event_key": lab["event_key"],
             "conflict_rules": sorted({f["rule"] for f in conflict["findings"]}) if conflict else []}
+
+
+CAL_THRESHOLDS = [0.3, 0.4, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
+
+
+def calibrate(ctx, index, memory_rows) -> dict:
+    """Phase 7 threshold calibration (testing plan §4): sweep the automatic-link score threshold, all other gates unchanged
+    (conflict layer not applied). T_auto = lowest threshold whose dev auto precision >= 0.95; reported on test."""
+    sweep = []
+    for t in CAL_THRESHOLDS:
+        c = dataclasses.replace(ctx, thresholds={**ctx.thresholds, "auto_min_score": t})
+        rows = memory_rows(c, index)
+        point = {"threshold": t}
+        for split in ("dev", "test"):
+            rs = [r for r in rows if r["split"] == split]
+            auto = [r for r in rs if r["decision"] == "matched"]
+            ok = sum(r["node"] == r["true"] for r in auto)
+            point[split] = {"auto": len(auto), "coverage": round(len(auto) / len(rs), 4),
+                            "precision": round(ok / len(auto), 4) if auto else None, "wrong": len(auto) - ok}
+        sweep.append(point)
+    eligible = [p for p in sweep if p["dev"]["precision"] is not None and p["dev"]["precision"] >= 0.95]
+    t_auto = min(p["threshold"] for p in eligible) if eligible else None
+    configured = ctx.thresholds["auto_min_score"]
+    same = [p for p in sweep if p["dev"] == next(x["dev"] for x in sweep if x["threshold"] == configured)]
+    return {"rule": "T_auto = lowest auto_min_score with dev auto-link precision >= 0.95 (other gates unchanged)",
+            "configured_auto_min_score": configured, "calibrated_T_auto": t_auto,
+            "thresholds_with_identical_dev_decisions_to_configured": [p["threshold"] for p in same],
+            "test_at_calibrated": next((p["test"] for p in sweep if p["threshold"] == t_auto), None),
+            "test_at_configured": next(p["test"] for p in sweep if p["threshold"] == configured),
+            "precision_coverage_curve": sweep}
+
+
+def reliability(rows: list[dict], buckets: int = 5) -> dict:
+    """Reliability of the top-candidate score as P(top candidate is the true activity); ECE over equal-width buckets."""
+    out, ece, n = [], 0.0, len(rows)
+    for b in range(buckets):
+        lo, hi = b / buckets, (b + 1) / buckets
+        rs = [r for r in rows if lo <= r["confidence"] < hi or (b == buckets - 1 and r["confidence"] == 1.0)]
+        if not rs:
+            out.append({"bucket": f"[{lo:.1f}, {hi:.1f})", "items": 0})
+            continue
+        conf = sum(r["confidence"] for r in rs) / len(rs)
+        acc = sum(bool(r["true"]) and r["cands"][:1] == [r["true"]] for r in rs) / len(rs)
+        ece += len(rs) / n * abs(acc - conf)
+        out.append({"bucket": f"[{lo:.1f}, {hi:.1f})", "items": len(rs), "mean_confidence": round(conf, 3), "top1_accuracy": round(acc, 3)})
+    return {"buckets": out, "ece": round(ece, 4), "note": "confidence = linker score of the top candidate (a fixed weighting, not a fitted probability)"}
 
 
 def conflict_report(rows: list[dict], layer_counts: dict) -> dict:

@@ -31,7 +31,8 @@ def init_db(engine: Engine) -> None:
     Base.metadata.create_all(engine)
     insp = inspect(engine)
     for table, column, ddl in (("event_link", "conflict", "JSON"),          # Phase 3.1
-                               ("plan_node", "percent_complete", "FLOAT")):  # Phase 5
+                               ("plan_node", "percent_complete", "FLOAT"),   # Phase 5
+                               ("audit_log", "entry_hash", "VARCHAR(64)")):   # Phase 7
         if column not in {c["name"] for c in insp.get_columns(table)}:
             with engine.begin() as conn:    # additive, nullable: existing databases keep all their data
                 conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {ddl}"))

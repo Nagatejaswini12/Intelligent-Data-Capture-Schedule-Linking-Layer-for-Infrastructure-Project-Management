@@ -4,11 +4,11 @@ from __future__ import annotations
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, HTTPException, Request
 
 from p2e.agent import time_agent
 from p2e.api import schemas as s
-from p2e.api.auth import Uploader
+from p2e.api.auth import Uploader, discipline_scope
 from p2e.api.links import detail_out, link_or_404
 from p2e.api.routes import NOT_FOUND, SessionDep, project_or_404
 
@@ -25,9 +25,12 @@ def agent_message(project_code: str, body: s.AgentMessageIn, request: Request, s
     ref = body.reference_datetime or datetime.now(ZoneInfo(project.timezone))     # the only clock read for this turn
     if ref.tzinfo is None:
         ref = ref.replace(tzinfo=ZoneInfo(project.timezone))
+    scope = discipline_scope(role)
+    if scope and body.discipline and body.discipline != scope:
+        raise HTTPException(403, f"this key may only log {scope} progress")
     out = time_agent.handle(session, project, body.message, ref, role, request.app.state.upload_dir,
-                            request.app.state.glossary_path, llm=request.app.state.llm, discipline=body.discipline,
-                            answers=body.answers.model_dump() if body.answers else None)
+                            request.app.state.glossary_path, llm=request.app.state.llm, discipline=body.discipline or scope,
+                            answers=body.answers.model_dump() if body.answers else None, allowed_discipline=scope)
     session.commit()
     link = detail_out(link_or_404(session, project, out["event_id"])) if out["event_id"] else None
     return s.AgentReplyOut(**out, reference_datetime=ref, link=link)

@@ -41,11 +41,23 @@ def rows(session: Session, project: Project) -> list[dict]:
     return out
 
 
+def csv_safe(v):
+    """Spreadsheet formula-injection guard: a text cell starting with = + - @ (or tab / CR) gets a leading apostrophe so
+    Excel / LibreOffice show it as text. Numbers, including negative ones, are left as they are."""
+    if isinstance(v, str) and v and v[0] in "=+-@\t\r":
+        try:
+            float(v)
+            return v
+        except ValueError:
+            return "'" + v
+    return v
+
+
 def to_csv(data: list[dict]) -> str:
     buf = io.StringIO()
     w = csv.DictWriter(buf, COLUMNS, lineterminator="\n")
     w.writeheader()
-    w.writerows(data)
+    w.writerows({k: csv_safe(v) for k, v in r.items()} for r in data)
     return buf.getvalue()
 
 

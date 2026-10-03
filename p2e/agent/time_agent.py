@@ -254,7 +254,7 @@ def finalize(raw: Raw, ctx: ProjectContext, ref: datetime, discipline: str | Non
 # ----------------------------------------------------------------------------- record + link
 
 def handle(session: Session, project: Project, message: str, ref: datetime, role: str, upload_dir: Path, glossary_path: Path,
-           llm=None, discipline: str | None = None, answers: dict | None = None) -> dict:
+           llm=None, discipline: str | None = None, answers: dict | None = None, allowed_discipline: str | None = None) -> dict:
     """One supervisor turn. Returns {status, reply, question, interpretation, event_id, document_id, link_event_id}.
     status: needs_clarification | rejected (nothing stored) | recorded | duplicate."""
     answers = {k: v for k, v in (answers or {}).items() if v}
@@ -269,6 +269,9 @@ def handle(session: Session, project: Project, message: str, ref: datetime, role
     out = {"interpretation": it.public(), "question": it.question, "event_id": None, "document_id": None}
     if it.missing:
         return out | {"status": "needs_clarification", "reply": it.question}
+    if allowed_discipline and it.discipline != allowed_discipline:      # discipline-scoped supervisor key
+        return out | {"status": "rejected", "reply": f"Not recorded: this key may only log {allowed_discipline} progress "
+                                                     f"(the message reports {it.discipline})."}
     content = _record_text(message, ref, role, it, answers)
     lines = content.split("\n")
     item = ExtractedItem(source_ref={"line": MESSAGE_LINE, "index": 0}, source_text=message, activity_text=it.activity_text,

@@ -159,6 +159,10 @@ Rules and evaluation: [Phase plan, Phase 5](../plan/PHASE_PLAN.md). Reject stays
 | GET | `/analytics/dataset` (`as_of`) | any | the actual-progress dataset as JSON `{as_of, items}` (same rows/columns as `dataset.csv`) |
 | POST | `/links/{event_id}/hold` | planner, admin | "send to review": decision → review / pending, held by the planner; the linker (and the conflict layer) no longer override it; 409 if a planner already confirmed / rejected |
 
+| GET | `/audit/verify` | any | recomputes the audit hash chain: `{entries, ok, first_broken_entry, unhashed_entries}` (original Phase 7 hardening) |
+
+Original Phase 7 hardening also added: CSV exports escape cells that start with `= + - @` (formula injection; numbers untouched); `P2E_API_KEYS` accepts discipline-scoped supervisor keys `supervisor@<discipline>:<key>` (the Time Agent refuses other disciplines: 403 for a mismatching `discipline`, `rejected` when the message states another one).
+
 `create_app` serves `web/dist` at `/` when it exists (after every API route; `/docs`, `/health`, `/api/...` unchanged). Frontend: [Frontend](FRONTEND.md).
 
 ## 1. Stack

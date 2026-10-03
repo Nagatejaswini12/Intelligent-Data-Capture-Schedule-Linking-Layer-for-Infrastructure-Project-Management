@@ -264,8 +264,20 @@ Phase 0 ─► 1 ─► 2 ─► 3 ─┬─► 5 ─► 7 ─► 8
 ---
 
 ## Phase 7: Evaluation, testing & hardening
-> **Status: delivered as the web application (2026-10-02, scope redefined by the team).** Phase 7 was used to build the frontend over the Phase 0–6 APIs: `web/` (React + Vite + TypeScript, 10 screens, Demo Flow), served by FastAPI. Backend additions only where the UI needed them: `GET …/analytics/dataset` (JSON), `POST …/links/{event_id}/hold` (planner "send to review"), static serving of `web/dist`. 5 backend + 15 frontend tests. Details: [Frontend](../architecture/FRONTEND.md). The evaluation / hardening items below remain open.
-
+> **Status (2026-10-03): original scope done, including confidence calibration (ECE).** Two pieces of work carry the Phase 7 label:
+>
+> 1. **Frontend (added later, 2026-10-02, team decision):** `web/` React + Vite app over the Phase 0–6 APIs, 10 screens + Demo Flow, served by FastAPI; backend additions `GET …/analytics/dataset`, `POST …/links/{event_id}/hold`, static serving. See [Frontend](../architecture/FRONTEND.md). Not part of the original Phase 7 below.
+> 2. **Original Phase 7 — evaluation, testing & hardening (2026-10-03):**
+>    - **Evaluation harness, one command:** `python -m eval.run [--split test|dev|all]` → `eval/report.md` + `eval/phase7_report.json`. Reuses the Phase 0/2/3/5/6 evaluations and adds Time Agent dialogues (`eval/time_agent_dialogues.json`, 20 scripted), silent-watch stats, latency and the LLM call ratio, and checks every target of the master plan §9 and the testing plan §3: **17/18 met** (headline split: test).
+>    - **Threshold calibration:** swept on dev, reported on test. Every `auto_min_score` from 0.30 to 0.70 gives identical decisions (auto precision 1.00, 0 wrong); the other gates bind, so the configured 0.70 is kept (no behaviour change).
+>    - **Ablations (test outcome agreement):** full 0.932; without tags 0.318; without stage-2 retrieval (RAG) 0.709; without glossary (CAG) 0.864; without the conflict layer 0.923; without aliases = the system before confirmations (MAG learning curve top-1 0.921 → 0.926). Without embeddings / without LLM adjudication: not applicable (none in use).
+>    - **Failure fix (dev failures only):** reports that name a known object but describe work none of its scheduled activities covers ("pt-2042 stand shifting") now go to unmatched / new_activity instead of review. NEW detection 25/25 (was 21/25); Phase 3 baseline moves from 261 / 132 / 40 to 261 / **128 / 44**, still 0 wrong auto-links, top-3 0.955, 8/11 conflicts.
+>    - **Security / hardening:** audit hash chain with `GET …/audit/verify` (tampering or deletion detected); CSV formula-injection escaping in both CSV exports; discipline-scoped supervisor keys (`supervisor@piping:<key>`); prompt-injection tests (DPR and Time Agent); end-to-end smoke script `scripts/smoke.py`. Already in place before: oversized files, XML bombs / XXE, macro workbooks, cached formula values, role checks, safe error responses.
+>    - **Tests:** 25 new (`tests/test_phase7_hardening.py`).
+>    - **Confidence calibration (ECE):** `python -m eval.calibration`; isotonic map chosen by 5-fold CV on dev, fitted on dev, evaluated once on test: test ECE 0.172 → 0.058 (target ≤ 0.05, just missed), Brier 0.096 → 0.068. Evaluation only; raw confidence and thresholds unchanged. See [Calibration](../quality/CALIBRATION.md). 8 tests (`tests/test_calibration.py`).
+>    - **Remaining:** testing-plan non-functional checks owned by later phases: fresh-machine / Docker run, offline-replay switch for a configured LLM, Lighthouse accessibility audit (Phase 8 packaging & demo).
+>
+> Run: `.venv\Scripts\python -m eval.run`, `.venv\Scripts\python scripts\smoke.py`, `.venv\Scripts\python -m pytest`.
 
 **Purpose.** Prove the claims with numbers, and remove demo-breaking failures.
 

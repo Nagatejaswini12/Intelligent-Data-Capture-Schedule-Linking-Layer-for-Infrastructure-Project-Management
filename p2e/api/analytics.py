@@ -18,6 +18,7 @@ from p2e.api.review import today
 from p2e.api.routes import NOT_FOUND, SessionDep, project_or_404
 from p2e.link.context import get_context
 from p2e.memory import knowledge
+from p2e.plan.exporters import csv_safe
 
 router = APIRouter(prefix="/api/v1/projects/{project_code}", tags=["analytics & memory"])
 P = {"model": s.ProblemOut}
@@ -44,7 +45,7 @@ def dataset_csv(project_code: str, session: SessionDep, _: AnyRole, as_of: date 
     buf = io.StringIO()
     w = csv.DictWriter(buf, metrics.DATASET_COLUMNS, extrasaction="ignore", lineterminator="\n")
     w.writeheader()
-    w.writerows(metrics.dataset(session, project, as_of or today(project)))
+    w.writerows({k: csv_safe(v) for k, v in r.items()} for r in metrics.dataset(session, project, as_of or today(project)))
     return Response(buf.getvalue(), media_type="text/csv",
                     headers={"Content-Disposition": f'attachment; filename="{project.code}-actual-progress.csv"'})
 

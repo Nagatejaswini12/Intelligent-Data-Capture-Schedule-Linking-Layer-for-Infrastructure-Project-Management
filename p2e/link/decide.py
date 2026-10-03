@@ -7,12 +7,13 @@ The score is a fixed, documented weighting (not a trained model); the evaluation
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 
 from p2e.link.context import ProjectContext
 from p2e.link.retrieve import Candidate, Query, ScheduleIndex, add_retrieved, attribute_matches, compatible, deterministic
 
-LINKER_VERSION = "1.0.0"
+LINKER_VERSION = "1.1.0"   # 1.1.0 (Phase 7): unscheduled work on a known object -> unmatched new_activity
 WEIGHTS = {"object": 0.40, "action": 0.35, "lexical": 0.15, "area_match": 0.05, "discipline_match": 0.05,
            "area_conflict": -0.25, "discipline_conflict": -0.15}
 OBJECT_EVIDENCE = {"tag": 1.0, "alias": 1.0, "attribute": 0.75}   # how strongly each method identifies the object
@@ -97,6 +98,14 @@ def decide(q: Query, index: ScheduleIndex, ctx: ProjectContext, object_aliases: 
         return out("unmatched", [f"tag(s) {', '.join(q.tags)} not in the schedule"], "unknown_reference")
     if top is None:
         return out("unmatched", ["no schedule activity shares any evidence"], "no_candidate")
+    tagged = [s for s in ranked if "tag" in s.cand.methods]
+    if tagged and not q.actions:      # Phase 7: known object, but the reported work is not any of its scheduled activities
+        tag_letters = {re.match(r"[a-z]*", t.lower()).group(0) for t in q.tags}      # "pt" left over from "PT 1104"
+        unexplained = [w for w in q.words if len(w) > 2 and w not in tag_letters      # 1-2 letter tokens are codes/abbreviations
+                       and not any(w in s.cand.node.words for s in tagged)]
+        if unexplained:
+            return out("unmatched", [f"reported work '{' '.join(unexplained)}' is not a scheduled activity of "
+                                     f"{', '.join(sorted({t for s in tagged for t in s.cand.matched_tags}))}"], "new_activity")
     gates = []
     if not top.features["action"]:
         gates.append("the reported work action matches no candidate" if q.actions else "no work action stated")
