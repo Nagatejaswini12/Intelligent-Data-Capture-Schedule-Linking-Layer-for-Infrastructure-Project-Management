@@ -14,7 +14,7 @@ export function LinkingPage() {
   const tab = params.get("tab") ?? "events";
   return (
     <>
-      <PageTitle title={t("linking.title")} subtitle={t("linking.sub")} />
+      <PageTitle icon="agent-linker" title={t("linking.title")} subtitle={t("linking.sub")} />
       <div className="tabs" role="tablist">
         <a role="tab" aria-selected={tab === "events"} className={tab === "events" ? "active" : ""} href={href("linking")}>Link decisions</a>
         <a role="tab" aria-selected={tab === "blocked"} className={tab === "blocked" ? "active" : ""} href={href("linking", { tab: "blocked" })}>Blocked actuals</a>

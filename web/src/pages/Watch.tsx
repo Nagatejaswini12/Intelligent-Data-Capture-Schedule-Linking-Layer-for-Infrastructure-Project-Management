@@ -18,7 +18,7 @@ export function WatchPage() {
     [project.code, asOf, f.days, f.discipline, f.area, live]);
   return (
     <>
-      <PageTitle title={t("watch.title")} subtitle={t("watch.sub")}
+      <PageTitle icon="agent-watch" title={t("watch.title")} subtitle={t("watch.sub")}
         actions={<a className="btn" href={href("agent", { message: "What should I report today?", discipline: f.discipline })}>{t("watch.ask")}</a>} />
       <Card title={`Silent as of ${asOf}`} actions={<>
         <label className="check">no report in

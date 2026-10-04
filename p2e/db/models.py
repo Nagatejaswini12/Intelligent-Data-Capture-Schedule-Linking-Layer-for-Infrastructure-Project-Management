@@ -322,6 +322,20 @@ class Alias(Base):
 AUDIT_ACTIONS = ("apply", "override", "undo", "create_activity")
 
 
+class AccessRequest(Base):
+    """Sign-up = request access: an admin reviews it and issues a role key out of band (no self-service accounts)."""
+    __tablename__ = "access_request"
+    __table_args__ = (CheckConstraint("status IN ('pending', 'approved', 'rejected')"),)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(120))
+    email: Mapped[str] = mapped_column(String(200))
+    organisation: Mapped[str] = mapped_column(String(200))
+    role_requested: Mapped[str] = mapped_column(String(16))
+    reason: Mapped[str] = mapped_column(Text, default="")
+    status: Mapped[str] = mapped_column(String(16), default="pending")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class AuditLog(Base):
     """Append-only record of every schedule change. Undo is a new, compensating entry (`reverts_id`); rows are never edited."""
     __tablename__ = "audit_log"

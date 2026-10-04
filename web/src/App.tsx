@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ApiError, apiKey } from "./api/client";
+import { apiKey } from "./api/client";
 import { p2e, type Project } from "./api/p2e";
 import { Badge, ErrorBox, Loading } from "./components/ui";
 import { useStream } from "./hooks/useStream";
@@ -13,13 +13,14 @@ import { OverviewPage } from "./pages/Overview";
 import { ReportsPage } from "./pages/Reports";
 import { RoiPage } from "./pages/ROI";
 import { GuidePage, TermsPage, VideoPage } from "./pages/Help";
+import { LandingPage, SignInPage, SignUpPage } from "./pages/Public";
 import { Assistant } from "./components/Assistant";
 import { LANGS, LangContext, loadLang, saveLang, useT, type Lang } from "./i18n";
 import { SchedulePage } from "./pages/Schedule";
 import { WatchPage } from "./pages/Watch";
 import { AppContext } from "./state";
 import { todayIso } from "./utils/format";
-import { href, useRoute } from "./utils/route";
+import { href, navigate, useRoute } from "./utils/route";
 
 // labels are i18n keys (web/src/i18n.ts)
 const NAV: { group: string; items: { page: string; label: string; icon: string }[] }[] = [
@@ -84,7 +85,7 @@ function Shell() {
   const [projectCode, setProjectCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [asOf, setAsOfState] = useState(loadAsOf);
-  const [theme, setTheme] = useState(() => (typeof localStorage !== "undefined" && localStorage.getItem("p2e.theme")) || "dark");
+  const [theme, setTheme] = useState(() => (typeof localStorage !== "undefined" && localStorage.getItem("p2e.theme")) || "light");
   const route = useRoute();
 
   useEffect(() => {
@@ -108,15 +109,20 @@ function Shell() {
   if (error) return <div className="center"><ErrorBox error={error} onRetry={() => window.location.reload()} /></div>;
   if (!projects) return <div className="center"><Loading what="Connecting to the P2E Bridge API" /></div>;
   if (!project) return <div className="center"><ErrorBox error="No project imported yet. Run scripts/phase1/init_database.py." /></div>;
-  if (!signedIn) return route.page === "terms" ? <div className="content"><LangPicker /> <a href={href("overview")}>←</a><TermsPage /></div>
-    : <SignIn project={project} onDone={() => setSignedIn(true)} />;
+  if (!signedIn) {
+    const done = () => { setSignedIn(true); navigate("overview"); };
+    if (route.page === "signin") return <SignInPage project={project} onDone={done} />;
+    if (route.page === "signup") return <SignUpPage />;
+    if (route.page === "terms") return <div className="content"><LangPicker /> <a href={href("welcome")}>←</a><TermsPage /></div>;
+    return <LandingPage project={project} />;
+  }
 
   const page = PAGES[route.page] ? route.page : "overview";
   return (
     <AppContext.Provider value={{ project, asOf, setAsOf, live, snapshot }}>
       <div className="shell">
         <aside className="sidebar">
-          <div className="brand"><span className="brand-mark">P2E</span><span><strong>Bridge</strong><small>{t("shell.tagline")}</small></span></div>
+          <div className="brand"><img src="/brand/logo.webp" alt="P2E Bridge" className="brand-logo" /><small>{t("shell.tagline")}</small></div>
           <nav aria-label="Main">
             {NAV.map((g) => (
               <div key={g.group} className="nav-group">
@@ -143,46 +149,12 @@ function Shell() {
             <LangPicker />
             <Badge tone={connected ? "ok" : "muted"} title="Live updates from the backend event stream">{connected ? t("shell.live") : t("shell.offline")}</Badge>
             <button type="button" className="btn btn-sm" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Toggle colour theme">{theme === "dark" ? "☀" : "☾"}</button>
-            <button type="button" className="btn btn-sm" onClick={() => { apiKey.clear(); setSignedIn(false); }}>{t("shell.signout")}</button>
+            <button type="button" className="btn btn-sm" onClick={() => { apiKey.clear(); setSignedIn(false); navigate("welcome"); }}>{t("shell.signout")}</button>
           </header>
           <main className="content" key={page}>{PAGES[page]()}</main>
         </div>
       </div>
       <Assistant />
     </AppContext.Provider>
-  );
-}
-
-function SignIn({ project, onDone }: { project: Project; onDone: () => void }) {
-  const { t } = useT();
-  const [key, setKey] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const submit = async () => {
-    setBusy(true);
-    setError(null);
-    apiKey.set(key.trim());
-    try {
-      await p2e.documents(project.code, { limit: 1 });       // a protected call: proves the key works
-      onDone();
-    } catch (e) {
-      apiKey.clear();
-      setError(e instanceof ApiError && e.status === 503 ? "The server has no API keys configured (set P2E_API_KEYS)." : (e as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  };
-  return (
-    <div className="center">
-      <form className="card signin" onSubmit={(e) => { e.preventDefault(); submit(); }}>
-        <div className="brand"><span className="brand-mark">P2E</span><span><strong>Bridge</strong><small>{project.code} · {project.name}</small></span></div>
-        <LangPicker />
-        <p className="muted">{t("signin.intro")}</p>
-        <label className="stacked">{t("signin.key")}<input type="password" autoComplete="off" value={key} onChange={(e) => setKey(e.target.value)} required minLength={16} autoFocus /></label>
-        {error && <ErrorBox error={error} />}
-        <button className="btn btn-primary" disabled={busy || key.trim().length < 16}>{busy ? t("signin.checking") : t("signin.go")}</button>
-        <p className="muted small"><a href={href("terms")}>{t("signin.terms")}</a></p>
-      </form>
-    </div>
   );
 }

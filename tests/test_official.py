@@ -117,3 +117,30 @@ def test_company_facts_are_official_only():
 def test_profit_figures_match_the_annual_report():
     fin = next(e for e in assistant.company()["entries"] if e["id"] == "financials")["text"]["en"]
     assert "₹6,114.19 crore standalone and ₹7,039.63 crore consolidated" in fin
+
+
+# ----------------------------------------------------------------------------- sign-in, demo account, request access
+
+ACCOUNT_KEYS = {"planner-key-0123456789ab": "planner", "admin-key-0123456789abcd": "admin"}
+
+
+def test_login_demo_and_access_requests(tmp_path, monkeypatch):
+    app = create_app(f"sqlite:///{(tmp_path / 'b.db').as_posix()}", api_keys=dict(ACCOUNT_KEYS), upload_dir=tmp_path / "up")
+    with TestClient(app) as c:
+        ok = c.post("/api/v1/auth/login", json={"username": "Planner", "password": "planner-key-0123456789ab"})
+        assert ok.status_code == 200 and ok.json() == {"role": "planner", "token": "planner-key-0123456789ab"}
+        assert c.post("/api/v1/auth/login", json={"username": "admin", "password": "planner-key-0123456789ab"}).status_code == 401
+        assert c.post("/api/v1/auth/login", json={"username": "planner", "password": "nope"}).status_code == 401
+        monkeypatch.delenv("P2E_DEMO_ACCOUNT", raising=False)
+        assert c.get("/api/v1/auth/demo").status_code == 404                          # production: no demo account
+        monkeypatch.setenv("P2E_DEMO_ACCOUNT", "admin")
+        assert c.get("/api/v1/auth/demo").json() == {"username": "admin", "password": "admin-key-0123456789abcd"}
+        form = {"name": "R. Gogoi", "email": "r.gogoi@example.in", "organisation": "Oil India Limited",
+                "role_requested": "planner", "reason": "Pilot on Area 3"}
+        made = c.post("/api/v1/access-requests", json=form)
+        assert made.status_code == 201 and made.json()["status"] == "pending"
+        assert c.post("/api/v1/access-requests", json=form | {"email": "not-an-email"}).status_code == 422
+        assert c.get("/api/v1/access-requests", headers={"X-API-Key": "planner-key-0123456789ab"}).status_code == 403
+        rows = c.get("/api/v1/access-requests", headers={"X-API-Key": "admin-key-0123456789abcd"}).json()
+        assert rows[0]["email"] == "r.gogoi@example.in" and rows[0]["status"] == "pending"
+    app.state.engine.dispose()

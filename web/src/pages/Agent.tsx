@@ -100,7 +100,7 @@ export function AgentPage() {
 
   return (
     <>
-      <PageTitle title={tr("agent.title")} subtitle={tr("agent.sub")} />
+      <PageTitle icon="agent-time" title={tr("agent.title")} subtitle={tr("agent.sub")} />
       <div className="agent">
         <div className="agent-settings card">
           <label className="stacked">{tr("agent.discipline")}

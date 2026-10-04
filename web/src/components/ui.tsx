@@ -144,10 +144,11 @@ export function CompareBars({ rows, a, b }: { rows: [string, number, number][]; 
   );
 }
 
-export function PageTitle({ title, subtitle, actions }: { title: string; subtitle?: ReactNode; actions?: ReactNode }) {
+export function PageTitle({ title, subtitle, actions, icon }: { title: string; subtitle?: ReactNode; actions?: ReactNode; icon?: string }) {
   return (
     <div className="page-title">
-      <div><h1>{title}</h1>{subtitle && <p className="muted">{subtitle}</p>}</div>
+      {icon && <img className="page-icon" src={`/brand/${icon}.webp`} alt="" width={48} height={48} />}
+      <div className="grow"><h1>{title}</h1>{subtitle && <p className="muted">{subtitle}</p>}</div>
       {actions && <div className="page-actions">{actions}</div>}
     </div>
   );

@@ -34,7 +34,7 @@ export function MemoryPage() {
   };
   return (
     <>
-      <PageTitle title={t("memory.title")} subtitle={t("memory.sub")} />
+      <PageTitle icon="agent-memory" title={t("memory.title")} subtitle={t("memory.sub")} />
       <div className="split split-wide">
         <div>
           <Card title="Ask">

@@ -10,7 +10,7 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.142-009688?logo=fastapi&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6?logo=typescript&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-307%20backend%20%7C%2017%20frontend-2ea44f)
+![Tests](https://img.shields.io/badge/tests-308%20backend%20%7C%2017%20frontend-2ea44f)
 ![AI tokens](https://img.shields.io/badge/AI%20tokens%20for%20routine%20work-0-5B3FD1)
 ![Languages](https://img.shields.io/badge/languages-English%20%7C%20தமிழ்%20%7C%20हिन्दी%20%7C%20অসমীয়া-14213D)
 ![Official resources](https://img.shields.io/badge/official%20resources-BHASHINI%20%7C%20AIKosh%20%7C%20OIL-FF9933)
@@ -199,7 +199,7 @@ Details and configuration: [docs/OFFICIAL_RESOURCES.md](docs/OFFICIAL_RESOURCES.
 
 ## Quick start (Windows)
 
-**Fastest:** double-click **`start_demo.bat`** → opens http://localhost:8000 → sign in with `demo-planner-key-123456` → set **As of = 2026-09-16**.
+**Fastest:** double-click **`start_demo.bat`** → opens http://localhost:8000 → the cinematic landing page opens → **Sign in** → press **Fill demo credentials** (admin demo account) → set **As of = 2026-09-16**. New users use **Request access** (stored for an admin to review; `GET /api/v1/access-requests`). The demo account is offered only when `P2E_DEMO_ACCOUNT` is set; production leaves it unset.
 
 First-time setup:
 ```powershell
@@ -223,7 +223,7 @@ Useful scripts: weekly PM report `scripts\phase8\generate_reports.py --period we
 
 ### Checks
 ```powershell
-.venv\Scripts\python -m pytest                     # 307 backend tests
+.venv\Scripts\python -m pytest                     # 308 backend tests
 .venv\Scripts\python scripts\phase3\evaluate_linking.py
 .venv\Scripts\python scripts\phase5\evaluate_apply.py
 .venv\Scripts\python scripts\phase6\evaluate_qa.py

@@ -49,11 +49,11 @@ export function Assistant() {
     }
   };
 
-  if (!open) return <button type="button" className="assistant-fab btn btn-primary" onClick={() => setOpen(true)}>💬 {t("as.open")}</button>;
+  if (!open) return <button type="button" className="assistant-fab btn btn-primary" onClick={() => setOpen(true)}><img src="/brand/chatbot.webp" alt="" width={26} height={26} className="fab-avatar" />{t("as.open")}</button>;
   return (
     <aside className="assistant card" aria-label={t("as.title")}>
       <header className="assistant-head">
-        <strong>{t("as.title")}</strong>
+        <img src="/brand/chatbot.webp" alt="" width={28} height={28} className="fab-avatar" /><strong>{t("as.title")}</strong>
         <button type="button" className="btn btn-sm" onClick={() => setOpen(false)} aria-label={t("as.close")}>✕</button>
       </header>
       <p className="muted small">{t("as.scope")}{voice.provider === "bhashini" && " · 🎤 BHASHINI"}</p>

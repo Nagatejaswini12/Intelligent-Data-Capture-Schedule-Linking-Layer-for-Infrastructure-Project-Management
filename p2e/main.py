@@ -18,8 +18,10 @@ from p2e.api.documents import router as documents_router
 from p2e.api.links import router as links_router
 from p2e.api.review import router as review_router
 from p2e.api.speech import router as speech_router
+from p2e.api.account import router as account_router
 from p2e.api.routes import health_router, router
 from p2e.config import REPO_ROOT, get_settings
+from p2e.db.models import AccessRequest
 from p2e.db.session import make_engine, make_sessionmaker
 from p2e.extract.pipeline import load_project_vocab
 from p2e.link import adjudicate
@@ -34,6 +36,7 @@ def create_app(db_url: str | None = None, *, api_keys: dict[str, str] | None = N
     settings = get_settings()
     app = FastAPI(title="P2E Bridge API (SIH26122)", version=__version__)
     app.state.engine = make_engine(db_url or settings.db_url)
+    AccessRequest.__table__.create(app.state.engine, checkfirst=True)   # sign-up table; databases built before it get it here
     app.state.sessionmaker = make_sessionmaker(app.state.engine)
     app.state.api_keys = api_keys if api_keys is not None else parse_api_keys(settings.api_keys_spec)
     app.state.upload_dir = Path(upload_dir or settings.upload_dir)
@@ -47,6 +50,7 @@ def create_app(db_url: str | None = None, *, api_keys: dict[str, str] | None = N
     app.include_router(agent_router)
     app.include_router(review_router)
     app.include_router(analytics_router)
+    app.include_router(account_router)         # sign-in, demo account, request access
     app.include_router(speech_router)          # BHASHINI speech / translation (official, optional)
 
     @app.exception_handler(StarletteHTTPException)
