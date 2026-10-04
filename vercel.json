@@ -3,6 +3,7 @@
   "installCommand": "cd web && npm ci",
   "buildCommand": "cd web && npm run build",
   "outputDirectory": "web/dist",
+  "regions": ["sin1"],
   "functions": {
     "api/index.py": {
       "maxDuration": 60,
