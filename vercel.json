@@ -6,6 +6,7 @@
   "functions": {
     "api/index.py": {
       "maxDuration": 60,
+      "includeFiles": "{p2e/**,data/company/**,data/help/**,data/synthetic/**}",
       "excludeFiles": "{web/**,tests/**,docs/**,eval/**,exports/**,scripts/**,data/uploads/**,data/*.db,.venv/**}"
     }
   },
