@@ -245,3 +245,7 @@ details summary { cursor: pointer; color: var(--muted); font-size: 12px; margin:
 .terms-section h3 { margin: 14px 0 4px; font-size: 15px; }
 .terms-section p { margin: 0; line-height: 1.55; }
 .guide-video { width: 100%; max-height: 70vh; border-radius: 8px; background: #000; }
+
+/* voice row (BHASHINI) */
+.assistant-foot { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.heard-note { margin: 4px 10px 0; }

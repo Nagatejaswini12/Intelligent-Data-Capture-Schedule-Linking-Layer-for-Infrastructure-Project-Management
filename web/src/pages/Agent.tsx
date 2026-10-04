@@ -2,6 +2,7 @@ import { useState } from "react";
 import { p2e, type AgentReply } from "../api/p2e";
 import { Badge, Empty, ErrorBox, Field, PageTitle } from "../components/ui";
 import { useApi } from "../hooks/useApi";
+import { useSpeech, type VoiceLang } from "../hooks/useSpeech";
 import { useApp } from "../state";
 import { useT } from "../i18n";
 import { decisionTone, fmtDate, fmtNum, humanize } from "../utils/format";
@@ -14,20 +15,6 @@ const EXAMPLES = ["LT-4011 loop check finished yesterday at 4 pm", "Line 1217 er
 // Menu taps send the plan name plus a glossary verb through the normal rules interpreter and linker (0 LLM tokens; the
 // linker's gates still apply, so near-identical names go to planner review instead of a guess).
 const TAP: [label: string, verb: string][] = [["agent.start", "tap.start"], ["agent.finish", "tap.finish"], ["agent.hold", "tap.hold"]];
-
-// Browser speech (Chrome/Edge): en-IN also transcribes spoken Hinglish in Latin script, which the glossary understands.
-type Recognizer = { lang: string; interimResults: boolean; onresult: (e: { results: { 0: { transcript: string } }[] }) => void;
-  onend: () => void; start: () => void };
-const SpeechRec = (globalThis as unknown as { SpeechRecognition?: new () => Recognizer; webkitSpeechRecognition?: new () => Recognizer })
-  .SpeechRecognition ?? (globalThis as unknown as { webkitSpeechRecognition?: new () => Recognizer }).webkitSpeechRecognition;
-
-function speak(text: string, lang = "en-IN") {
-  if (!("speechSynthesis" in globalThis)) return;
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = lang;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
-}
 
 interface Turn { message: string; answers?: Record<string, string>; reply?: AgentReply; error?: string; retracted?: boolean; note?: string }
 
@@ -42,14 +29,16 @@ export function expandReference(message: string, lastActivity: string | null): s
 
 export function AgentPage() {
   const { project, asOf } = useApp();
-  const { t: tr, lang, speech } = useT();
+  const { t: tr, lang } = useT();
   const { params } = useRoute();
   const [discipline, setDiscipline] = useState(params.get("discipline") ?? "");
   const [time, setTime] = useState("18:00");
   const [text, setText] = useState(params.get("message") ?? "");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [busy, setBusy] = useState(false);
-  const [listening, setListening] = useState(false);
+  const voice = useSpeech();
+  const [voiceLang, setVoiceLang] = useState<VoiceLang>(lang);
+  const [heardNote, setHeardNote] = useState<string | null>(null);
   const [voiceReplies, setVoiceReplies] = useState(false);
   const reference = `${asOf}T${time}:00`;      // relative dates resolve against this (project timezone on the server)
   const menu = useApi(() => (discipline ? p2e.checklist(project.code, { as_of: asOf, discipline }) : Promise.resolve(null)),
@@ -65,7 +54,7 @@ export function AgentPage() {
       await p2e.retract(project.code, eventId);
       setTurns((ts) => [...ts.map((t) => (t.reply?.event_id === eventId ? { ...t, retracted: true } : t)),
         { message: "undo", note: tr("agent.undone") }]);
-      if (voiceReplies) speak(tr("agent.undone"), speech);
+      if (voiceReplies) voice.speak(tr("agent.undone"), lang);
     } catch (e) {
       setTurns((ts) => [...ts, { message: "undo", error: (e as Error).message }]);
     }
@@ -83,7 +72,7 @@ export function AgentPage() {
     const turn: Turn = { message, answers };
     try {
       turn.reply = await p2e.agent(project.code, { message, reference_datetime: reference, discipline: discipline || undefined, answers, lang });
-      if (voiceReplies) speak(turn.reply.reply, speech);
+      if (voiceReplies) voice.speak(turn.reply.reply, lang);
       if (turn.reply.status === "recorded") menu.reload();
     } catch (e) {
       turn.error = (e as Error).message;
@@ -92,15 +81,21 @@ export function AgentPage() {
     setBusy(false);
   };
 
-  const listen = () => {
-    if (!SpeechRec) return;
-    const r = new SpeechRec();
-    r.lang = speech;
-    r.interimResults = false;
-    r.onresult = (e) => setText(e.results[0][0].transcript);
-    r.onend = () => setListening(false);
-    setListening(true);
-    r.start();
+  // Voice: BHASHINI when configured (adds Assamese, translated to English for the Time Agent), else the browser.
+  const listen = async () => {
+    if (voice.listening) { voice.stop(); return; }
+    try {
+      const heard = await voice.listen(voiceLang);
+      if (voiceLang === "as") {
+        setHeardNote(heard);
+        setText(await voice.translate(heard, "as", "en"));
+      } else {
+        setHeardNote(null);
+        setText(heard);
+      }
+    } catch (e) {
+      setTurns((ts) => [...ts, { message: "🎤", error: (e as Error).message }]);
+    }
   };
 
   return (
@@ -150,9 +145,15 @@ export function AgentPage() {
               </div>
             ))}
           </div>
+          {heardNote && <p className="muted small heard-note">অসমীয়া: {heardNote} → EN (BHASHINI)</p>}
           <form className="chat-input" onSubmit={(e) => { e.preventDefault(); if (text.trim()) { send(text.trim()); setText(""); } }}>
             <input value={text} onChange={(e) => setText(e.target.value)} placeholder={tr("agent.placeholder")} aria-label="Message" maxLength={1000} />
-            {SpeechRec && <button type="button" className="btn" onClick={listen} disabled={busy || listening} aria-label="Speak message">{listening ? tr("agent.listening") : "🎤"}</button>}
+            {voice.provider !== "none" && <button type="button" className="btn" onClick={listen} disabled={busy} aria-label="Speak message">{voice.listening ? "■ " + tr("agent.listening") : "🎤"}</button>}
+            {voice.provider !== "none" && (
+              <select value={voiceLang} onChange={(e) => setVoiceLang(e.target.value as VoiceLang)} aria-label="Voice language">
+                {voice.languages.map((l) => <option key={l} value={l}>{{ en: "EN", hi: "हि", ta: "த", as: "অ" }[l]}</option>)}
+              </select>
+            )}
             <button className="btn btn-primary" disabled={busy || !text.trim()}>{busy ? "…" : tr("agent.send")}</button>
           </form>
         </div>

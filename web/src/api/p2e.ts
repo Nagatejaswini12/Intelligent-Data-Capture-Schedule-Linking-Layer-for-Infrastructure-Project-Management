@@ -124,6 +124,10 @@ export const p2e = {
   // Phase 1: schedule tree
   hierarchy: (c: string) => api<TreeNode>(`${P(c)}/hierarchy`),
   // Phase 4: Time Agent
+  speechStatus: () => api<{ provider: string; mode: string | null; languages: string[] }>(`/api/v1/speech/status`),   // BHASHINI
+  asr: (body: { audio_b64: string; lang: string }) => api<{ text: string }>(`/api/v1/speech/asr`, { method: "POST", body }),
+  tts: (body: { text: string; lang: string }) => api<{ audio_b64: string; format: string }>(`/api/v1/speech/tts`, { method: "POST", body }),
+  translate: (body: { text: string; source: string; target: string }) => api<{ text: string }>(`/api/v1/speech/translate`, { method: "POST", body }),
   helpDoc: (doc: "guide" | "terms") => api<HelpDoc>(`/api/v1/help/${doc}`),   // upgrade L4 (public)
   assistant: (c: string, body: { question: string; lang: string; as_of: string }) => api<AssistantReply>(`${P(c)}/assistant/ask`, { method: "POST", body }),   // upgrade L3
   agent: (c: string, body: { message: string; reference_datetime: string; discipline?: string; answers?: Record<string, string>; lang?: string }) =>

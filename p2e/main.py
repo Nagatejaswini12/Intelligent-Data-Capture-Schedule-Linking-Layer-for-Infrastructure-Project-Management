@@ -17,6 +17,7 @@ from p2e.api.auth import parse_api_keys
 from p2e.api.documents import router as documents_router
 from p2e.api.links import router as links_router
 from p2e.api.review import router as review_router
+from p2e.api.speech import router as speech_router
 from p2e.api.routes import health_router, router
 from p2e.config import REPO_ROOT, get_settings
 from p2e.db.session import make_engine, make_sessionmaker
@@ -46,6 +47,7 @@ def create_app(db_url: str | None = None, *, api_keys: dict[str, str] | None = N
     app.include_router(agent_router)
     app.include_router(review_router)
     app.include_router(analytics_router)
+    app.include_router(speech_router)          # BHASHINI speech / translation (official, optional)
 
     @app.exception_handler(StarletteHTTPException)
     async def http_problem(_: Request, exc: StarletteHTTPException):

@@ -1,114 +1,130 @@
 {
-  "_note": "Company facts for the P2E assistant. Every entry cites a public source and an as-of date; figures change, so re-check them before a presentation. Tamil and Hindi are translations of the English text and should be reviewed by native speakers. Market data is information, not investment advice.",
+  "_note": "Oil India Limited facts for the P2E assistant, taken ONLY from official sources: OIL's Annual Report 2024-25 and pages on oil-india.com (financial results, Net Zero 2040, CSR). Every entry cites its source and date. Tamil and Hindi are translations of the English text and should be reviewed by native speakers. Live share prices, analyst targets, employee reviews and social-media opinions are not official data and are deliberately not answered.",
   "company": "Oil India Limited",
   "retrieved": "2026-10-04",
+  "official_domains": ["oil-india.com", "nseindia.com", "bseindia.com", "gov.in"],
   "entries": [
     {
       "id": "overview",
       "topic": "Company overview",
-      "keywords": ["oil india", "company", "maharatna", "duliajan", "noida", "headquarters", "headquarter", "founded", "history", "1959", "cpse", "நிறுவனம்", "ஆயில் இந்தியா", "வரலாறு", "தலைமையகம்", "कंपनी", "ऑयल इंडिया", "इतिहास", "मुख्यालय", "महारत्न"],
+      "keywords": ["oil india", "company", "maharatna", "history", "founded", "1959", "digboi", "cpse", "wells", "rigs", "நிறுவனம்", "ஆயில் இந்தியா", "வரலாறு", "மகாரத்னா", "कंपनी", "ऑयल इंडिया", "इतिहास", "महारत्न"],
       "text": {
-        "en": "Oil India Limited (OIL) is a Government of India Maharatna company (status granted in August 2023, the 13th Maharatna CPSE) in oil and gas exploration and production. It was founded on 18 February 1959; its registered office and field headquarters are in Duliajan, Assam, and its corporate office is in Noida.",
-        "ta": "ஆயில் இந்தியா லிமிடெட் (OIL) இந்திய அரசின் மகாரத்னா நிறுவனம் (ஆகஸ்ட் 2023-இல் இந்த அந்தஸ்து பெற்றது; 13-ஆவது மகாரத்னா பொதுத்துறை நிறுவனம்). இது எண்ணெய் மற்றும் எரிவாயு ஆய்வு, உற்பத்தியில் ஈடுபட்டுள்ளது. 18 பிப்ரவரி 1959-இல் தொடங்கப்பட்டது; பதிவு அலுவலகமும் களத் தலைமையகமும் அசாமின் துலியாஜானில், கார்ப்பரேட் அலுவலகம் நொய்டாவில் உள்ளன.",
-        "hi": "ऑयल इंडिया लिमिटेड (OIL) भारत सरकार की महारत्न कंपनी है (अगस्त 2023 में यह दर्जा मिला; 13वीं महारत्न सीपीएसई), जो तेल और गैस की खोज और उत्पादन करती है। इसकी स्थापना 18 फ़रवरी 1959 को हुई; पंजीकृत कार्यालय और फ़ील्ड मुख्यालय दुलियाजान, असम में और कॉर्पोरेट कार्यालय नोएडा में है।"
+        "en": "Oil India Limited (OIL) is a National Oil Company, incorporated in 1959 and rooted in India's first crude oil discovery at Digboi in 1889. It was awarded Maharatna CPSE status on 4 August 2023. In FY 2024-25 it completed 57 wells (22 exploratory, 35 development) with a fleet of 21 rigs across Assam, Rajasthan, Mahanadi and the Andaman offshore.",
+        "ta": "ஆயில் இந்தியா லிமிடெட் (OIL) ஒரு தேசிய எண்ணெய் நிறுவனம்; 1959-இல் நிறுவப்பட்டது, 1889-இல் திக்பாயில் இந்தியாவின் முதல் கச்சா எண்ணெய் கண்டுபிடிப்பில் வேரூன்றியது. 4 ஆகஸ்ட் 2023 அன்று மகாரத்னா பொதுத்துறை அந்தஸ்து பெற்றது. 2024-25-இல் அசாம், ராஜஸ்தான், மகாநதி, அந்தமான் கடல்பகுதியில் 21 துளையிடும் கருவிகளுடன் 57 கிணறுகளை (22 ஆய்வு, 35 மேம்பாட்டு) முடித்தது.",
+        "hi": "ऑयल इंडिया लिमिटेड (OIL) एक राष्ट्रीय तेल कंपनी है, जिसकी स्थापना 1959 में हुई और जिसकी जड़ें 1889 में डिगबोई में भारत की पहली कच्चे तेल की खोज में हैं। 4 अगस्त 2023 को इसे महारत्न सीपीएसई का दर्जा मिला। वित्त वर्ष 2024-25 में असम, राजस्थान, महानदी और अंडमान अपतटीय क्षेत्र में 21 रिग के साथ 57 कुएँ (22 अन्वेषण, 35 विकास) पूरे किए।"
       },
-      "sources": [{"title": "Oil India (Wikipedia)", "url": "https://en.wikipedia.org/wiki/Oil_India"}],
+      "sources": [{"title": "OIL Annual Report 2024-25 (official)", "url": "https://www.oil-india.com/files/financial_results_documents/OIL_India_Annual_Report_2024_25_0.pdf"}],
+      "as_of": "2025-03-31"
+    },
+    {
+      "id": "financials",
+      "topic": "Financial results",
+      "keywords": ["revenue", "profit", "income", "financial", "financials", "results", "earnings", "pat", "eps", "fy25", "fy26", "2024-25", "2025-26", "annual report", "performance", "market report", "exchequer", "வருவாய்", "லாபம்", "நிதி", "முடிவுகள்", "செயல்திறன்", "राजस्व", "मुनाफ़ा", "लाभ", "वित्तीय", "नतीजे", "प्रदर्शन"],
+      "text": {
+        "en": "FY 2024-25 (Annual Report): total income ₹23,987.07 crore standalone and ₹37,830.04 crore consolidated; net profit ₹6,114.19 crore standalone and ₹7,039.63 crore consolidated; ₹11,231.86 crore contributed to the Government as duties, taxes and dividends. Year ended 31 March 2026 (as shown on OIL's Financial Results page): revenue ₹24,039 crore, profit after tax ₹4,455 crore, earnings per share ₹27.39.",
+        "ta": "2024-25 (ஆண்டறிக்கை): மொத்த வருவாய் தனிநிலை ₹23,987.07 கோடி, ஒருங்கிணைந்த ₹37,830.04 கோடி; நிகர லாபம் தனிநிலை ₹6,114.19 கோடி, ஒருங்கிணைந்த ₹7,039.63 கோடி; வரி, தீர்வை, ஈவுத்தொகையாக அரசுக்கு ₹11,231.86 கோடி. 31 மார்ச் 2026-இல் முடிந்த ஆண்டு (OIL நிதி முடிவுகள் பக்கம்): வருவாய் ₹24,039 கோடி, வரிக்குப் பிந்தைய லாபம் ₹4,455 கோடி, பங்கு வருவாய் ₹27.39.",
+        "hi": "वित्त वर्ष 2024-25 (वार्षिक रिपोर्ट): कुल आय स्टैंडअलोन ₹23,987.07 करोड़ और समेकित ₹37,830.04 करोड़; शुद्ध लाभ स्टैंडअलोन ₹6,114.19 करोड़ और समेकित ₹7,039.63 करोड़; शुल्क, कर और लाभांश के रूप में सरकार को ₹11,231.86 करोड़। 31 मार्च 2026 को समाप्त वर्ष (OIL के वित्तीय परिणाम पृष्ठ के अनुसार): राजस्व ₹24,039 करोड़, कर-पश्चात लाभ ₹4,455 करोड़, प्रति शेयर आय ₹27.39।"
+      },
+      "sources": [{"title": "OIL Annual Report 2024-25 (official)", "url": "https://www.oil-india.com/files/financial_results_documents/OIL_India_Annual_Report_2024_25_0.pdf"},
+                  {"title": "OIL Financial Results (official)", "url": "https://www.oil-india.com/financial-results"}],
       "as_of": "2026-10-04"
+    },
+    {
+      "id": "production",
+      "topic": "Oil and gas production FY 2024-25",
+      "keywords": ["production", "produce", "crude", "oil production", "gas", "natural gas", "mmtoe", "mmt", "mmscm", "output", "reserves", "உற்பத்தி", "கச்சா", "எரிவாயு", "उत्पादन", "कच्चा तेल", "गैस"],
+      "text": {
+        "en": "FY 2024-25 was OIL's best production year since inception: 6.710 MMTOE of oil and oil-equivalent gas, the highest-ever natural gas production of 3,252 MMSCM, and crude oil of 3.458 MMT, up 2.95% from 3.359 MMT in FY 2023-24 (nearly 15% growth over three years).",
+        "ta": "2024-25 OIL-இன் தொடக்கம் முதல் சிறந்த உற்பத்தி ஆண்டு: எண்ணெய் மற்றும் எண்ணெய்க்கு இணையான எரிவாயு 6.710 MMTOE, இதுவரை இல்லாத இயற்கை எரிவாயு உற்பத்தி 3,252 MMSCM, கச்சா எண்ணெய் 3.458 MMT (2023-24-இன் 3.359 MMT-இலிருந்து 2.95% உயர்வு; மூன்று ஆண்டுகளில் சுமார் 15% வளர்ச்சி).",
+        "hi": "वित्त वर्ष 2024-25 स्थापना के बाद से OIL का सबसे अच्छा उत्पादन वर्ष रहा: तेल और तेल-समतुल्य गैस 6.710 MMTOE, अब तक का सर्वाधिक प्राकृतिक गैस उत्पादन 3,252 MMSCM, और कच्चा तेल 3.458 MMT (2023-24 के 3.359 MMT से 2.95% अधिक; तीन वर्षों में लगभग 15% वृद्धि)।"
+      },
+      "sources": [{"title": "OIL Annual Report 2024-25 (official)", "url": "https://www.oil-india.com/files/financial_results_documents/OIL_India_Annual_Report_2024_25_0.pdf"}],
+      "as_of": "2025-03-31"
     },
     {
       "id": "nrl",
-      "topic": "Numaligarh Refinery (subsidiary)",
-      "keywords": ["numaligarh", "nrl", "refinery", "subsidiary", "stake", "நுமாலிகார்", "சுத்திகரிப்பு", "துணை நிறுவனம்", "नुमालीगढ़", "रिफ़ाइनरी", "सहायक कंपनी"],
+      "topic": "Numaligarh Refinery (material subsidiary)",
+      "keywords": ["numaligarh", "nrl", "refinery", "subsidiary", "sustainable aviation fuel", "saf", "நுமாலிகார்", "சுத்திகரிப்பு", "துணை நிறுவனம்", "नुमालीगढ़", "रिफ़ाइनरी", "सहायक कंपनी"],
       "text": {
-        "en": "OIL is the promoter and holding company of Numaligarh Refinery Limited (NRL): it held 12.35% from 2000 and acquired a further 54.16% from BPCL in March 2021, making NRL its subsidiary.",
-        "ta": "நுமாலிகார் ரிஃபைனரி லிமிடெட் (NRL)-இன் ஊக்குவிப்பாளரும் தாய் நிறுவனமும் OIL: 2000 முதல் 12.35% பங்கு வைத்திருந்தது; மார்ச் 2021-இல் BPCL-இடமிருந்து மேலும் 54.16% வாங்கி NRL-ஐத் துணை நிறுவனமாக்கியது.",
-        "hi": "OIL, नुमालीगढ़ रिफ़ाइनरी लिमिटेड (NRL) की प्रमोटर और होल्डिंग कंपनी है: 2000 से इसकी 12.35% हिस्सेदारी थी और मार्च 2021 में BPCL से 54.16% और ख़रीदकर NRL को अपनी सहायक कंपनी बनाया।"
+        "en": "Numaligarh Refinery Limited (NRL) is OIL's material subsidiary. It is expanding from 3 to 9 MMTPA (₹9,108.82 crore of capex in FY 2024-25) and is developing a 2.4 KTPA green hydrogen plant; a 200 KTPA sustainable aviation fuel project at Paradip is planned.",
+        "ta": "நுமாலிகார் ரிஃபைனரி லிமிடெட் (NRL) OIL-இன் முக்கிய துணை நிறுவனம். இது 3-இலிருந்து 9 MMTPA-க்கு விரிவடைகிறது (2024-25-இல் ₹9,108.82 கோடி மூலதனச் செலவு); 2.4 KTPA பசுமை ஹைட்ரஜன் ஆலையை உருவாக்குகிறது; பாரதீப்பில் 200 KTPA நிலையான விமான எரிபொருள் திட்டம் திட்டமிடப்பட்டுள்ளது.",
+        "hi": "नुमालीगढ़ रिफ़ाइनरी लिमिटेड (NRL) OIL की प्रमुख सहायक कंपनी है। इसका विस्तार 3 से 9 MMTPA तक हो रहा है (2024-25 में ₹9,108.82 करोड़ पूंजीगत व्यय) और यह 2.4 KTPA ग्रीन हाइड्रोजन संयंत्र विकसित कर रही है; पारादीप में 200 KTPA सस्टेनेबल एविएशन फ़्यूल परियोजना प्रस्तावित है।"
       },
-      "sources": [{"title": "Oil India (Wikipedia)", "url": "https://en.wikipedia.org/wiki/Oil_India"}, {"title": "Numaligarh Refinery (Wikipedia)", "url": "https://en.wikipedia.org/wiki/Numaligarh_Refinery"}],
-      "as_of": "2026-10-04"
-    },
-    {
-      "id": "financials_fy25",
-      "topic": "Financial results FY 2024-25",
-      "keywords": ["revenue", "profit", "income", "financial", "financials", "results", "earnings", "turnover", "pat", "fy25", "2024-25", "annual report", "performance", "market report", "வருவாய்", "லாபம்", "நிதி", "முடிவுகள்", "செயல்திறன்", "राजस्व", "मुनाफ़ा", "लाभ", "वित्तीय", "नतीजे", "प्रदर्शन"],
-      "text": {
-        "en": "FY 2024-25: income from operations ₹36,163.75 crore (FY24: ₹36,303.62 crore); standalone profit after tax ₹7,039.63 crore (FY24: ₹6,980.45 crore); consolidated net profit ₹6,550.93 crore, up 3.3% year on year.",
-        "ta": "2024-25 நிதியாண்டு: செயல்பாட்டு வருவாய் ₹36,163.75 கோடி (2023-24: ₹36,303.62 கோடி); தனிநிலை வரிக்குப் பிந்தைய லாபம் ₹7,039.63 கோடி (2023-24: ₹6,980.45 கோடி); ஒருங்கிணைந்த நிகர லாபம் ₹6,550.93 கோடி, ஆண்டுக்கு 3.3% உயர்வு.",
-        "hi": "वित्त वर्ष 2024-25: परिचालन से आय ₹36,163.75 करोड़ (2023-24: ₹36,303.62 करोड़); स्टैंडअलोन कर-पश्चात लाभ ₹7,039.63 करोड़ (2023-24: ₹6,980.45 करोड़); समेकित शुद्ध लाभ ₹6,550.93 करोड़, साल-दर-साल 3.3% अधिक।"
-      },
-      "sources": [{"title": "OIL Annual Report 2024-25", "url": "https://www.oil-india.com/files/financial_results_documents/OIL_India_Annual_Report_2024_25.pdf"}, {"title": "EnergyWatch: Oil India FY25 results", "url": "https://www.energywatch.in/companies/oil-indias-fy25-profit-drops-on-tax-provisions-but-core-operations-stay-strong"}],
-      "as_of": "2025-05-21"
-    },
-    {
-      "id": "production_fy25",
-      "topic": "Oil and gas production FY 2024-25",
-      "keywords": ["production", "produce", "crude", "oil production", "gas", "natural gas", "mmtoe", "mmt", "bcm", "output", "உற்பத்தி", "கச்சா", "எரிவாயு", "उत्पादन", "कच्चा तेल", "गैस"],
-      "text": {
-        "en": "FY 2024-25 was OIL's highest-ever combined oil and gas production at 6.71 MMTOE: crude oil 3.458 million tonnes (+2.95%) and natural gas 3.252 billion cubic metres (+2.20%).",
-        "ta": "2024-25-இல் OIL இதுவரை இல்லாத அளவு 6.71 MMTOE எண்ணெய் மற்றும் எரிவாயு உற்பத்தி செய்தது: கச்சா எண்ணெய் 3.458 மில்லியன் டன் (+2.95%), இயற்கை எரிவாயு 3.252 பில்லியன் கன மீட்டர் (+2.20%).",
-        "hi": "वित्त वर्ष 2024-25 में OIL का अब तक का सबसे अधिक संयुक्त तेल और गैस उत्पादन 6.71 MMTOE रहा: कच्चा तेल 3.458 मिलियन टन (+2.95%) और प्राकृतिक गैस 3.252 बिलियन घन मीटर (+2.20%)।"
-      },
-      "sources": [{"title": "EnergyWatch: Oil India FY25 results", "url": "https://www.energywatch.in/companies/oil-indias-fy25-profit-drops-on-tax-provisions-but-core-operations-stay-strong"}],
-      "as_of": "2025-05-21"
+      "sources": [{"title": "OIL Annual Report 2024-25 (official)", "url": "https://www.oil-india.com/files/financial_results_documents/OIL_India_Annual_Report_2024_25_0.pdf"}],
+      "as_of": "2025-03-31"
     },
     {
       "id": "net_zero",
-      "topic": "Environment: net zero 2040 and ESG",
-      "keywords": ["environment", "environmental", "esg", "net zero", "emission", "emissions", "carbon", "climate", "flaring", "sustainability", "green", "சுற்றுச்சூழல்", "உமிழ்வு", "கார்பன்", "நிலைத்தன்மை", "பசுமை", "पर्यावरण", "उत्सर्जन", "कार्बन", "स्थिरता", "हरित"],
+      "topic": "Environment: Net Zero 2040",
+      "keywords": ["environment", "environmental", "esg", "net zero", "emission", "emissions", "ghg", "carbon", "climate", "flaring", "sustainability", "green", "சுற்றுச்சூழல்", "உமிழ்வு", "கார்பன்", "நிலைத்தன்மை", "பசுமை", "पर्यावरण", "उत्सर्जन", "कार्बन", "स्थिरता", "हरित"],
       "text": {
-        "en": "OIL has committed to net-zero Scope 1 and 2 emissions by 2040. Its ESG strategy was launched on 14 June 2024 in Noida, covering emissions reduction, renewables, biodiversity, human rights and diversity; it targets zero routine flaring and plans about ₹25,000 crore of transition investment.",
-        "ta": "2040-க்குள் Scope 1, 2 உமிழ்வுகளை நிகர பூஜ்ஜியமாக்க OIL உறுதியளித்துள்ளது. அதன் ESG உத்தி 14 ஜூன் 2024-இல் நொய்டாவில் தொடங்கப்பட்டது; உமிழ்வுக் குறைப்பு, புதுப்பிக்கத்தக்க ஆற்றல், பல்லுயிர், மனித உரிமைகள், பன்முகத்தன்மை ஆகியவை இதில் அடங்கும். வழக்கமான எரிப்பைப் பூஜ்ஜியமாக்கவும் சுமார் ₹25,000 கோடி முதலீடு செய்யவும் திட்டமிட்டுள்ளது.",
-        "hi": "OIL ने 2040 तक स्कोप 1 और 2 उत्सर्जन को नेट-ज़ीरो करने की प्रतिबद्धता की है। इसकी ESG रणनीति 14 जून 2024 को नोएडा में शुरू हुई, जिसमें उत्सर्जन में कमी, नवीकरणीय ऊर्जा, जैव विविधता, मानवाधिकार और विविधता शामिल हैं; लक्ष्य शून्य रूटीन फ़्लेयरिंग और लगभग ₹25,000 करोड़ का निवेश है।"
+        "en": "OIL aims to be a net-zero emissions energy company by 2040 (baseline 2023-24), with interim greenhouse-gas reductions of about 25% by 2026, 85% by 2030 and 95% by 2035, zero routine flaring by 2026, and an approximate investment of ₹20,000 crore by 2040.",
+        "ta": "2040-க்குள் நிகர பூஜ்ஜிய உமிழ்வு எரிசக்தி நிறுவனமாக OIL இலக்கு கொண்டுள்ளது (அடிப்படை ஆண்டு 2023-24): 2026-க்குள் சுமார் 25%, 2030-க்குள் 85%, 2035-க்குள் 95% பசுமை இல்ல வாயுக் குறைப்பு; 2026-க்குள் வழக்கமான எரிப்பு பூஜ்ஜியம்; 2040-க்குள் சுமார் ₹20,000 கோடி முதலீடு.",
+        "hi": "OIL का लक्ष्य 2040 तक नेट-ज़ीरो उत्सर्जन ऊर्जा कंपनी बनना है (आधार वर्ष 2023-24): ग्रीनहाउस गैसों में 2026 तक लगभग 25%, 2030 तक 85% और 2035 तक 95% कमी, 2026 तक शून्य रूटीन फ़्लेयरिंग, और 2040 तक लगभग ₹20,000 करोड़ का निवेश।"
       },
-      "sources": [{"title": "OIL: Net Zero by 2040", "url": "https://www.oil-india.com/sustainability/net-zero-2040"}, {"title": "Business Standard: OIL commences ESG initiatives", "url": "https://www.business-standard.com/markets/capital-market-news/oil-india-commences-esg-initiatives-to-achieve-net-zero-emission-by-2040-124061500312_1.html"}],
-      "as_of": "2024-06-15"
+      "sources": [{"title": "OIL: Net Zero by 2040 (official)", "url": "https://www.oil-india.com/sustainability/net-zero-2040"}],
+      "as_of": "2026-10-04"
     },
     {
       "id": "renewables",
-      "topic": "Renewable energy",
-      "keywords": ["renewable", "renewables", "solar", "wind", "hydrogen", "biofuel", "carbon capture", "gw", "mw", "clean energy", "புதுப்பிக்கத்தக்க", "சூரிய", "காற்றாலை", "ஹைட்ரஜன்", "नवीकरणीय", "सौर", "पवन", "हाइड्रोजन"],
+      "topic": "Renewable energy and green hydrogen",
+      "keywords": ["renewable", "renewables", "solar", "wind", "hydrogen", "green hydrogen", "biofuel", "gw", "mw", "clean energy", "ogel", "apgcl", "புதுப்பிக்கத்தக்க", "சூரிய", "காற்றாலை", "ஹைட்ரஜன்", "नवीकरणीय", "सौर", "पवन", "हाइड्रोजन"],
       "text": {
-        "en": "OIL reports 188.1 MW of installed renewable capacity (wind 174.1 MW, solar 14 MW) and targets 5 to 5.5 GW by 2040, alongside green hydrogen, biofuels and carbon capture projects.",
-        "ta": "OIL-இன் நிறுவப்பட்ட புதுப்பிக்கத்தக்க ஆற்றல் திறன் 188.1 MW (காற்றாலை 174.1 MW, சூரிய 14 MW); 2040-க்குள் 5 முதல் 5.5 GW இலக்கு. பசுமை ஹைட்ரஜன், உயிரி எரிபொருள், கார்பன் பிடிப்புத் திட்டங்களும் உள்ளன.",
-        "hi": "OIL की स्थापित नवीकरणीय क्षमता 188.1 MW है (पवन 174.1 MW, सौर 14 MW) और 2040 तक 5 से 5.5 GW का लक्ष्य है; साथ में ग्रीन हाइड्रोजन, जैव ईंधन और कार्बन कैप्चर परियोजनाएँ भी हैं।"
+        "en": "From a base of 188.1 MW of renewables, OIL targets 5 to 5.5 GW by 2040 through its wholly owned subsidiary OGEL, including a 645 MW solar joint venture with APGCL in Assam. Its captive solar plants total 1,989 kWp, and with HPPCL it began developing a 1 MW green hydrogen plant at Dabhota, Himachal Pradesh, in FY 2024-25.",
+        "ta": "188.1 MW புதுப்பிக்கத்தக்க ஆற்றல் அடித்தளத்திலிருந்து, முழு உரிமை துணை நிறுவனமான OGEL மூலம் 2040-க்குள் 5 முதல் 5.5 GW இலக்கு; அசாமில் APGCL உடன் 645 MW சூரிய ஆற்றல் கூட்டு முயற்சி. சொந்தப் பயன்பாட்டு சூரிய ஆலைகள் 1,989 kWp; 2024-25-இல் HPPCL உடன் இமாச்சலின் தபோட்டாவில் 1 MW பசுமை ஹைட்ரஜன் ஆலை உருவாக்கம் தொடங்கியது.",
+        "hi": "188.1 MW नवीकरणीय क्षमता के आधार से OIL अपनी पूर्ण स्वामित्व वाली सहायक कंपनी OGEL के माध्यम से 2040 तक 5 से 5.5 GW का लक्ष्य रखती है, जिसमें असम में APGCL के साथ 645 MW सौर संयुक्त उद्यम शामिल है। इसके कैप्टिव सौर संयंत्र 1,989 kWp के हैं, और 2024-25 में HPPCL के साथ हिमाचल प्रदेश के दाभोटा में 1 MW ग्रीन हाइड्रोजन संयंत्र का विकास शुरू हुआ।"
       },
-      "sources": [{"title": "OIL: Net Zero by 2040", "url": "https://www.oil-india.com/sustainability/net-zero-2040"}],
-      "as_of": "2026-10-04"
+      "sources": [{"title": "OIL Annual Report 2024-25 (official)", "url": "https://www.oil-india.com/files/financial_results_documents/OIL_India_Annual_Report_2024_25_0.pdf"}],
+      "as_of": "2025-03-31"
     },
     {
       "id": "csr",
       "topic": "Social: CSR and community",
-      "keywords": ["csr", "social", "community", "livelihood", "rupantar", "swabalamban", "women", "villages", "corporate social", "சமூக", "சமூகப் பொறுப்பு", "வாழ்வாதாரம்", "சமுதாயம்", "सामाजिक", "सीएसआर", "समुदाय", "आजीविका"],
+      "keywords": ["csr", "social", "community", "livelihood", "rupantar", "swabalamban", "sparsha", "women", "villages", "corporate social", "சமூக", "சமூகப் பொறுப்பு", "வாழ்வாதாரம்", "சமுதாயம்", "सामाजिक", "सीएसआर", "समुदाय", "आजीविका"],
       "text": {
-        "en": "Under Project Rupantar (sustainable livelihoods) OIL supported 428 joint liability groups and 1,925 families in FY 2024-25 (project cost ₹9.21 crore), including 227 women-only handloom groups. Project OIL Swabalamban provides vocational training for youth in Assam and Arunachal Pradesh; OIL's CSR schemes cover healthcare, education, skills and women's empowerment.",
-        "ta": "'ரூபாந்தர்' (நிலையான வாழ்வாதாரம்) திட்டத்தின் கீழ் 2024-25-இல் OIL 428 கூட்டுப் பொறுப்புக் குழுக்களுக்கும் 1,925 குடும்பங்களுக்கும் உதவியது (திட்டச் செலவு ₹9.21 கோடி); இதில் பெண்கள் மட்டுமே உள்ள 227 கைத்தறிக் குழுக்கள் அடங்கும். 'ஸ்வபலம்பன்' திட்டம் அசாம், அருணாச்சல பிரதேச இளைஞர்களுக்குத் தொழில் பயிற்சி அளிக்கிறது.",
-        "hi": "'प्रोजेक्ट रूपांतर' (टिकाऊ आजीविका) के तहत OIL ने वित्त वर्ष 2024-25 में 428 संयुक्त देयता समूहों और 1,925 परिवारों की मदद की (परियोजना लागत ₹9.21 करोड़), जिनमें 227 केवल-महिला हथकरघा समूह शामिल हैं। 'प्रोजेक्ट OIL स्वावलंबन' असम और अरुणाचल प्रदेश के युवाओं को व्यावसायिक प्रशिक्षण देता है।"
+        "en": "OIL's CSR spans healthcare, drinking water and sanitation, education, sustainable livelihoods, women's empowerment, skill development, rural sports, environmental sustainability and rural infrastructure. Under Project Rupantar, OIL has formed 8,500 self-help and joint-liability groups since 2003 with a 50% subsidy; under Project Swabalamban, 11,680 candidates were trained and 9,171 placed between 2013-14 and 2017-18.",
+        "ta": "OIL-இன் சமூகப் பொறுப்புத் திட்டங்கள் சுகாதாரம், குடிநீர் மற்றும் சுகாதாரம், கல்வி, நிலையான வாழ்வாதாரம், பெண்கள் மேம்பாடு, திறன் வளர்ப்பு, கிராமப்புற விளையாட்டு, சுற்றுச்சூழல், கிராமப்புற உள்கட்டமைப்பு ஆகியவற்றை உள்ளடக்கியவை. 'ரூபாந்தர்' திட்டத்தில் 2003 முதல் 50% மானியத்துடன் 8,500 சுய உதவி / கூட்டுப் பொறுப்புக் குழுக்கள்; 'ஸ்வபலம்பன்' திட்டத்தில் 2013-14 முதல் 2017-18 வரை 11,680 பேர் பயிற்சி பெற்று 9,171 பேர் பணியமர்த்தப்பட்டனர்.",
+        "hi": "OIL का CSR स्वास्थ्य, पेयजल और स्वच्छता, शिक्षा, टिकाऊ आजीविका, महिला सशक्तिकरण, कौशल विकास, ग्रामीण खेल, पर्यावरण और ग्रामीण बुनियादी ढाँचे तक फैला है। 'प्रोजेक्ट रूपांतर' के तहत 2003 से 50% सब्सिडी के साथ 8,500 स्वयं सहायता / संयुक्त देयता समूह बने; 'प्रोजेक्ट स्वावलंबन' में 2013-14 से 2017-18 के बीच 11,680 लोगों को प्रशिक्षण मिला और 9,171 को रोज़गार।"
       },
-      "sources": [{"title": "Sentinel Assam: OIL's sustainable livelihood initiatives", "url": "https://www.sentinelassam.com/north-east-india-news/assam-news/assam-oils-sustainable-livelihood-initiatives-under-csr-project-in-duliajan"}, {"title": "OIL: CSR @OIL", "url": "https://www.oil-india.com/csr-oil"}],
+      "sources": [{"title": "OIL: CSR @OIL (official)", "url": "https://www.oil-india.com/csr-oil"},
+                  {"title": "OIL Annual Report 2024-25 (official)", "url": "https://www.oil-india.com/files/financial_results_documents/OIL_India_Annual_Report_2024_25_0.pdf"}],
       "as_of": "2026-10-04"
     },
     {
-      "id": "market",
-      "topic": "Market: share price and analyst view",
-      "keywords": ["share", "shares", "stock", "share price", "market", "market cap", "capitalisation", "capitalization", "analyst", "target price", "investor", "nse", "bse", "பங்கு", "பங்கு விலை", "சந்தை", "முதலீட்டாளர்", "शेयर", "शेयर की कीमत", "बाज़ार", "बाजार", "निवेशक", "विश्लेषक"],
+      "id": "digital",
+      "topic": "Digital transformation: DRIVE",
+      "keywords": ["digital", "drive", "technology", "innovation", "ai", "analytics", "real-time", "real time", "command", "it-ot", "transformation", "டிஜிட்டல்", "தொழில்நுட்பம்", "डिजिटल", "प्रौद्योगिकी", "तकनीक"],
       "text": {
-        "en": "On 10 September 2026 OIL's share price was about ₹500 (NSE: OIL) and its market capitalisation about ₹81,160 crore. The consensus 12-month target of 21 analysts was about ₹536 (range ₹370 to ₹645). Market data changes daily; this is information, not investment advice.",
-        "ta": "10 செப்டம்பர் 2026 அன்று OIL பங்கு விலை சுமார் ₹500 (NSE: OIL), சந்தை மதிப்பு சுமார் ₹81,160 கோடி. 21 ஆய்வாளர்களின் 12 மாத சராசரி இலக்கு சுமார் ₹536 (₹370 முதல் ₹645). சந்தைத் தரவு தினமும் மாறும்; இது முதலீட்டு ஆலோசனை அல்ல.",
-        "hi": "10 सितंबर 2026 को OIL का शेयर लगभग ₹500 (NSE: OIL) और बाज़ार पूंजीकरण लगभग ₹81,160 करोड़ था। 21 विश्लेषकों का 12 महीने का औसत लक्ष्य लगभग ₹536 (₹370 से ₹645) था। बाज़ार डेटा रोज़ बदलता है; यह निवेश सलाह नहीं है।"
+        "en": "Under its flagship programme DRIVE (Digital Readiness for Innovation and Value in E&P), OIL implemented 11 digital initiatives, including AI-enabled drone surveillance, real-time monitoring of drilling and production operations, and advanced analytics. DRIVE 2.0 is establishing a Command-and-Control Centre and an IT-OT integration framework. P2E Bridge fits this agenda by turning field progress into verified digital schedule data.",
+        "ta": "முதன்மைத் திட்டமான DRIVE (E&P-இல் புதுமை மற்றும் மதிப்புக்கான டிஜிட்டல் தயார்நிலை) மூலம் OIL 11 டிஜிட்டல் முயற்சிகளைச் செயல்படுத்தியது: AI ட்ரோன் கண்காணிப்பு, துளையிடல் மற்றும் உற்பத்தியின் நிகழ்நேரக் கண்காணிப்பு, மேம்பட்ட பகுப்பாய்வு. DRIVE 2.0 கட்டளை மற்றும் கட்டுப்பாட்டு மையத்தையும் IT-OT ஒருங்கிணைப்பையும் உருவாக்குகிறது. களமுன்னேற்றத்தை உறுதிசெய்த டிஜிட்டல் அட்டவணைத் தரவாக மாற்றுவதன் மூலம் P2E Bridge இதற்குப் பொருந்துகிறது.",
+        "hi": "अपने प्रमुख कार्यक्रम DRIVE (E&P में नवाचार और मूल्य के लिए डिजिटल तत्परता) के तहत OIL ने 11 डिजिटल पहल लागू कीं, जिनमें AI ड्रोन निगरानी, ड्रिलिंग और उत्पादन की रीयल-टाइम निगरानी और उन्नत विश्लेषण शामिल हैं। DRIVE 2.0 कमांड-एंड-कंट्रोल सेंटर और IT-OT एकीकरण ढाँचा बना रहा है। P2E Bridge फ़ील्ड प्रगति को सत्यापित डिजिटल शेड्यूल डेटा में बदलकर इस एजेंडे में फ़िट होता है।"
       },
-      "sources": [{"title": "INDmoney: Oil India share price", "url": "https://www.indmoney.com/stocks/oil-india-ltd-share-price"}, {"title": "Investing.com: Oil India consensus estimates", "url": "https://in.investing.com/equities/oil-india-consensus-estimates"}],
-      "as_of": "2026-09-10"
+      "sources": [{"title": "OIL Annual Report 2024-25 (official)", "url": "https://www.oil-india.com/files/financial_results_documents/OIL_India_Annual_Report_2024_25_0.pdf"}],
+      "as_of": "2025-03-31"
     },
     {
-      "id": "reviews",
-      "topic": "Employee reviews and survey ratings",
-      "keywords": ["review", "reviews", "rating", "ratings", "glassdoor", "employee", "employees", "work culture", "workplace", "survey", "social media", "reputation", "recommend", "மதிப்பாய்வு", "மதிப்பீடு", "ஊழியர்", "கணக்கெடுப்பு", "சமூக ஊடக", "समीक्षा", "रेटिंग", "कर्मचारी", "सर्वे", "सर्वेक्षण", "सोशल मीडिया"],
+      "id": "ratings",
+      "topic": "Credit ratings and listing",
+      "keywords": ["rating", "ratings", "credit", "moody", "moody's", "fitch", "crisil", "care", "listed", "listing", "nse", "bse", "ipo", "மதிப்பீடு", "கடன்", "பட்டியல்", "रेटिंग", "क्रेडिट", "सूचीबद्ध"],
       "text": {
-        "en": "On Glassdoor, OIL employees rate the company 4.3 out of 5 (77 reviews); 85% would recommend it to a friend. Category ratings: compensation and benefits 4.4, work-life balance 4.0, career opportunities 3.9, culture and values 3.8. Online reviews are self-reported and not a scientific survey.",
-        "ta": "Glassdoor-இல் OIL ஊழியர்கள் நிறுவனத்துக்கு 5-க்கு 4.3 மதிப்பீடு அளித்துள்ளனர் (77 மதிப்பாய்வுகள்); 85% பேர் நண்பருக்குப் பரிந்துரைப்பார்கள். ஊதியம் மற்றும் சலுகைகள் 4.4, வேலை-வாழ்க்கை சமநிலை 4.0, தொழில் வாய்ப்புகள் 3.9, கலாச்சாரம் 3.8. இணைய மதிப்பாய்வுகள் தனிநபர் கருத்துகள்; அறிவியல் கணக்கெடுப்பு அல்ல.",
-        "hi": "Glassdoor पर OIL के कर्मचारियों ने कंपनी को 5 में से 4.3 रेटिंग दी है (77 समीक्षाएँ); 85% किसी मित्र को इसकी सिफ़ारिश करेंगे। वेतन और लाभ 4.4, कार्य-जीवन संतुलन 4.0, करियर अवसर 3.9, संस्कृति 3.8। ऑनलाइन समीक्षाएँ स्व-घोषित हैं, वैज्ञानिक सर्वेक्षण नहीं।"
+        "en": "OIL holds the highest long-term and short-term ratings from CRISIL and CARE Ratings in India; internationally Moody's (Baa3, Stable) and Fitch (BBB-, Stable) rate it at par with India's sovereign rating. Its shares are listed on NSE and BSE following its IPO in September 2009.",
+        "ta": "இந்தியாவில் CRISIL, CARE Ratings நிறுவனங்களிடமிருந்து OIL மிக உயர்ந்த நீண்டகால மற்றும் குறுகியகால மதிப்பீடுகளைப் பெற்றுள்ளது; சர்வதேச அளவில் Moody's (Baa3, நிலையானது), Fitch (BBB-, நிலையானது) இந்தியாவின் இறையாண்மை மதிப்பீட்டுக்கு இணையாக மதிப்பிடுகின்றன. செப்டம்பர் 2009 IPO-வுக்குப் பிறகு பங்குகள் NSE, BSE-இல் பட்டியலிடப்பட்டுள்ளன.",
+        "hi": "भारत में OIL को CRISIL और CARE Ratings से सर्वोच्च दीर्घकालिक और अल्पकालिक रेटिंग मिली है; अंतरराष्ट्रीय स्तर पर Moody's (Baa3, स्थिर) और Fitch (BBB-, स्थिर) इसे भारत की संप्रभु रेटिंग के बराबर आँकते हैं। सितंबर 2009 के IPO के बाद इसके शेयर NSE और BSE पर सूचीबद्ध हैं।"
       },
-      "sources": [{"title": "Glassdoor: Oil India reviews", "url": "https://www.glassdoor.com/Reviews/Oil-India-Reviews-E473246.htm"}],
+      "sources": [{"title": "OIL Annual Report 2024-25 (official)", "url": "https://www.oil-india.com/files/financial_results_documents/OIL_India_Annual_Report_2024_25_0.pdf"}],
+      "as_of": "2025-03-31"
+    },
+    {
+      "id": "official_only",
+      "topic": "Reviews, social media, live share price",
+      "keywords": ["review", "reviews", "glassdoor", "employee reviews", "social media", "survey", "opinion", "reputation", "share", "shares", "share price", "stock", "stock price", "market", "analyst", "target price", "மதிப்பாய்வு", "சமூக ஊடக", "கணக்கெடுப்பு", "பங்கு", "சந்தை", "समीक्षा", "सोशल मीडिया", "सर्वे", "सर्वेक्षण", "शेयर", "बाज़ार", "विश्लेषक"],
+      "text": {
+        "en": "P2E Bridge answers only from official sources. Employee reviews, social-media opinions, surveys by third parties, live share prices and analyst targets are not official data, so I do not quote them. For the live share price see the official NSE (symbol OIL) or BSE (533106) pages; for company performance see OIL's annual report and financial results.",
+        "ta": "P2E Bridge அதிகாரப்பூர்வ ஆதாரங்களிலிருந்து மட்டுமே பதிலளிக்கிறது. ஊழியர் மதிப்பாய்வுகள், சமூக ஊடகக் கருத்துகள், மூன்றாம் தரப்பு கணக்கெடுப்புகள், நேரடிப் பங்கு விலை, ஆய்வாளர் இலக்குகள் அதிகாரப்பூர்வத் தரவு அல்ல; அவற்றை நான் மேற்கோள் காட்டுவதில்லை. நேரடிப் பங்கு விலைக்கு அதிகாரப்பூர்வ NSE (OIL) அல்லது BSE (533106) பக்கங்களைப் பார்க்கவும்; நிறுவனச் செயல்திறனுக்கு OIL ஆண்டறிக்கை மற்றும் நிதி முடிவுகளைப் பார்க்கவும்.",
+        "hi": "P2E Bridge केवल आधिकारिक स्रोतों से जवाब देता है। कर्मचारी समीक्षाएँ, सोशल मीडिया राय, तृतीय-पक्ष सर्वे, लाइव शेयर मूल्य और विश्लेषक लक्ष्य आधिकारिक डेटा नहीं हैं, इसलिए मैं उन्हें उद्धृत नहीं करता। लाइव शेयर मूल्य के लिए आधिकारिक NSE (OIL) या BSE (533106) पृष्ठ देखें; कंपनी के प्रदर्शन के लिए OIL की वार्षिक रिपोर्ट और वित्तीय परिणाम देखें।"
+      },
+      "sources": [{"title": "NSE: Oil India (official exchange)", "url": "https://www.nseindia.com/get-quotes/equity?symbol=OIL"},
+                  {"title": "OIL Financial Results (official)", "url": "https://www.oil-india.com/financial-results"}],
       "as_of": "2026-10-04"
     }
   ]

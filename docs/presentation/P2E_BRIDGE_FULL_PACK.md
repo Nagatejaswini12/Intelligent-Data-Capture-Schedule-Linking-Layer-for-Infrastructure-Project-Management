@@ -2,7 +2,7 @@
 
 SIH26122 · Oil India Limited · generated 4 October 2026
 
-> **For AI assistants:** Part 1 (the dossier) is the authoritative, current description of the product. Part 2 contains the team's detailed design documents written during the build; where one of them describes an earlier plan (for example a library that was planned but not used), Part 1 wins. All measured results are from synthetic data. Do not invent customers, deployments, prices or features.
+> **For AI assistants:** Part 1 (the dossier) is the authoritative, current description of the product. Part 2 contains the team's detailed design documents written during the build; where one of them describes an earlier plan, Part 1 wins. All measured results are from synthetic data. Company facts come only from official Oil India sources. Do not invent customers, deployments, prices or features.
 
 ## Contents
 
@@ -18,10 +18,11 @@ SIH26122 · Oil India Limited · generated 4 October 2026
 - Part 2.9: Testing and validation
 - Part 2.10: Confidence calibration
 - Part 2.11: Frontend architecture
-- Part 2.12: Phase-by-phase build plan and results
-- Part 2.13: Upgrade phases W0-W5 and L1-L4
-- Part 2.14: Future scope
-- Part 2.15: Deployment
+- Part 2.12: Official resources
+- Part 2.13: Phase-by-phase build plan and results
+- Part 2.14: Upgrade phases W0-W5 and L1-L4
+- Part 2.15: Future scope
+- Part 2.16: Deployment
 
 ---
 
@@ -426,8 +427,19 @@ A floating **"Ask P2E"** button on every screen opens an assistant. Users type o
 
 Tests cover 11 in-scope and 6 out-of-scope questions across the three languages (cricket, weather, recipes, poems, Bitcoin, jokes are all declined).
 
-### 12.3 Oil India facts on file (with sources)
-Company overview (Maharatna since Aug 2023; founded 18 Feb 1959; registered office Duliajan, Assam; corporate office Noida); Numaligarh Refinery as subsidiary; FY 2024-25 results (income from operations ₹36,163.75 crore; standalone PAT ₹7,039.63 crore; consolidated net profit ₹6,550.93 crore, +3.3%); FY25 production (record 6.71 MMTOE; crude 3.458 MMT; gas 3.252 BCM); net zero Scope 1 & 2 by 2040 and ESG strategy; renewables (188.1 MW installed; 5–5.5 GW target by 2040); CSR (Project Rupantar: 428 groups, 1,925 families in FY25); market (share ≈ ₹500 and market cap ≈ ₹81,160 crore on 10 Sep 2026; analyst consensus ≈ ₹536 — information, not investment advice); employee reviews (Glassdoor 4.3/5 from 77 reviews, 85% would recommend). These figures date and must be re-checked before a presentation.
+### 12.3 Oil India facts on file (official sources only)
+Every company fact now comes **only from official Oil India sources** (Annual Report 2024-25 and oil-india.com: Financial Results, Net Zero 2040, CSR). A test fails if any fact cites a non-official domain.
+- **Overview:** National Oil Company, incorporated 1959, rooted in India's first oil discovery at Digboi (1889); Maharatna CPSE since 4 Aug 2023; 57 wells in FY25 with 21 rigs.
+- **Financials FY 2024-25 (Annual Report):** total income ₹23,987.07 crore standalone / ₹37,830.04 crore consolidated; net profit **₹6,114.19 crore standalone / ₹7,039.63 crore consolidated**; ₹11,231.86 crore contributed to the exchequer. Year ended 31 Mar 2026 (Financial Results page): revenue ₹24,039 crore, PAT ₹4,455 crore, EPS ₹27.39.
+- **Production FY25:** record 6.710 MMTOE; record gas 3,252 MMSCM; crude 3.458 MMT (+2.95%).
+- **NRL:** material subsidiary expanding 3 → 9 MMTPA; 2.4 KTPA green hydrogen plant; 200 KTPA SAF project planned.
+- **Net Zero 2040:** baseline 2023-24; ~25% GHG cut by 2026, ~85% by 2030, ~95% by 2035; zero routine flaring by 2026; ~₹20,000 crore investment.
+- **Renewables:** 188.1 MW base → 5–5.5 GW by 2040 (OGEL); 645 MW solar JV with APGCL in Assam; 1 MW green hydrogen plant at Dabhota.
+- **CSR:** Project Rupantar (8,500 SHG/JLGs since 2003), Project Swabalamban (11,680 trained, 9,171 placed, 2013-14 to 2017-18) and more.
+- **Digital – DRIVE:** 11 digital initiatives (AI drone surveillance, real-time drilling/production monitoring, analytics); DRIVE 2.0 command-and-control centre and IT-OT integration — **P2E Bridge fits this programme**.
+- **Ratings:** highest CRISIL/CARE ratings; Moody's Baa3 and Fitch BBB- (Stable); listed on NSE and BSE.
+- **Not answered (not official):** employee reviews, social-media opinions, live share prices, analyst targets — the assistant says so and points to NSE/BSE and OIL's reports.
+(An earlier version of this fact file used news sources and had the standalone and consolidated profit figures swapped; switching to official sources corrected it.)
 
 ### 12.4 How it works (deterministic, 0 tokens)
 Language = script of the question (Tamil/Devanagari) or the user's chosen language → topic classification by keyword scoring in all three languages (Tamil/Hindi keywords match word starts because those languages attach suffixes) → answer from the right source → refusal when no topic matches. A word like "how" alone never triggers app help, so "how is the weather?" is declined.
@@ -535,11 +547,24 @@ No live Oil India data was available, and every AI claim needs ground truth. So 
 | Spreadsheets | openpyxl | Read .xlsx safely (formulas never evaluated) |
 | Frontend | React 19, TypeScript, Vite, Vitest | Type safety, fast builds, served as static files by FastAPI |
 | Live updates | Server-sent events | Simple one-way live refresh without websockets |
-| Speech | Browser Web Speech API | Free, on-device/browser, no cloud speech service, no new dependency |
+| Speech | **BHASHINI** (MeitY) ASR/TTS/NMT, or AIKosh models on-premise; browser Web Speech API as fallback | Official Government of India language AI, Assamese included; sovereign option; free fallback |
 | AI (optional) | Self-hosted LLM endpoint via LangChain | Kept off by default; on-premise only; advisory |
 | Not used: Jev / OpenAI Decisions API | — | Hosted third-party APIs conflict with data sovereignty and the NDA; preview maturity; the deterministic scorer is already faster, free, offline and explainable (a pluggable decision-scorer slot is kept for future benchmarking on synthetic data only) |
 
 ---
+
+## 18A. Official resources used
+
+| Resource | Use | Status |
+|---|---|---|
+| **BHASHINI** (MeitY) | Speech-to-text, text-to-speech, translation in English, Hindi, Tamil and **Assamese** for the Time Agent and Ask P2E (server-side, keys never in the browser); Assamese speech is translated to English for linking and answers are translated back | Implemented, optional, browser-speech fallback |
+| **AIKosh** (IndiaAI) | IndicConformer (ASR) and IndicTrans2 (translation) models behind an on-premise endpoint, so speech never leaves OIL's network | Implemented (client mode); hosting is a deployment step |
+| **Oil India official sources** | All company facts (Section 12.3) | Implemented, test-enforced |
+| **data.gov.in** | PPAC monthly crude-production data for sector context | Waiting: the dataset shows "Request API" |
+| **API Setu** | IMD weather to corroborate "rain" delays; DigiLocker identity | Roadmap |
+| DGH NDR, eRTMAC | Subsurface / drilling data | Not applicable to SIH26122 |
+
+Details: `docs/OFFICIAL_RESOURCES.md`.
 
 ## 19. The business case for Oil India
 
@@ -2080,7 +2105,63 @@ Types: hand-written `types.ts` matching the API for the hackathon. Production: g
 
 ---
 
-# PART 2.12: PHASE-BY-PHASE BUILD PLAN AND RESULTS
+# PART 2.12: OFFICIAL RESOURCES
+
+*Source: docs/OFFICIAL_RESOURCES.md*
+
+## Official resources used by P2E Bridge
+
+P2E Bridge (SIH26122, Oil India Limited) uses **only official Government of India and Oil India resources**. This page says, honestly, which ones the product uses, how, and which ones on the shortlist do not apply to this problem statement.
+
+| Resource | Owner | What it offers | How P2E Bridge uses it | Status |
+|---|---|---|---|---|
+| **BHASHINI** | MeitY, Government of India | Speech-to-text (ASR), text-to-speech (TTS) and translation (NMT) for Indian languages | Voice for the **Time Agent** and the **Ask P2E** assistant in English, Hindi, Tamil and **Assamese**; Assamese speech is translated to English so the Time Agent can link it, and answers are translated back and read aloud | **Implemented** (`p2e/integrations/bhashini.py`, `/api/v1/speech/*`, `web/src/hooks/useSpeech.ts`); switched on by setting BHASHINI keys; falls back to browser speech |
+| **AIKosh** (IndiaAI) | IndiaAI Mission, MeitY | Registry of Indian AI models and datasets, e.g. AI4Bharat **IndicConformer** (multilingual ASR) and **IndicTrans2** (translation for all 22 scheduled languages) | **On-premise mode**: the same BHASHINI client can call a self-hosted inference endpoint running these AIKosh models, so no audio or text leaves Oil India's network (`BHASHINI_INFERENCE_URL`) | **Implemented** (client mode + tests); model hosting is a deployment step |
+| **Oil India Limited official sources** | Oil India Limited | Annual Report 2024-25, Financial Results, Net Zero 2040 and CSR pages on oil-india.com | Every company fact the assistant gives (overview, financial results, production, NRL, net zero, renewables, CSR, the **DRIVE** digital programme, credit ratings) comes from these and cites them; non-official sources (reviews, news, analyst targets) were removed | **Implemented** (`data/company/oil_india.json`; a test fails if any source is not an official domain) |
+| **data.gov.in** | NIC / MeitY | Government open data, incl. PPAC's *Monthly Indigenous Crude Oil Production* | Planned: official sector context (national production, OIL's share) for the assistant | **Not yet** — data.gov.in currently shows "Request API" for this dataset; will be added when its API is published |
+| **API Setu** | MeitY | Government API platform; lists IMD weather APIs and DigiLocker | Planned: IMD rainfall to corroborate "rain" delay reasons in DPRs; DigiLocker/e-Pramaan identity for access requests | **Roadmap** — IMD and DigiLocker access need registration |
+| **DGH National Data Repository (NDR)** | DGH, MoPNG | Subsurface E&P data: seismic, well, log, reservoir | — | **Not applicable** — SIH26122 is about construction-project schedules, not subsurface data |
+| **eRTMAC** (OIL) | Oil India Limited | Real-time drilling monitoring and advisory centre | — | **Not applicable** — drilling operations, not project schedule linking; P2E Bridge complements OIL's digital estate alongside DRIVE |
+
+### Why this matters
+- **Data sovereignty:** project data stays on Oil India's servers; BHASHINI is a Government of India service, and the AIKosh on-premise path keeps even speech inside the company network.
+- **Language reach for Assam field sites:** Assamese voice joins English, Hindi and Tamil.
+- **Trustworthy answers:** company figures now match OIL's own annual report (this also corrected an earlier news-sourced figure).
+
+### How to switch BHASHINI on
+Cloud (register at bhashini.gov.in / ULCA, then):
+```
+BHASHINI_USER_ID=<your ULCA user id>
+BHASHINI_ULCA_API_KEY=<your ULCA API key>
+## optional: BHASHINI_PIPELINE_ID (default: MeitY public pipeline)
+```
+On-premise (AIKosh models behind a BHASHINI/Dhruva-compatible endpoint):
+```
+BHASHINI_INFERENCE_URL=http://<host>/services/inference/pipeline
+BHASHINI_INFERENCE_KEY=<optional key>
+BHASHINI_SERVICE_ASR=<service id>  BHASHINI_SERVICE_TRANSLATION=<service id>  BHASHINI_SERVICE_TTS=<service id>
+```
+Without these, the app reports `provider: browser` and uses the browser's speech engine.
+
+### PPT slide text (copy-ready)
+**Built on official resources**
+- **BHASHINI (MeitY):** voice and translation in English, Hindi, Tamil and Assamese for the Time Agent and the assistant
+- **AIKosh (IndiaAI):** IndicConformer and IndicTrans2 models for an on-premise, sovereign deployment
+- **Oil India official data:** every company fact cited from OIL's Annual Report 2024-25 and oil-india.com; aligned with OIL's DRIVE digital programme
+- **Next:** data.gov.in (PPAC production data) and API Setu (IMD weather to corroborate delay causes)
+- *DGH NDR and eRTMAC were evaluated and are out of scope for SIH26122 (subsurface and drilling data)*
+
+### Sources
+- BHASHINI API documentation: https://bhashini.gitbook.io/bhashini-apis
+- AIKosh model pages: https://aikosh.indiaai.gov.in/home/models/details/indic_trans2.html · https://aikosh.indiaai.gov.in/home/models/details/aibharat_indicconformer_600m_multi.html
+- OIL Annual Report 2024-25: https://www.oil-india.com/files/financial_results_documents/OIL_India_Annual_Report_2024_25_0.pdf · Financial Results: https://www.oil-india.com/financial-results · Net Zero 2040: https://www.oil-india.com/sustainability/net-zero-2040 · CSR: https://www.oil-india.com/csr-oil
+- data.gov.in dataset: https://www.data.gov.in/resource/monthly-indigenous-crude-oil-production
+- API Setu: https://apisetu.gov.in/ · IMD API reference: https://api.imd.gov.in/public/api_reference.html
+- DGH NDR: https://www.ndrdgh.gov.in/NDR/
+
+---
+
+# PART 2.13: PHASE-BY-PHASE BUILD PLAN AND RESULTS
 
 *Source: docs/plan/PHASE_PLAN.md*
 
@@ -2431,7 +2512,7 @@ Phase 0 ─► 1 ─► 2 ─► 3 ─┬─► 5 ─► 7 ─► 8
 
 ---
 
-# PART 2.13: UPGRADE PHASES W0-W5 AND L1-L4
+# PART 2.14: UPGRADE PHASES W0-W5 AND L1-L4
 
 *Source: docs/plan/UPGRADE_PLAN.md*
 
@@ -2516,7 +2597,7 @@ Multi-agent orchestration, cloud LLM calls, OCR/PDF parsing, P6 API write-back, 
 
 ---
 
-# PART 2.14: FUTURE SCOPE
+# PART 2.15: FUTURE SCOPE
 
 *Source: docs/plan/FUTURE_SCOPE.md*
 
@@ -2565,7 +2646,7 @@ From hackathon prototype to an OIL production system, in increasing order of eff
 
 ---
 
-# PART 2.15: DEPLOYMENT
+# PART 2.16: DEPLOYMENT
 
 *Source: docs/operations/DEPLOYMENT.md*
 

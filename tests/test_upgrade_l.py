@@ -75,7 +75,7 @@ def applied_db(linked):
     ("What is Oil India's net zero target?", "en", "company", "en", "2040"),
     ("ஆயில் இந்தியாவின் லாபம் என்ன?", None, "company", "ta", "₹7,039.63"),
     ("Oil India का शेयर कितना है?", "hi", "company", "hi", "शेयर"),
-    ("Oil India employee reviews", "ta", "company", "ta", "Glassdoor"),
+    ("Oil India employee reviews", "ta", "company", "ta", "அதிகாரப்பூர்வ"),      # official sources only
     ("How do I upload a report?", "en", "app", "en", "Field Reports"),
     ("அறிக்கையை எப்படிப் பதிவேற்றுவது?", None, "app", "ta", "Field Reports"),
     ("रिपोर्ट कैसे अपलोड करें?", None, "app", "hi", "Field Reports"),

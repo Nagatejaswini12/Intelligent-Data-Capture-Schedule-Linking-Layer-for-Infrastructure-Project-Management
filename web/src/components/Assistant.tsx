@@ -1,43 +1,36 @@
 import { useState } from "react";
 import { p2e, type AssistantReply } from "../api/p2e";
+import { useSpeech, type VoiceLang } from "../hooks/useSpeech";
 import { useT } from "../i18n";
 import { useApp } from "../state";
 import { ErrorBox } from "./ui";
 
-// Floating "Ask P2E" assistant: typed or spoken questions in English / Tamil / Hindi, answered by the backend's scoped
-// assistant (this app, this project, Oil India only) with sources. Browser speech: recognition + optional spoken replies.
-type Recognizer = { lang: string; interimResults: boolean; onresult: (e: { results: { 0: { transcript: string } }[] }) => void;
-  onend: () => void; onerror: () => void; start: () => void };
-const g = globalThis as unknown as { SpeechRecognition?: new () => Recognizer; webkitSpeechRecognition?: new () => Recognizer };
-const SpeechRec = g.SpeechRecognition ?? g.webkitSpeechRecognition;
-
-interface Turn { q: string; reply?: AssistantReply; error?: string }
+// Floating "Ask P2E" assistant: typed or spoken questions, answered by the backend's scoped assistant (this app, this
+// project, Oil India from official sources only). Voice uses BHASHINI when the server has it (adds Assamese: the question
+// is translated to English, answered, and the answer translated back), otherwise the browser's speech engine.
+interface Turn { q: string; reply?: AssistantReply; shown?: string; error?: string }
 
 export function Assistant() {
-  const { t, lang, speech } = useT();
+  const { t, lang } = useT();
   const { project, asOf } = useApp();
+  const voice = useSpeech();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [busy, setBusy] = useState(false);
-  const [listening, setListening] = useState(false);
-  const [voice, setVoice] = useState(false);
+  const [speakReplies, setSpeakReplies] = useState(false);
+  const [voiceLang, setVoiceLang] = useState<VoiceLang>(lang);
 
-  const say = (s: string, l: string) => {
-    if (!voice || !("speechSynthesis" in globalThis)) return;
-    const u = new SpeechSynthesisUtterance(s);
-    u.lang = l;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(u);
-  };
-
-  const ask = async (q: string) => {
+  const ask = async (q: string, spokenIn: VoiceLang = lang) => {
     if (!q.trim()) return;
     setBusy(true);
     const turn: Turn = { q };
     try {
-      turn.reply = await p2e.assistant(project.code, { question: q, lang, as_of: asOf });
-      say(turn.reply.answer, { en: "en-IN", ta: "ta-IN", hi: "hi-IN" }[turn.reply.lang]);
+      const assamese = spokenIn === "as";
+      const question = assamese ? await voice.translate(q, "as", "en") : q;
+      turn.reply = await p2e.assistant(project.code, { question, lang: assamese ? "en" : lang, as_of: asOf });
+      turn.shown = assamese ? await voice.translate(turn.reply.answer, "en", "as") : turn.reply.answer;
+      if (speakReplies) voice.speak(turn.shown, assamese ? "as" : turn.reply.lang);
     } catch (e) {
       turn.error = (e as Error).message;
     }
@@ -46,15 +39,14 @@ export function Assistant() {
     setBusy(false);
   };
 
-  const listen = () => {
-    if (!SpeechRec) return;
-    const r = new SpeechRec();
-    r.lang = speech;
-    r.interimResults = false;
-    r.onresult = (e) => setText(e.results[0][0].transcript);
-    r.onend = r.onerror = () => setListening(false);
-    setListening(true);
-    r.start();
+  const mic = async () => {
+    if (voice.listening) { voice.stop(); return; }
+    try {
+      const heard = await voice.listen(voiceLang);
+      if (voiceLang === "as") ask(heard, "as"); else setText(heard);
+    } catch (e) {
+      setTurns((ts) => [...ts, { q: "🎤", error: (e as Error).message }]);
+    }
   };
 
   if (!open) return <button type="button" className="assistant-fab btn btn-primary" onClick={() => setOpen(true)}>💬 {t("as.open")}</button>;
@@ -64,7 +56,7 @@ export function Assistant() {
         <strong>{t("as.title")}</strong>
         <button type="button" className="btn btn-sm" onClick={() => setOpen(false)} aria-label={t("as.close")}>✕</button>
       </header>
-      <p className="muted small">{t("as.scope")}</p>
+      <p className="muted small">{t("as.scope")}{voice.provider === "bhashini" && " · 🎤 BHASHINI"}</p>
       <div className="assistant-log" aria-live="polite">
         {turns.length === 0 && (
           <div className="chips">{["as.ex1", "as.ex2", "as.ex3"].map((k) => (
@@ -76,7 +68,7 @@ export function Assistant() {
             <div className="bubble user">{tu.q}</div>
             {tu.error ? <ErrorBox error={tu.error} /> : tu.reply && (
               <div className="bubble agent">
-                <p>{tu.reply.answer}</p>
+                <p>{tu.shown ?? tu.reply.answer}</p>
                 {tu.reply.sources.length > 0 && (
                   <p className="small">{t("as.sources")}: {tu.reply.sources.map((s, j) => (
                     <span key={j}>{j > 0 && " · "}<a href={s.url} target="_blank" rel="noreferrer noopener">{s.title}</a> ({s.as_of})</span>
@@ -92,12 +84,19 @@ export function Assistant() {
       </div>
       <form className="chat-input" onSubmit={(e) => { e.preventDefault(); ask(text); }}>
         <input value={text} onChange={(e) => setText(e.target.value)} placeholder={t("as.placeholder")} aria-label={t("as.placeholder")} maxLength={500} />
-        {SpeechRec && <button type="button" className="btn" onClick={listen} disabled={busy || listening} aria-label="🎤">{listening ? "…" : "🎤"}</button>}
+        {voice.provider !== "none" && (
+          <button type="button" className="btn" onClick={mic} disabled={busy} aria-label="🎤">{voice.listening ? "■" : "🎤"}</button>
+        )}
         <button className="btn btn-primary" disabled={busy || !text.trim()}>{busy ? "…" : t("as.ask")}</button>
       </form>
-      {"speechSynthesis" in globalThis && (
-        <label className="small"><input type="checkbox" checked={voice} onChange={(e) => setVoice(e.target.checked)} /> {t("agent.speak")}</label>
-      )}
+      <div className="assistant-foot small">
+        {voice.provider !== "none" && (
+          <select value={voiceLang} onChange={(e) => setVoiceLang(e.target.value as VoiceLang)} aria-label="Voice language">
+            {voice.languages.map((l) => <option key={l} value={l}>{{ en: "English", hi: "हिन्दी", ta: "தமிழ்", as: "অসমীয়া" }[l]}</option>)}
+          </select>
+        )}
+        <label><input type="checkbox" checked={speakReplies} onChange={(e) => setSpeakReplies(e.target.checked)} /> {t("agent.speak")}</label>
+      </div>
     </aside>
   );
 }
