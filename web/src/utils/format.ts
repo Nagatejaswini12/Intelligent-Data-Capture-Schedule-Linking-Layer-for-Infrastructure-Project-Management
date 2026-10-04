@@ -1,3 +1,4 @@
+import { valueLabel } from "../i18n";
 // Display helpers only (no business rules).
 export const dash = "—";
 
@@ -24,7 +25,7 @@ export function pct(part: number, whole: number): string {
 }
 
 export function humanize(s: unknown): string {
-  return s === null || s === undefined ? dash : String(s).replace(/_/g, " ");
+  return s === null || s === undefined ? dash : valueLabel(String(s)) ?? String(s).replace(/_/g, " ");
 }
 
 export type Tone = "ok" | "warn" | "bad" | "info" | "muted" | "ai";

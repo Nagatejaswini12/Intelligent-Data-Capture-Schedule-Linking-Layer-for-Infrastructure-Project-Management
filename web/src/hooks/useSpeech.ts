@@ -82,20 +82,27 @@ export function useSpeech() {
 
   const stop = () => { if (rec.current?.state === "recording") rec.current.stop(); };
 
-  /** Read text aloud: BHASHINI TTS when configured (all four languages), else the browser voice. */
-  const speak = async (text: string, lang: VoiceLang) => {
+  /** Read text aloud: BHASHINI TTS when configured (all four languages), else an installed browser voice.
+   *  Resolves false when this device has no voice for the language (Windows: add the language's speech pack, or use Edge). */
+  const speak = async (text: string, lang: VoiceLang): Promise<boolean> => {
     if (provider === "bhashini") {
       try {
         const { audio_b64 } = await p2e.tts({ text: text.slice(0, 1500), lang });
         await new Audio(`data:audio/wav;base64,${audio_b64}`).play();
-        return;
+        return true;
       } catch { /* fall back to the browser voice */ }
     }
-    if (!("speechSynthesis" in globalThis)) return;
+    if (!("speechSynthesis" in globalThis)) return false;
+    const voices = speechSynthesis.getVoices().length ? speechSynthesis.getVoices()
+      : await new Promise<SpeechSynthesisVoice[]>((r) => { speechSynthesis.onvoiceschanged = () => r(speechSynthesis.getVoices()); setTimeout(() => r(speechSynthesis.getVoices()), 1500); });
+    const voice = voices.find((v) => v.lang === BCP47[lang]) ?? voices.find((v) => v.lang.toLowerCase().startsWith(lang));
+    if (!voice) return false;
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = BCP47[lang];
+    u.voice = voice;
+    u.lang = voice.lang;
     speechSynthesis.cancel();
     speechSynthesis.speak(u);
+    return true;
   };
 
   const translate = async (text: string, source: VoiceLang, target: VoiceLang) =>

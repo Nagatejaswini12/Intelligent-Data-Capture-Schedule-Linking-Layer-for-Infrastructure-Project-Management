@@ -3,7 +3,7 @@ import { p2e, type ApplyOut, type DatasetRow, type TreeNode } from "../api/p2e";
 import { Async, Badge, Card, Empty, ErrorBox, Modal, PageTitle } from "../components/ui";
 import { useApi } from "../hooks/useApi";
 import { useApp } from "../state";
-import { useT } from "../i18n";
+import { useT, T } from "../i18n";
 import { fmtDate, fmtNum, humanize, statusTone, variance } from "../utils/format";
 import { href, navigate, useRoute } from "../utils/route";
 
@@ -40,11 +40,11 @@ export function SchedulePage() {
     <>
       <PageTitle title={t("schedule.title")} subtitle={t("schedule.sub", { asOf })}
         actions={<>
-          <button type="button" className="btn btn-primary" onClick={() => setApply(true)}>Apply verified actuals…</button>
-          <button type="button" className="btn" onClick={() => p2e.exportCsv(c).catch((e) => alert(e.message))}>Export CSV</button>
-          <button type="button" className="btn" onClick={() => p2e.exportXml(c, asOf).catch((e) => alert(e.message))}>Export MSPDI</button>
+          <button type="button" className="btn btn-primary" onClick={() => setApply(true)}>{T("sc.apply")}…</button>
+          <button type="button" className="btn" onClick={() => p2e.exportCsv(c).catch((e) => alert(e.message))}>{T("sc.exportCsv")}</button>
+          <button type="button" className="btn" onClick={() => p2e.exportXml(c, asOf).catch((e) => alert(e.message))}>{T("sc.exportXml")}</button>
         </>} />
-      <Async state={state} what="Loading the schedule">
+      <Async state={state} what={T("sc.loading")}>
         {({ rows, tree, conflictCodes }) => (
           <div className="split split-tree">
             <Card title="WBS">
@@ -65,7 +65,7 @@ function TreeItem({ node, selected, onPick, depth }: { node: TreeNode; selected:
   return (
     <li>
       <div className={`tree-row ${selected === node.code ? "selected" : ""}`}>
-        {kids.length > 0 ? <button type="button" className="tree-toggle" onClick={() => setOpen(!open)} aria-label={open ? "Collapse" : "Expand"}>{open ? "▾" : "▸"}</button> : <span className="tree-toggle" />}
+        {kids.length > 0 ? <button type="button" className="tree-toggle" onClick={() => setOpen(!open)} aria-label={open ? T("sc.collapse") : T("sc.expand")}>{open ? "▾" : "▸"}</button> : <span className="tree-toggle" />}
         <button type="button" className="tree-label" onClick={() => onPick(node.code)} title={node.code}>L{node.level} {node.name}</button>
       </div>
       {open && kids.length > 0 && <ul>{kids.map((k) => <TreeItem key={k.code} node={k} selected={selected} onPick={onPick} depth={depth + 1} />)}</ul>}
@@ -86,21 +86,21 @@ function ScheduleTable({ rows, tree, filter, set, conflictCodes }: { rows: Datas
     && (!filter.conflict || conflictCodes.has(r.code))
     && (!q || r.code.toLowerCase().includes(q) || r.name.toLowerCase().includes(q)));
   return (
-    <Card title={`Activities (${shown.length} of ${rows.length})`} actions={<>
-      <input placeholder="Search code or name" value={filter.q} onChange={(e) => set("q", e.target.value)} aria-label="Search" />
-      <select aria-label="Discipline" value={filter.discipline} onChange={(e) => set("discipline", e.target.value)}><option value="">All disciplines</option>{disciplines.map((d) => <option key={d} value={d}>{humanize(d)}</option>)}</select>
-      <select aria-label="Area" value={filter.area} onChange={(e) => set("area", e.target.value)}><option value="">All areas</option>{areas.map((a) => <option key={a}>{a}</option>)}</select>
-      <select aria-label="Status" value={filter.status} onChange={(e) => set("status", e.target.value)}><option value="">Any status</option><option value="completed">Completed</option><option value="in_progress">In progress</option><option value="not_started">Not started</option></select>
-      <label className="check"><input type="checkbox" checked={!!filter.late} onChange={(e) => set("late", e.target.checked ? "1" : "")} />late</label>
-      <label className="check"><input type="checkbox" checked={!!filter.conflict} onChange={(e) => set("conflict", e.target.checked ? "1" : "")} />conflict</label>
+    <Card title={T("sc.activities", { n: shown.length, total: rows.length })} actions={<>
+      <input placeholder={T("sc.search")} value={filter.q} onChange={(e) => set("q", e.target.value)} aria-label={T("sc.search")} />
+      <select aria-label={T("f.discipline")} value={filter.discipline} onChange={(e) => set("discipline", e.target.value)}><option value="">{T("common.allDisc")}</option>{disciplines.map((d) => <option key={d} value={d}>{humanize(d)}</option>)}</select>
+      <select aria-label={T("f.area")} value={filter.area} onChange={(e) => set("area", e.target.value)}><option value="">{T("common.allAreas")}</option>{areas.map((a) => <option key={a}>{a}</option>)}</select>
+      <select aria-label={T("f.status")} value={filter.status} onChange={(e) => set("status", e.target.value)}><option value="">{T("sc.anyStatus")}</option>{["completed", "in_progress", "not_started"].map((s) => <option key={s} value={s}>{humanize(s)}</option>)}</select>
+      <label className="check"><input type="checkbox" checked={!!filter.late} onChange={(e) => set("late", e.target.checked ? "1" : "")} />{T("sc.late")}</label>
+      <label className="check"><input type="checkbox" checked={!!filter.conflict} onChange={(e) => set("conflict", e.target.checked ? "1" : "")} />{T("sc.conflict")}</label>
     </>}>
-      {shown.length === 0 ? <Empty>No activity matches the filters.</Empty> : (
+      {shown.length === 0 ? <Empty>{T("sc.noMatch")}</Empty> : (
         <div className="scroll tall">
           <table className="table compact sticky">
-            <thead><tr><th>Activity</th><th>Planned</th><th>Actual</th><th>%</th><th>Status</th><th>Start var.</th><th>Finish var.</th><th>Reports</th><th>Delays</th></tr></thead>
+            <thead><tr><th>{T("f.activity")}</th><th>{T("sc.planned")}</th><th>{T("sc.actual")}</th><th>%</th><th>{T("f.status")}</th><th>{T("sc.startVar")}</th><th>{T("sc.finishVar")}</th><th>{T("sc.reports")}</th><th>{T("an.tDelays")}</th></tr></thead>
             <tbody>{shown.map((r) => (
               <tr key={r.code}>
-                <td><span className="mono">{r.code}</span>{conflictCodes.has(r.code) && <Badge tone="bad">conflict</Badge>}<div className="small muted">{r.name}</div></td>
+                <td><span className="mono">{r.code}</span>{conflictCodes.has(r.code) && <Badge tone="bad">{T("sc.conflict")}</Badge>}<div className="small muted">{r.name}</div></td>
                 <td className="small">{fmtDate(r.planned_start)} → {fmtDate(r.planned_finish)}</td>
                 <td className="small">{fmtDate(r.actual_start)} → {fmtDate(r.actual_finish)}</td>
                 <td>{r.percent_complete != null ? `${fmtNum(r.percent_complete, 1)}%` : "—"}</td>
@@ -138,26 +138,26 @@ function ApplyDialog({ onClose }: { onClose: () => void }) {
   };
   const r = done ?? preview;
   return (
-    <Modal title={`Apply verified actuals (as of ${asOf})`} onClose={onClose}>
-      <p className="muted">Uses only auto-matched or planner-confirmed reports that pass every rule; each change gets an audit entry and can be undone.</p>
+    <Modal title={T("sc.applyTitle", { asOf })} onClose={onClose}>
+      <p className="muted">{T("sc.applyHint")}</p>
       {!preview && !done && <button type="button" className="btn btn-primary" disabled={busy} onClick={() => go(true)}>{busy ? "Checking…" : "Preview (dry run)"}</button>}
       {error && <ErrorBox error={error} />}
       {r && (
         <>
-          <p>{done ? <Badge tone="ok">applied</Badge> : <Badge tone="info">preview</Badge>} {done ? done.applied.length : r.would_apply.length} activities updated · {r.blocked.length} blocked (review queue) · {r.unchanged} unchanged</p>
+          <p>{done ? <Badge tone="ok">{T("sc.applied")}</Badge> : <Badge tone="info">{T("sc.preview")}</Badge>} {T("sc.applySummary", { n: done ? done.applied.length : r.would_apply.length, b: r.blocked.length, u: r.unchanged })}</p>
           <div className="scroll">
             <table className="table compact">
-              <thead><tr><th>Activity</th><th>Changes</th></tr></thead>
+              <thead><tr><th>{T("f.activity")}</th><th>{T("sc.changes")}</th></tr></thead>
               <tbody>{(done ? done.applied.map((e) => ({ code: e.plan_node_code, changes: e.changes })) : r.would_apply.map((p) => ({ code: p.plan_node_code, changes: p.changes }))).map((x) => (
                 <tr key={x.code}><td className="mono">{x.code}</td><td className="small">{Object.entries(x.changes).map(([f, [a, b]]) => `${humanize(f)}: ${a ?? "—"} → ${b}`).join(" · ")}</td></tr>
               ))}</tbody>
             </table>
           </div>
           {!done && <button type="button" className="btn btn-primary" disabled={busy || r.would_apply.length === 0} onClick={() => go(false)}>Apply {r.would_apply.length} activities</button>}
-          {done && <p><a href="#/audit">See the audit trail →</a> · <a href="#/linking?tab=blocked">Blocked activities →</a></p>}
+          {done && <p><a href="#/audit">{T("nav.audit")} →</a> · <a href="#/linking?tab=blocked">{T("lk.tabBlocked")} →</a></p>}
         </>
       )}
-      {r && r.would_apply.length === 0 && !done && <Empty>Nothing to apply.</Empty>}
+      {r && r.would_apply.length === 0 && !done && <Empty>{T("sc.nothing")}</Empty>}
     </Modal>
   );
 }

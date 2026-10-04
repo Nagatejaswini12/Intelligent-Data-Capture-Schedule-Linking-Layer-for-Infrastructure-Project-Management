@@ -2,9 +2,11 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
 import { ApiError, apiKey } from "../api/client";
 import { p2e, type Project } from "../api/p2e";
 import { LANGS, useT, type Lang } from "../i18n";
+import { humanize } from "../utils/format";
 import { href } from "../utils/route";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -59,10 +61,10 @@ function PublicNav({ sections = false }: { sections?: boolean }) {
   );
 }
 
-const CHAPTERS = [
-  { video: "landing-1", title: "pub.ch1t", body: "pub.ch1b" },
-  { video: "landing-2", title: "pub.ch2t", body: "pub.ch2b" },
-  { video: "landing-3", title: "pub.ch3t", body: "pub.ch3b" },
+const FRAMES = 242;                                   // web/public/seq: landing-1..3 at 10 fps (scroll-scrubbed, Apple style)
+const frameUrl = (i: number) => `/seq/f_${String(i + 1).padStart(3, "0")}.webp`;
+const BEATS = [
+  { k: "pub.ch1t", b: "pub.ch1b", at: 0.22 }, { k: "pub.ch2t", b: "pub.ch2b", at: 0.47 }, { k: "pub.ch3t", b: "pub.ch3b", at: 0.72 },
 ];
 const STEPS = ["pub.s1", "pub.s2", "pub.s3", "pub.s4", "pub.s5"];
 const AGENTS = [
@@ -78,58 +80,153 @@ const PROOF = [
 ];
 const OFFICIAL = [["BHASHINI", "pub.offBhashini"], ["AIKosh", "pub.offAikosh"], ["Oil India Limited", "pub.offOil"]];
 
+/** Draw frame i cover-fitted; falls back to the nearest frame already loaded. */
+function draw(ctx: CanvasRenderingContext2D, imgs: HTMLImageElement[], i: number) {
+  let img = imgs[i];
+  for (let d = 1; (!img || !img.complete || !img.naturalWidth) && d < FRAMES; d++) img = imgs[i - d] ?? imgs[i + d];
+  if (!img?.naturalWidth) return;
+  const { width: w, height: h } = ctx.canvas, s = Math.max(w / img.naturalWidth, h / img.naturalHeight);
+  ctx.drawImage(img, (w - img.naturalWidth * s) / 2, (h - img.naturalHeight * s) / 2, img.naturalWidth * s, img.naturalHeight * s);
+}
+
 export function LandingPage({ project }: { project: Project }) {
   const { t } = useT();
   const root = useRef<HTMLDivElement>(null);
-  const [chapter, setChapter] = useState(0);
+  const canvas = useRef<HTMLCanvasElement>(null);
 
   useLayoutEffect(() => {
-    if (still() || !root.current) return;
-    const ctx = gsap.context(() => {
-      const pin = { trigger: ".hero-pin", start: "top top", end: "bottom bottom", scrub: true };
-      ScrollTrigger.create({ ...pin, onUpdate: (st) => setChapter(Math.min(2, Math.floor(st.progress * 3))) });
-      gsap.to(".hero-rail-fill", { scaleY: 1, ease: "none", scrollTrigger: pin });
-      gsap.to(".hero-copy", { yPercent: -18, opacity: 0.15, ease: "none", scrollTrigger: { ...pin, end: "35% top" } });
-      gsap.from(".hero-copy > *", { y: 40, opacity: 0, duration: 1.1, ease: "power3.out", stagger: 0.12 });
-      gsap.utils.toArray<HTMLElement>(".reveal").forEach((el) =>
-        gsap.from(el, { y: 56, opacity: 0, duration: 1, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 86%" } }));
+    if (!root.current || !canvas.current) return;
+    const lenis = new Lenis({ lerp: 0.085, smoothWheel: true });          // one smooth-scroll loop, synced with ScrollTrigger
+    lenis.on("scroll", ScrollTrigger.update);
+    const tick = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(tick);
+    gsap.ticker.lagSmoothing(0);
+
+    const ctx2d = canvas.current.getContext("2d")!;
+    const imgs: HTMLImageElement[] = [];
+    const seq = { frame: 0 };
+    const resize = () => {
+      const c = canvas.current!, dpr = Math.min(window.devicePixelRatio || 1, 2);
+      c.width = innerWidth * dpr; c.height = innerHeight * dpr;
+      draw(ctx2d, imgs, Math.round(seq.frame));
+    };
+    for (let i = 0; i < FRAMES; i++) {                                     // first frame at once, the rest progressively
+      const img = new Image();
+      img.decoding = "async";
+      img.src = frameUrl(i);
+      if (i === 0) img.onload = () => draw(ctx2d, imgs, 0);
+      imgs.push(img);
+    }
+    resize();
+    addEventListener("resize", resize);
+
+    const gctx = gsap.context(() => {
+      const hero = { trigger: ".seq", start: "top top", end: "bottom bottom", scrub: 0.6 };
+      gsap.to(seq, { frame: FRAMES - 1, ease: "none", scrollTrigger: hero, onUpdate: () => draw(ctx2d, imgs, Math.round(seq.frame)) });
+      gsap.fromTo(".seq-canvas", { scale: 1.18 }, { scale: 1, ease: "none", scrollTrigger: hero });
+      gsap.to(".seq-progress i", { scaleX: 1, ease: "none", scrollTrigger: hero });
+      // intro: letters assemble, then the headline lifts away as the film starts
+      gsap.from(".intro .display", { opacity: 0, y: 60, filter: "blur(18px)", duration: 1.4, ease: "expo.out" });
+      gsap.from(".intro .lede, .intro .hero-cta, .intro .kicker", { opacity: 0, y: 30, duration: 1.2, stagger: 0.12, delay: 0.3, ease: "expo.out" });
+      const tl = gsap.timeline({ scrollTrigger: hero });
+      tl.to(".intro", { opacity: 0, y: -120, scale: 0.92, filter: "blur(10px)", duration: 0.12, ease: "power2.in" }, 0.02);
+      gsap.utils.toArray<HTMLElement>(".beat").forEach((el, i) => {
+        const at = BEATS[i].at;
+        tl.fromTo(el, { opacity: 0, y: 80, filter: "blur(12px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.08, ease: "power2.out" }, at - 0.06)
+          .to(el, { opacity: 0, y: -80, filter: "blur(12px)", duration: 0.08, ease: "power2.in" }, at + 0.14);
+      });
+      tl.fromTo(".seq-veil", { opacity: 0.25 }, { opacity: 0.75, duration: 0.2 }, 0.8);
+      tl.set({}, {}, 1);                                                   // timeline spans the whole pinned scroll
+
+      // statement: words light up as they cross the viewport (Apple text reveal)
+      gsap.fromTo(".statement .w", { opacity: 0.12 }, { opacity: 1, stagger: 0.05, ease: "none",
+        scrollTrigger: { trigger: ".statement", start: "top 75%", end: "bottom 45%", scrub: true } });
+
+      // 3D product reveal: the dashboard tilts up out of the page while pinned
+      const tilt = gsap.timeline({ scrollTrigger: { trigger: ".device-pin", start: "top top", end: "+=140%", scrub: 0.8, pin: true } });
+      tilt.fromTo(".device", { rotateX: 58, scale: 0.72, y: 160 }, { rotateX: 0, scale: 1, y: 0, ease: "power2.out" })
+        .fromTo(".device .kpi-tile", { opacity: 0, y: 30 }, { opacity: 1, y: 0, stagger: 0.05 }, 0.45)
+        .fromTo(".device .mbar i", { scaleX: 0 }, { scaleX: 1, stagger: 0.04 }, 0.55)
+        .fromTo(".device .kcard", { opacity: 0, x: -24 }, { opacity: 1, x: 0, stagger: 0.04 }, 0.6)
+        .fromTo(".device-caption", { opacity: 0, y: 40 }, { opacity: 1, y: 0 }, 0.7);
+
       gsap.fromTo(".flow-line path", { strokeDashoffset: 1 }, { strokeDashoffset: 0, ease: "none",
         scrollTrigger: { trigger: ".flow", start: "top 75%", end: "bottom 55%", scrub: true } });
-      gsap.from(".flow-step", { y: 30, opacity: 0, stagger: 0.14, duration: 0.8, ease: "power2.out", scrollTrigger: { trigger: ".flow", start: "top 72%" } });
-      gsap.from(".agent-card", { y: 50, opacity: 0, stagger: 0.08, duration: 0.9, ease: "power3.out", scrollTrigger: { trigger: ".agents", start: "top 78%" } });
+      gsap.from(".flow-step", { y: 40, opacity: 0, stagger: 0.12, duration: 0.9, ease: "expo.out", scrollTrigger: { trigger: ".flow", start: "top 72%" } });
+
+      // agents: vertical scroll drives a horizontal track, cards turn in 3D as they pass
+      const track = document.querySelector<HTMLElement>(".agents-track");
+      if (track) {
+        const dist = () => Math.max(0, track.scrollWidth - innerWidth + 64);
+        gsap.to(track, { x: () => -dist(), ease: "none",
+          scrollTrigger: { trigger: ".agents-pin", start: "top top", end: () => `+=${dist()}`, scrub: 0.8, pin: true, invalidateOnRefresh: true } });
+        gsap.from(".agent-card", { rotateY: -35, opacity: 0, stagger: 0.08, duration: 1, ease: "expo.out", scrollTrigger: { trigger: ".agents-pin", start: "top 70%" } });
+      }
+      gsap.utils.toArray<HTMLElement>(".reveal").forEach((el) =>
+        gsap.from(el, { y: 70, opacity: 0, duration: 1.1, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 88%" } }));
       gsap.utils.toArray<HTMLElement>(".count").forEach((el) => {
         const end = Number(el.dataset.n), dec = Number(el.dataset.dec), obj = { v: 0 };
-        gsap.to(obj, { v: end, duration: 1.6, ease: "power2.out", scrollTrigger: { trigger: el, start: "top 88%" },
+        gsap.to(obj, { v: end, duration: 1.8, ease: "power2.out", scrollTrigger: { trigger: el, start: "top 88%" },
           onUpdate: () => { el.textContent = obj.v.toFixed(dec); } });
       });
     }, root);
-    return () => ctx.revert();
+    return () => { gctx.revert(); gsap.ticker.remove(tick); lenis.destroy(); removeEventListener("resize", resize); };
   }, []);
 
+  const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   return (
     <div className="public landing" ref={root}>
       <PublicNav sections />
-      <section className="hero-pin">
-        <div className="hero-stage">
-          <VideoBackdrop names={CHAPTERS.map((c) => c.video)} active={chapter} className="hero-video" />
-          <div className="hero-copy">
+      <section className="seq" aria-label={t("pub.heroTitle")}>
+        <div className="seq-stage">
+          <canvas ref={canvas} className="seq-canvas" aria-hidden />
+          <div className="seq-veil" aria-hidden />
+          <div className="intro">
             <span className="kicker">SIH26122 · Oil India Limited · {project.code}</span>
             <h1 className="display">{t("pub.heroTitle")}</h1>
             <p className="lede">{t("pub.heroLede")}</p>
             <div className="hero-cta">
               <a className="btn btn-primary btn-lg" href={href("signin")}>{t("pub.tryDemo")}</a>
-              <button type="button" className="btn btn-glass btn-lg" onClick={() => scrollTo("how")}>{t("pub.seeHow")}</button>
+              <button type="button" className="btn btn-glass btn-lg" onClick={() => go("how")}>{t("pub.seeHow")}</button>
+            </div>
+            <span className="scroll-hint" aria-hidden>{t("pub.scroll")}</span>
+          </div>
+          {BEATS.map((b, i) => (
+            <div key={b.k} className="beat"><span className="beat-n">0{i + 1}</span><h2>{t(b.k)}</h2><p>{t(b.b)}</p></div>
+          ))}
+          <div className="seq-progress" aria-hidden><i /></div>
+        </div>
+      </section>
+
+      <section className="statement band">
+        <p>{t("pub.statement").split(" ").map((w, i) => <span key={i} className="w">{w} </span>)}</p>
+      </section>
+
+      <section className="device-pin">
+        <div className="device-stage">
+          <div className="device" aria-hidden>
+            <div className="device-bar"><i /><i /><i /><span>P2E Bridge · {project.code}</span></div>
+            <div className="device-body">
+              <div className="kpi-row">
+                {[["261 / 433", "pub.p1"], ["0", "pub.p2"], ["48 / 48", "pub.p3"], ["5.3 s", "pub.p4"]].map(([v, k]) => (
+                  <div key={k} className="kpi-tile"><b>{v}</b><span>{t(k)}</span></div>
+                ))}
+              </div>
+              <div className="device-grid">
+                <div className="mpanel"><h4>{t("an.progDisc")}</h4>
+                  {([["civil", 82], ["piping", 64], ["electrical", 48], ["instrumentation", 57], ["static_eq", 71]] as const).map(([d, v]) => (
+                    <div key={d} className="mbar"><span>{humanize(d)}</span><em><i style={{ width: `${v}%` }} /></em></div>
+                  ))}
+                </div>
+                <div className="mpanel kanban">
+                  {[["review", "LT-4011 loop check", "Line 1217 erection"], ["matched", "Line 1211 hydrotest", "P-101A grouting"], ["confirmed", "HT-SWBD-1 install", "Area 3 backfill"]].map(([col, ...cards]) => (
+                    <div key={col} className="kcol"><h4>{humanize(col)}</h4>{cards.map((c) => <div key={c} className="kcard">{c}</div>)}</div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-          <ol className="hero-chapters" aria-label={t("pub.navHow")}>
-            {CHAPTERS.map((c, i) => (
-              <li key={c.video} className={i === chapter ? "on" : ""}>
-                <span className="chapter-n">0{i + 1}</span>
-                <div><strong>{t(c.title)}</strong><p>{t(c.body)}</p></div>
-              </li>
-            ))}
-          </ol>
-          <div className="hero-rail" aria-hidden><div className="hero-rail-fill" /></div>
+          <div className="device-caption"><span className="kicker">{t("pub.deviceK")}</span><h2 className="display-2">{t("pub.deviceT")}</h2></div>
         </div>
       </section>
 
@@ -143,12 +240,12 @@ export function LandingPage({ project }: { project: Project }) {
         </div>
       </section>
 
-      <section id="agents" className="band band-tint">
-        <div className="band-head reveal"><span className="kicker">{t("pub.agentsK")}</span><h2 className="display-2">{t("pub.agentsT")}</h2></div>
-        <div className="agents">
+      <section id="agents" className="agents-pin band-tint">
+        <div className="agents-head"><span className="kicker">{t("pub.agentsK")}</span><h2 className="display-2">{t("pub.agentsT")}</h2></div>
+        <div className="agents-track">
           {AGENTS.map((a) => (
             <article key={a.icon} className="agent-card">
-              <img src={`/brand/${a.icon}.webp`} alt="" width={64} height={64} loading="lazy" />
+              <img src={`/brand/${a.icon}.webp`} alt="" width={88} height={88} loading="lazy" />
               <h3>{t(a.title)}</h3><p>{t(a.body)}</p>
             </article>
           ))}

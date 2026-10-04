@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { p2e, type AssistantReply } from "../api/p2e";
 import { useSpeech, type VoiceLang } from "../hooks/useSpeech";
 import { useT } from "../i18n";
 import { useApp } from "../state";
+import { MODEL_LABEL, rephrase, webgpuAvailable } from "../utils/localAi";
 import { ErrorBox } from "./ui";
 
 // Floating "Ask P2E" assistant: typed or spoken questions, answered by the backend's scoped assistant (this app, this
 // project, Oil India from official sources only). Voice uses BHASHINI when the server has it (adds Assamese: the question
 // is translated to English, answered, and the answer translated back), otherwise the browser's speech engine.
-interface Turn { q: string; reply?: AssistantReply; shown?: string; error?: string }
+interface Turn { q: string; reply?: AssistantReply; shown?: string; error?: string; note?: string }
 
 export function Assistant() {
   const { t, lang } = useT();
@@ -20,30 +21,41 @@ export function Assistant() {
   const [busy, setBusy] = useState(false);
   const [speakReplies, setSpeakReplies] = useState(false);
   const [voiceLang, setVoiceLang] = useState<VoiceLang>(lang);
+  const [pending, setPending] = useState<string | null>(null);
+  const [useAi, setUseAi] = useState(() => { try { return localStorage.getItem("p2e.ai") === "1"; } catch { return false; } });
+  const [progress, setProgress] = useState<number | null>(null);
+  const toggleAi = (on: boolean) => { setUseAi(on); try { localStorage.setItem("p2e.ai", on ? "1" : "0"); } catch { /* ignore */ } };
+  useEffect(() => setVoiceLang(lang), [lang]);              // the voice follows the page language
 
-  const ask = async (q: string, spokenIn: VoiceLang = lang) => {
+  const ask = async (q: string, spokenIn: VoiceLang = lang, spoken = false) => {
     if (!q.trim()) return;
     setBusy(true);
+    setPending(q);
+    setText("");
     const turn: Turn = { q };
     try {
       const assamese = spokenIn === "as";
       const question = assamese ? await voice.translate(q, "as", "en") : q;
-      turn.reply = await p2e.assistant(project.code, { question, lang: assamese ? "en" : lang, as_of: asOf });
+      turn.reply = await p2e.assistant(project.code, { question, lang: assamese ? "en" : spokenIn, as_of: asOf, ai: useAi });
+      if (useAi && turn.reply.prompt) {                     // on-device model rephrases; guard fails -> rules answer stays
+        const ai = await rephrase(turn.reply.prompt, turn.reply.answer, setProgress);
+        setProgress(null);
+        if (ai) turn.reply = { ...turn.reply, answer: ai, answered_by: MODEL_LABEL };
+      }
       turn.shown = assamese ? await voice.translate(turn.reply.answer, "en", "as") : turn.reply.answer;
-      if (speakReplies) voice.speak(turn.shown, assamese ? "as" : turn.reply.lang);
+      if ((speakReplies || spoken) && !(await voice.speak(turn.shown, assamese ? "as" : turn.reply.lang))) turn.note = t("as.noVoice");
     } catch (e) {
       turn.error = (e as Error).message;
     }
     setTurns((ts) => [...ts, turn]);
-    setText("");
+    setPending(null);
     setBusy(false);
   };
 
   const mic = async () => {
     if (voice.listening) { voice.stop(); return; }
     try {
-      const heard = await voice.listen(voiceLang);
-      if (voiceLang === "as") ask(heard, "as"); else setText(heard);
+      ask(await voice.listen(voiceLang), voiceLang, true);   // a spoken question is asked at once and answered aloud
     } catch (e) {
       setTurns((ts) => [...ts, { q: "🎤", error: (e as Error).message }]);
     }
@@ -69,6 +81,8 @@ export function Assistant() {
             {tu.error ? <ErrorBox error={tu.error} /> : tu.reply && (
               <div className="bubble agent">
                 <p>{tu.shown ?? tu.reply.answer}</p>
+                {tu.reply.answered_by && tu.reply.answered_by !== "rules" && <p className="small muted">{t("as.byAi", { model: tu.reply.answered_by })}</p>}
+                {tu.note && <p className="small warn-text">{tu.note}</p>}
                 {tu.reply.sources.length > 0 && (
                   <p className="small">{t("as.sources")}: {tu.reply.sources.map((s, j) => (
                     <span key={j}>{j > 0 && " · "}<a href={s.url} target="_blank" rel="noreferrer noopener">{s.title}</a> ({s.as_of})</span>
@@ -81,20 +95,22 @@ export function Assistant() {
             )}
           </div>
         ))}
+        {pending && <div className="turn"><div className="bubble user">{pending}</div><div className="bubble agent typing">{progress !== null && progress < 100 ? t("as.download", { pct: progress }) : t("as.thinking")}</div></div>}
       </div>
       <form className="chat-input" onSubmit={(e) => { e.preventDefault(); ask(text); }}>
         <input value={text} onChange={(e) => setText(e.target.value)} placeholder={t("as.placeholder")} aria-label={t("as.placeholder")} maxLength={500} />
         {voice.provider !== "none" && (
-          <button type="button" className="btn" onClick={mic} disabled={busy} aria-label="🎤">{voice.listening ? "■" : "🎤"}</button>
+          <button type="button" className="btn" onClick={mic} disabled={busy} aria-label={t("as.mic")} title={t("as.mic")}>{voice.listening ? "■" : <img src="/brand/voice.webp" alt="" width={20} height={20} />}</button>
         )}
         <button className="btn btn-primary" disabled={busy || !text.trim()}>{busy ? "…" : t("as.ask")}</button>
       </form>
       <div className="assistant-foot small">
         {voice.provider !== "none" && (
-          <select value={voiceLang} onChange={(e) => setVoiceLang(e.target.value as VoiceLang)} aria-label="Voice language">
+          <select value={voiceLang} onChange={(e) => setVoiceLang(e.target.value as VoiceLang)} aria-label={t("as.voiceLang")}>
             {voice.languages.map((l) => <option key={l} value={l}>{{ en: "English", hi: "हिन्दी", ta: "தமிழ்", as: "অসমীয়া" }[l]}</option>)}
           </select>
         )}
+        {webgpuAvailable() && <label><input type="checkbox" checked={useAi} onChange={(e) => toggleAi(e.target.checked)} /> {t("as.ai")}</label>}
         <label><input type="checkbox" checked={speakReplies} onChange={(e) => setSpeakReplies(e.target.checked)} /> {t("agent.speak")}</label>
       </div>
     </aside>

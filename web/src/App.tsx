@@ -3,6 +3,7 @@ import { apiKey } from "./api/client";
 import { p2e, type Project } from "./api/p2e";
 import { Badge, ErrorBox, Loading } from "./components/ui";
 import { useStream } from "./hooks/useStream";
+import { AccessPage } from "./pages/Access";
 import { AgentPage } from "./pages/Agent";
 import { AnalyticsPage } from "./pages/Analytics";
 import { AuditPage } from "./pages/Audit";
@@ -15,7 +16,7 @@ import { RoiPage } from "./pages/ROI";
 import { GuidePage, TermsPage, VideoPage } from "./pages/Help";
 import { LandingPage, SignInPage, SignUpPage } from "./pages/Public";
 import { Assistant } from "./components/Assistant";
-import { LANGS, LangContext, loadLang, saveLang, useT, type Lang } from "./i18n";
+import { LANGS, LangContext, loadLang, saveLang, setCurrentLang, useT, type Lang, T } from "./i18n";
 import { SchedulePage } from "./pages/Schedule";
 import { WatchPage } from "./pages/Watch";
 import { AppContext } from "./state";
@@ -41,6 +42,7 @@ const NAV: { group: string; items: { page: string; label: string; icon: string }
     { page: "memory", label: "nav.memory", icon: "❖" },
   ] },
   { group: "nav.present", items: [{ page: "demo", label: "nav.demo", icon: "▶" }] },
+  { group: "nav.admin", items: [{ page: "access", label: "nav.access", icon: "✓" }] },
   { group: "nav.help", items: [
     { page: "guide", label: "nav.guide", icon: "?" },
     { page: "video", label: "nav.video", icon: "▷" },
@@ -51,7 +53,7 @@ const NAV: { group: string; items: { page: string; label: string; icon: string }
 const PAGES: Record<string, () => ReactNode> = {
   overview: () => <OverviewPage />, reports: () => <ReportsPage />, linking: () => <LinkingPage />, agent: () => <AgentPage />,
   schedule: () => <SchedulePage />, watch: () => <WatchPage />, audit: () => <AuditPage />, analytics: () => <AnalyticsPage />,
-  memory: () => <MemoryPage />, demo: () => <DemoPage />, roi: () => <RoiPage />,
+  memory: () => <MemoryPage />, access: () => <AccessPage />, demo: () => <DemoPage />, roi: () => <RoiPage />,
   guide: () => <GuidePage />, terms: () => <TermsPage />, video: () => <VideoPage />,
 };
 
@@ -66,6 +68,7 @@ function LangPicker() {
 
 export function App() {
   const [lang, setLangState] = useState<Lang>(loadLang);
+  setCurrentLang(lang);
   useEffect(() => saveLang(lang), [lang]);
   return <LangContext.Provider value={{ lang, setLang: setLangState }}><Shell /></LangContext.Provider>;
 }
@@ -85,13 +88,12 @@ function Shell() {
   const [projectCode, setProjectCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [asOf, setAsOfState] = useState(loadAsOf);
-  const [theme, setTheme] = useState(() => (typeof localStorage !== "undefined" && localStorage.getItem("p2e.theme")) || "light");
   const route = useRoute();
 
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    try { localStorage.setItem("p2e.theme", theme); } catch { /* ignore */ }
-  }, [theme]);
+  useEffect(() => {                                   // one light, professional theme (the old dark choice is cleared)
+    document.documentElement.dataset.theme = "light";
+    try { localStorage.removeItem("p2e.theme"); } catch { /* ignore */ }
+  }, []);
 
   useEffect(() => {
     p2e.projects().then((ps) => { setProjects(ps); setProjectCode((c) => c ?? ps[0]?.code ?? null); }, (e: Error) => setError(e.message));
@@ -107,7 +109,7 @@ function Shell() {
   };
 
   if (error) return <div className="center"><ErrorBox error={error} onRetry={() => window.location.reload()} /></div>;
-  if (!projects) return <div className="center"><Loading what="Connecting to the P2E Bridge API" /></div>;
+  if (!projects) return <div className="center"><Loading what={T("shell.connecting")} /></div>;
   if (!project) return <div className="center"><ErrorBox error="No project imported yet. Run scripts/phase1/init_database.py." /></div>;
   if (!signedIn) {
     const done = () => { setSignedIn(true); navigate("overview"); };
@@ -123,7 +125,7 @@ function Shell() {
       <div className="shell">
         <aside className="sidebar">
           <div className="brand"><img src="/brand/logo.webp" alt="P2E Bridge" className="brand-logo" /><small>{t("shell.tagline")}</small></div>
-          <nav aria-label="Main">
+          <nav aria-label={T("shell.menu")}>
             {NAV.map((g) => (
               <div key={g.group} className="nav-group">
                 <span className="nav-title">{t(g.group)}</span>
@@ -147,8 +149,7 @@ function Shell() {
               <input type="date" value={asOf} onChange={(e) => e.target.value && setAsOf(e.target.value)} />
             </label>
             <LangPicker />
-            <Badge tone={connected ? "ok" : "muted"} title="Live updates from the backend event stream">{connected ? t("shell.live") : t("shell.offline")}</Badge>
-            <button type="button" className="btn btn-sm" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Toggle colour theme">{theme === "dark" ? "☀" : "☾"}</button>
+            <Badge tone={connected ? "ok" : "muted"} title={T("shell.liveHint")}>{connected ? t("shell.live") : t("shell.offline")}</Badge>
             <button type="button" className="btn btn-sm" onClick={() => { apiKey.clear(); setSignedIn(false); navigate("welcome"); }}>{t("shell.signout")}</button>
           </header>
           <main className="content" key={page}>{PAGES[page]()}</main>

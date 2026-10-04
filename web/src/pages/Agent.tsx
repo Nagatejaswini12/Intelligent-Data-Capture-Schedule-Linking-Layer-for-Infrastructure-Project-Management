@@ -1,16 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { p2e, type AgentReply } from "../api/p2e";
 import { Badge, Empty, ErrorBox, Field, PageTitle } from "../components/ui";
 import { useApi } from "../hooks/useApi";
 import { useSpeech, type VoiceLang } from "../hooks/useSpeech";
 import { useApp } from "../state";
-import { useT } from "../i18n";
+import { useT, T } from "../i18n";
 import { decisionTone, fmtDate, fmtNum, humanize } from "../utils/format";
 import { href, useRoute } from "../utils/route";
 
 const DISCIPLINES = ["civil", "piping", "electrical", "instrumentation", "hse", "static_eq", "rotating_eq"];
-const EXAMPLES = ["LT-4011 loop check finished yesterday at 4 pm", "Line 1217 erection completed on 14/09/2026",
-  "Line 1211 reinstatement completed.", "What should I report today?"];
+const EXAMPLES = ["agent.ex1", "agent.ex2", "agent.ex3", "agent.ex4"];
 
 // Menu taps send the plan name plus a glossary verb through the normal rules interpreter and linker (0 LLM tokens; the
 // linker's gates still apply, so near-identical names go to planner review instead of a guess).
@@ -38,6 +37,7 @@ export function AgentPage() {
   const [busy, setBusy] = useState(false);
   const voice = useSpeech();
   const [voiceLang, setVoiceLang] = useState<VoiceLang>(lang);
+  useEffect(() => setVoiceLang(lang), [lang]);           // the voice follows the page language
   const [heardNote, setHeardNote] = useState<string | null>(null);
   const [voiceReplies, setVoiceReplies] = useState(false);
   const reference = `${asOf}T${time}:00`;      // relative dates resolve against this (project timezone on the server)
@@ -61,7 +61,7 @@ export function AgentPage() {
     setBusy(false);
   };
 
-  const send = async (typed: string, answers?: Record<string, string>) => {
+  const send = async (typed: string, answers?: Record<string, string>, spoken = false) => {
     if (UNDO.test(typed)) {
       if (last) return retract(last.reply!.event_id!);
       setTurns((ts) => [...ts, { message: typed, error: tr("agent.nothingUndo") }]);
@@ -72,7 +72,7 @@ export function AgentPage() {
     const turn: Turn = { message, answers };
     try {
       turn.reply = await p2e.agent(project.code, { message, reference_datetime: reference, discipline: discipline || undefined, answers, lang });
-      if (voiceReplies) voice.speak(turn.reply.reply, lang);
+      if ((voiceReplies || spoken) && !(await voice.speak(turn.reply.reply, lang))) turn.note = T("as.noVoice");
       if (turn.reply.status === "recorded") menu.reload();
     } catch (e) {
       turn.error = (e as Error).message;
@@ -86,13 +86,8 @@ export function AgentPage() {
     if (voice.listening) { voice.stop(); return; }
     try {
       const heard = await voice.listen(voiceLang);
-      if (voiceLang === "as") {
-        setHeardNote(heard);
-        setText(await voice.translate(heard, "as", "en"));
-      } else {
-        setHeardNote(null);
-        setText(heard);
-      }
+      setHeardNote(voiceLang === "as" ? heard : null);
+      send(voiceLang === "as" ? await voice.translate(heard, "as", "en") : heard, undefined, true);   // spoken: sent at once, answered aloud
     } catch (e) {
       setTurns((ts) => [...ts, { message: "🎤", error: (e as Error).message }]);
     }
@@ -109,15 +104,15 @@ export function AgentPage() {
             </select>
           </label>
           <label className="stacked">{tr("agent.time")} ({asOf})<input type="time" value={time} onChange={(e) => setTime(e.target.value)} /></label>
-          <p className="muted small">"today" / "yesterday" resolve against {reference}. Change the date with "As of" in the top bar.</p>
-          <div className="chips">{EXAMPLES.map((x) => <button type="button" key={x} className="chip" onClick={() => setText(x)}>{x}</button>)}</div>
+          <p className="muted small">{T("agent.relNote", { ref: reference })}</p>
+          <div className="chips">{EXAMPLES.map((k) => <button type="button" key={k} className="chip" onClick={() => setText(tr(k))}>{tr(k)}</button>)}</div>
           {"speechSynthesis" in globalThis && (
             <label className="small"><input type="checkbox" checked={voiceReplies} onChange={(e) => setVoiceReplies(e.target.checked)} /> {tr("agent.speak")}</label>
           )}
           <h3>{tr("agent.menu")}</h3>
           {!discipline ? <p className="muted small">{tr("agent.pick")}</p>
             : menu.error ? <ErrorBox error={menu.error} />
-            : menu.loading ? <p className="muted small">Loading…</p>
+            : menu.loading ? <p className="muted small">{T("common.loading")}…</p>
             : menu.data && menu.data.items.length === 0 ? <p className="muted small">{tr("agent.nothing")}</p>
             : (
               <ul className="menu-list">{menu.data?.items.map((i) => (
@@ -137,9 +132,10 @@ export function AgentPage() {
             {turns.length === 0 && <Empty>{tr("agent.empty")}</Empty>}
             {turns.map((t, i) => (
               <div key={i} className="turn">
-                <div className="bubble user">{t.message}{t.answers && <span className="muted small"> · answers {JSON.stringify(t.answers)}</span>}</div>
-                {t.error ? <ErrorBox error={t.error} /> : t.note ? <div className="bubble agent tone-info"><p>{t.note}</p></div>
+                <div className="bubble user">{t.message}{t.answers && <span className="muted small"> · {T("agent.answers")} {Object.values(t.answers).join(", ")}</span>}</div>
+                {t.error ? <ErrorBox error={t.error} /> : t.note && !t.reply ? <div className="bubble agent tone-info"><p>{t.note}</p></div>
                   : t.reply && <ReplyCard reply={t.reply} onAnswer={(a) => send(t.message, { ...t.answers, ...a })} busy={busy} />}
+                {t.reply && t.note && <p className="small warn-text">{t.note}</p>}
                 {t.retracted && <Badge tone="warn">{tr("agent.retracted")}</Badge>}
                 {!t.retracted && t === last && <button type="button" className="btn btn-sm" disabled={busy} onClick={() => retract(t.reply!.event_id!)}>{tr("agent.undo")}</button>}
               </div>
@@ -147,10 +143,10 @@ export function AgentPage() {
           </div>
           {heardNote && <p className="muted small heard-note">অসমীয়া: {heardNote} → EN (BHASHINI)</p>}
           <form className="chat-input" onSubmit={(e) => { e.preventDefault(); if (text.trim()) { send(text.trim()); setText(""); } }}>
-            <input value={text} onChange={(e) => setText(e.target.value)} placeholder={tr("agent.placeholder")} aria-label="Message" maxLength={1000} />
-            {voice.provider !== "none" && <button type="button" className="btn" onClick={listen} disabled={busy} aria-label="Speak message">{voice.listening ? "■ " + tr("agent.listening") : "🎤"}</button>}
+            <input value={text} onChange={(e) => setText(e.target.value)} placeholder={tr("agent.placeholder")} aria-label={T("agent.message")} maxLength={1000} />
+            {voice.provider !== "none" && <button type="button" className="btn" onClick={listen} disabled={busy} aria-label={T("as.mic")} title={T("as.mic")}>{voice.listening ? "■ " + tr("agent.listening") : <img src="/brand/voice.webp" alt="" width={20} height={20} />}</button>}
             {voice.provider !== "none" && (
-              <select value={voiceLang} onChange={(e) => setVoiceLang(e.target.value as VoiceLang)} aria-label="Voice language">
+              <select value={voiceLang} onChange={(e) => setVoiceLang(e.target.value as VoiceLang)} aria-label={T("as.voiceLang")}>
                 {voice.languages.map((l) => <option key={l} value={l}>{{ en: "EN", hi: "हि", ta: "த", as: "অ" }[l]}</option>)}
               </select>
             )}
@@ -171,23 +167,23 @@ export function ReplyCard({ reply, onAnswer, busy }: { reply: AgentReply; onAnsw
       <p><Badge tone={tone}>{humanize(reply.status)}</Badge> {reply.reply}</p>
       {reply.status !== "checklist" && it.activity_text !== undefined && (
         <div className="fields">
-          <Field label="Activity">{String(it.activity_text || "—")}</Field>
-          <Field label="Status">{humanize(it.event_type)}</Field>
-          <Field label="Date">{fmtDate(it.event_date)}{it.date_text ? ` (“${it.date_text}”)` : ""}</Field>
-          <Field label="Time">{String(it.event_time ?? "—")}</Field>
-          <Field label="Quantity">{it.quantity != null ? `${it.quantity} ${it.unit}` : "—"}</Field>
-          <Field label="Discipline">{humanize(it.discipline)}</Field>
-          <Field label="Tags"><span className="mono">{((it.tags as string[]) ?? []).join(", ") || "—"}</span></Field>
-          <Field label="Extraction confidence">{fmtNum(it.extraction_confidence)} · {String(it.interpreted_by ?? "")}</Field>
+          <Field label={T("f.activity")}>{String(it.activity_text || "—")}</Field>
+          <Field label={T("f.status")}>{humanize(it.event_type)}</Field>
+          <Field label={T("f.date")}>{fmtDate(it.event_date)}{it.date_text ? ` (“${it.date_text}”)` : ""}</Field>
+          <Field label={T("f.time")}>{String(it.event_time ?? "—")}</Field>
+          <Field label={T("f.quantity")}>{it.quantity != null ? `${it.quantity} ${it.unit}` : "—"}</Field>
+          <Field label={T("f.discipline")}>{humanize(it.discipline)}</Field>
+          <Field label={T("f.tags")}><span className="mono">{((it.tags as string[]) ?? []).join(", ") || "—"}</span></Field>
+          <Field label={T("agent.extConf")}>{fmtNum(it.extraction_confidence)} · {String(it.interpreted_by ?? "")}</Field>
         </div>
       )}
       {reply.link && (
         <div className="link-result">
-          <Badge tone={decisionTone(reply.link.decision, reply.link.state)}>{reply.link.decision}</Badge>{" "}
-          {reply.link.plan_node_code ? <a className="mono" href={href("schedule", { q: reply.link.plan_node_code })}>{reply.link.plan_node_code}</a> : <span>no activity applied</span>}{" "}
-          <span className="muted">confidence {fmtNum(reply.link.confidence)}</span>{" "}
-          <a href={href("linking", { event: reply.link.event_id, decision: "" })}>open in linking →</a>
-          {reply.link.conflict && <p><Badge tone="bad">cross-source date conflict</Badge> {reply.link.conflict.dates.join(" vs ")}</p>}
+          <Badge tone={decisionTone(reply.link.decision, reply.link.state)}>{humanize(reply.link.decision)}</Badge>{" "}
+          {reply.link.plan_node_code ? <a className="mono" href={href("schedule", { q: reply.link.plan_node_code })}>{reply.link.plan_node_code}</a> : <span>{T("agent.noApplied")}</span>}{" "}
+          <span className="muted">{T("f.confidence")} {fmtNum(reply.link.confidence)}</span>{" "}
+          <a href={href("linking", { event: reply.link.event_id, decision: "" })}>{T("agent.openLinking")}</a>
+          {reply.link.conflict && <p><Badge tone="bad">{T("lk.dateConflict")}</Badge> {reply.link.conflict.dates.join(" vs ")}</p>}
           {reply.link.decision !== "matched" && reply.link.candidates.length > 0 && (
             <ol className="mini-cands">{reply.link.candidates.slice(0, 3).map((c) => <li key={c.rank}><span className="mono">{c.plan_node_code}</span> {c.activity_name} <span className="muted">{fmtNum(c.score)}</span></li>)}</ol>
           )}
@@ -196,10 +192,10 @@ export function ReplyCard({ reply, onAnswer, busy }: { reply: AgentReply; onAnsw
       {reply.status === "needs_clarification" && (missing.includes("date") || missing.includes("discipline")) && <ClarifyForm missing={missing} onAnswer={onAnswer} busy={busy} />}
       {reply.checklist && (
         <table className="table compact">
-          <thead><tr><th>Activity</th><th>Expected because</th><th>Last report</th><th>Today</th></tr></thead>
+          <thead><tr><th>{T("f.activity")}</th><th>{T("agent.expected")}</th><th>{T("agent.lastReport")}</th><th>{T("agent.today")}</th></tr></thead>
           <tbody>{reply.checklist.map((c) => (
-            <tr key={c.plan_node_code}><td><span className="mono">{c.plan_node_code}</span> {c.activity_name}</td><td className="small">{c.expectation}</td>
-              <td>{fmtDate(c.last_reported)}</td><td>{c.reported_today ? <Badge tone="ok">reported</Badge> : <Badge tone="warn">not yet</Badge>}</td></tr>
+            <tr key={c.plan_node_code}><td><span className="mono">{c.plan_node_code}</span> {c.activity_name}</td><td className="small">{humanize(c.expectation)}</td>
+              <td>{fmtDate(c.last_reported)}</td><td>{c.reported_today ? <Badge tone="ok">{T("agent.reported")}</Badge> : <Badge tone="warn">{T("agent.notYet")}</Badge>}</td></tr>
           ))}</tbody>
         </table>
       )}
@@ -212,13 +208,13 @@ function ClarifyForm({ missing, onAnswer, busy }: { missing: string[]; onAnswer:
   const [disc, setDisc] = useState("");
   return (
     <form className="inline clarify" onSubmit={(e) => { e.preventDefault(); const a: Record<string, string> = {}; if (date) a.date = date; if (disc) a.discipline = disc; onAnswer(a); }}>
-      {missing.includes("date") && <input value={date} onChange={(e) => setDate(e.target.value)} placeholder="today, yesterday or 2026-09-14" aria-label="Date answer" />}
+      {missing.includes("date") && <input value={date} onChange={(e) => setDate(e.target.value)} placeholder={T("agent.dateHint")} aria-label={T("f.date")} />}
       {missing.includes("discipline") && (
-        <select value={disc} onChange={(e) => setDisc(e.target.value)} aria-label="Discipline answer">
-          <option value="">discipline…</option>{DISCIPLINES.map((d) => <option key={d} value={d}>{humanize(d)}</option>)}
+        <select value={disc} onChange={(e) => setDisc(e.target.value)} aria-label={T("f.discipline")}>
+          <option value="">{T("f.discipline")}…</option>{DISCIPLINES.map((d) => <option key={d} value={d}>{humanize(d)}</option>)}
         </select>
       )}
-      <button className="btn btn-sm btn-primary" disabled={busy || (!date && !disc)}>Answer</button>
+      <button className="btn btn-sm btn-primary" disabled={busy || (!date && !disc)}>{T("agent.answer")}</button>
     </form>
   );
 }

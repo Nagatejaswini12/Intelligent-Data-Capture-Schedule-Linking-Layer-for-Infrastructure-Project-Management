@@ -1,6 +1,7 @@
 """FastAPI app factory.  Run:  .venv\\Scripts\\python -m uvicorn p2e.main:app --port 8000"""
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from fastapi import FastAPI, Request
@@ -43,6 +44,8 @@ def create_app(db_url: str | None = None, *, api_keys: dict[str, str] | None = N
     app.state.glossary_path = Path(glossary_path or settings.glossary_path)
     app.state.vocab = load_project_vocab(app.state.glossary_path)
     app.state.llm = llm if llm is not None else adjudicate.from_env()   # None unless P2E_LLM_ENDPOINT is set
+    # bulk linking calls the tie-breaker once per ambiguous report: opt-in for env-configured models (slow on small GPUs)
+    app.state.tiebreak = app.state.llm if llm is not None or os.environ.get("P2E_LLM_TIEBREAKER") == "1" else None
     app.include_router(health_router)
     app.include_router(router)
     app.include_router(documents_router)

@@ -70,7 +70,8 @@ export interface KnowledgeEntry { id: string; kind: string; title: string; text:
 type L3 = { en: string; ta: string; hi: string };
 export interface HelpDoc { title?: L3; status?: L3; sections: { id?: string; title?: L3; steps?: { en: string[]; ta: string[]; hi: string[] };
   heading?: L3; text?: L3 }[] }
-export interface AssistantReply { question: string; lang: "en" | "ta" | "hi"; topic: string; answer: string;
+export interface AssistantReply { question: string; lang: "en" | "ta" | "hi"; topic: string; answer: string; answered_by?: string;
+  prompt?: { role: "system" | "user"; content: string }[];
   citations: { kind: string; id: string | number; text: string; date?: string }[]; sources: { title: string; url: string; as_of: string }[] }
 export interface Efficiency { as_of: string; assumptions: Record<string, number>; reports: number; items: number;
   tiers: { automatic: number; planner: number; review_pending: number; flagged: number }; automatic_by_evidence: Record<string, number>;
@@ -86,6 +87,9 @@ export interface AgentReply { status: "recorded" | "duplicate" | "needs_clarific
 const P = (code: string) => `/api/v1/projects/${encodeURIComponent(code)}`;
 
 /** Every backend route the UI uses (checked by the backend contract test tests/test_phase7.py). */
+export interface AccessRequest { id: number; name: string; email: string; organisation: string; role_requested: string;
+  reason: string; status: "pending" | "approved" | "rejected"; created_at: string }
+
 export const p2e = {
   health: () => api<{ status: string; version: string }>("/health"),
   projects: () => api<Project[]>("/api/v1/projects"),
@@ -130,9 +134,11 @@ export const p2e = {
   translate: (body: { text: string; source: string; target: string }) => api<{ text: string }>(`/api/v1/speech/translate`, { method: "POST", body }),
   login: (body: { username: string; password: string }) => api<{ role: string; token: string }>(`/api/v1/auth/login`, { method: "POST", body }),   // public
   demoAccount: () => api<{ username: string; password: string }>(`/api/v1/auth/demo`),   // 404 unless P2E_DEMO_ACCOUNT is set
+  accessRequests: () => api<AccessRequest[]>(`/api/v1/access-requests`),
+  decideAccess: (id: number, status: "approved" | "rejected") => api<AccessRequest>(`/api/v1/access-requests/${id}`, { method: "PATCH", body: { status } }),
   requestAccess: (body: { name: string; email: string; organisation: string; role_requested: string; reason: string }) => api<{ id: number; status: string }>(`/api/v1/access-requests`, { method: "POST", body }),
   helpDoc: (doc: "guide" | "terms") => api<HelpDoc>(`/api/v1/help/${doc}`),   // upgrade L4 (public)
-  assistant: (c: string, body: { question: string; lang: string; as_of: string }) => api<AssistantReply>(`${P(c)}/assistant/ask`, { method: "POST", body }),   // upgrade L3
+  assistant: (c: string, body: { question: string; lang: string; as_of: string; ai?: boolean }) => api<AssistantReply>(`${P(c)}/assistant/ask`, { method: "POST", body }),   // upgrade L3
   agent: (c: string, body: { message: string; reference_datetime: string; discipline?: string; answers?: Record<string, string>; lang?: string }) =>
     api<AgentReply>(`${P(c)}/agent/messages`, { method: "POST", body }),
   retract: (c: string, eventId: number) => api<LinkDetail>(`${P(c)}/agent/events/${eventId}/retract`, { method: "POST" }),   // upgrade W1

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useT } from "../i18n";
+import { useT, T } from "../i18n";
 import { p2e, type ApplyOut, type LinkDetail } from "../api/p2e";
 import { EvidenceModal } from "../components/Evidence";
 import { Async, Badge, Card, Empty, ErrorBox, Field, Flow, PageTitle } from "../components/ui";
@@ -16,8 +16,8 @@ export function LinkingPage() {
     <>
       <PageTitle icon="agent-linker" title={t("linking.title")} subtitle={t("linking.sub")} />
       <div className="tabs" role="tablist">
-        <a role="tab" aria-selected={tab === "events"} className={tab === "events" ? "active" : ""} href={href("linking")}>Link decisions</a>
-        <a role="tab" aria-selected={tab === "blocked"} className={tab === "blocked" ? "active" : ""} href={href("linking", { tab: "blocked" })}>Blocked actuals</a>
+        <a role="tab" aria-selected={tab === "events"} className={tab === "events" ? "active" : ""} href={href("linking")}>{T("lk.tabDecisions")}</a>
+        <a role="tab" aria-selected={tab === "blocked"} className={tab === "blocked" ? "active" : ""} href={href("linking", { tab: "blocked" })}>{T("lk.tabBlocked")}</a>
       </div>
       {tab === "blocked" ? <BlockedActuals /> : <LinkDecisions />}
     </>
@@ -37,37 +37,37 @@ function LinkDecisions() {
   const setFilter = (k: string, v: string) => navigate("linking", { decision, state, conflict, node, [k]: v, event: undefined });
   return (
     <div className="split">
-      <Card title={node ? `Decisions linked to ${node}` : "Decisions"} actions={<>
-        <select aria-label="Decision" value={decision} onChange={(e) => setFilter("decision", e.target.value)}>
-          <option value="">All decisions</option><option value="review">Review</option><option value="matched">Matched</option><option value="unmatched">Unmatched</option>
+      <Card title={node ? T("lk.decisionsFor", { node }) : T("lk.decisions")} actions={<>
+        <select aria-label={T("lk.decision")} value={decision} onChange={(e) => setFilter("decision", e.target.value)}>
+          <option value="">{T("lk.allDecisions")}</option><option value="review">{humanize("review")}</option><option value="matched">{humanize("matched")}</option><option value="unmatched">{humanize("unmatched")}</option>
         </select>
-        <select aria-label="State" value={state} onChange={(e) => setFilter("state", e.target.value)}>
-          <option value="">Any state</option><option value="pending">Pending</option><option value="auto">Auto</option><option value="confirmed">Confirmed</option><option value="rejected">Rejected</option>
+        <select aria-label={T("lk.state")} value={state} onChange={(e) => setFilter("state", e.target.value)}>
+          <option value="">{T("lk.anyState")}</option>{["pending", "auto", "confirmed", "rejected"].map((v) => <option key={v} value={v}>{humanize(v)}</option>)}
         </select>
-        <label className="check"><input type="checkbox" checked={conflict === "true"} onChange={(e) => setFilter("conflict", e.target.checked ? "true" : "")} />conflicts</label>
+        <label className="check"><input type="checkbox" checked={conflict === "true"} onChange={(e) => setFilter("conflict", e.target.checked ? "true" : "")} />{T("lk.conflicts")}</label>
       </>}>
-        <Async state={list} what="Loading decisions">
-          {(page) => page.items.length === 0 ? <Empty>Nothing here. {decision === "review" && "The review queue is empty."}</Empty> : (
+        <Async state={list} what={T("lk.loadingDecisions")}>
+          {(page) => page.items.length === 0 ? <Empty>{T("lk.nothing")} {decision === "review" && T("lk.queueEmpty")}</Empty> : (
             <ul className="queue">
               {page.items.map((l) => (
                 <li key={l.event_id} className={l.event_id === eventId ? "selected" : ""}>
                   <a href={href("linking", { decision, state, conflict, node, event: l.event_id })}>
                     <span className="queue-text">{l.activity_text}</span>
                     <span className="queue-meta">
-                      <Badge tone={decisionTone(l.decision, l.state)}>{l.decision} · {l.state}</Badge>
+                      <Badge tone={decisionTone(l.decision, l.state)}>{humanize(l.decision)} · {humanize(l.state)}</Badge>
                       {l.plan_node_code && <span className="mono">{l.plan_node_code}</span>}
-                      {l.conflict && <Badge tone="bad">date conflict</Badge>}
+                      {l.conflict && <Badge tone="bad">{T("lk.dateConflict")}</Badge>}
                       <span className="muted">{fmtDate(l.event_date)} · {fmtNum(l.confidence)}</span>
                     </span>
                   </a>
                 </li>
               ))}
-              <li className="muted small">{page.total} decisions</li>
+              <li className="muted small">{T("lk.total", { n: page.total })}</li>
             </ul>
           )}
         </Async>
       </Card>
-      {eventId ? <LinkWorkspace eventId={eventId} onChanged={list.reload} /> : <Card title="Decision detail"><Empty>Select a decision to see the evidence, the candidates and the planner actions.</Empty></Card>}
+      {eventId ? <LinkWorkspace eventId={eventId} onChanged={list.reload} /> : <Card title={T("lk.detail")}><Empty>{T("lk.select")}</Empty></Card>}
     </div>
   );
 }
@@ -96,44 +96,44 @@ function LinkWorkspace({ eventId, onChanged }: { eventId: number; onChanged: () 
     }
   };
   const applied = (a: ApplyOut) => a.applied.length
-    ? `Applied to the schedule: ${a.applied.map((e) => `${e.plan_node_code} ${Object.keys(e.changes).join(", ")}`).join("; ")}.`
-    : a.blocked.length ? `Not applied: ${a.blocked.map((b) => `${b.plan_node_code}: ${b.blockers.join("; ")}`).join(" | ")}` : "No schedule change needed.";
+    ? T("lk.appliedTo", { items: a.applied.map((e) => `${e.plan_node_code} ${Object.keys(e.changes).join(", ")}`).join("; ") })
+    : a.blocked.length ? T("lk.notApplied", { items: a.blocked.map((b) => `${b.plan_node_code}: ${b.blockers.join("; ")}`).join(" | ") }) : T("lk.noChange");
   const approve = (code?: string) => run(async () => {
     const r = await p2e.approve(c, eventId, asOf, code);
-    return `Confirmed ${r.link.plan_node_code}. ${r.learned.length ? `Alias memory learned ${r.learned.length} phrase(s). ` : ""}${applied(r.apply)}`;
+    return `${T("lk.confirmed", { code: String(r.link.plan_node_code) })} ${r.learned.length ? T("lk.learned", { n: r.learned.length }) + " " : ""}${applied(r.apply)}`;
   });
 
   return (
-    <Card title={`Event ${eventId}`}>
-      <Async state={state} what="Loading the decision">
+    <Card title={T("lk.event", { id: eventId })}>
+      <Async state={state} what={T("lk.loadingDecision")}>
         {({ link, event }) => {
           const top = link.candidates[0];
           return (
             <>
               <Flow steps={[
-                { label: "Field report", value: <span className="source-inline">{link.source_text}</span>, tone: "info" },
-                { label: "AI extraction", value: `${humanize(link.event_type)} · ${fmtDate(link.event_date)}${event.quantity != null ? ` · ${event.quantity} ${event.unit}` : ""}`, tone: "ai" },
-                { label: "Candidate activity", value: top ? `${top.plan_node_code}` : "none", tone: top ? "ai" : "bad" },
-                { label: "Confidence", value: `${fmtNum(link.confidence)} (margin ${fmtNum(link.margin)})`, tone: link.confidence >= 0.7 ? "ok" : "warn" },
-                { label: "Planner decision", value: `${link.decision} · ${link.state}`, tone: decisionTone(link.decision, link.state) },
+                { label: T("flow.report"), value: <span className="source-inline">{link.source_text}</span>, tone: "info" },
+                { label: T("flow.extract"), value: `${humanize(link.event_type)} · ${fmtDate(link.event_date)}${event.quantity != null ? ` · ${event.quantity} ${event.unit}` : ""}`, tone: "ai" },
+                { label: T("flow.candidate"), value: top ? `${top.plan_node_code}` : T("lk.none"), tone: top ? "ai" : "bad" },
+                { label: T("f.confidence"), value: `${fmtNum(link.confidence)} (${T("lk.margin")} ${fmtNum(link.margin)})`, tone: link.confidence >= 0.7 ? "ok" : "warn" },
+                { label: T("flow.decision"), value: `${humanize(link.decision)} · ${humanize(link.state)}`, tone: decisionTone(link.decision, link.state) },
               ]} />
               <div className="fields">
-                <Field label="Extracted activity">{link.activity_text}</Field>
-                <Field label="Discipline">{humanize(event.discipline)}</Field>
-                <Field label="Area">{event.area ?? "—"}</Field>
-                <Field label="Tags"><span className="mono">{event.tags.join(", ") || "—"}</span></Field>
-                <Field label="Source">{event.document_filename} <button type="button" className="btn btn-sm" onClick={() => setEvidence(eventId)}>Evidence</button></Field>
-                <Field label="Linked activity">{link.plan_node_code ? <a href={href("schedule", { q: link.plan_node_code })}>{link.plan_node_code}</a> : "—"}</Field>
-                <Field label="Retrieval">{link.method}{link.retrieval_used ? " + stage-2 retrieval (RAG)" : " (deterministic)"}</Field>
-                <Field label="Decided by">{link.decided_by ? `${link.decided_by} · ${fmtDate(link.decided_at)}` : "linker"}</Field>
+                <Field label={T("lk.extracted")}>{link.activity_text}</Field>
+                <Field label={T("f.discipline")}>{humanize(event.discipline)}</Field>
+                <Field label={T("f.area")}>{event.area ?? "—"}</Field>
+                <Field label={T("f.tags")}><span className="mono">{event.tags.join(", ") || "—"}</span></Field>
+                <Field label={T("f.source")}>{event.document_filename} <button type="button" className="btn btn-sm" onClick={() => setEvidence(eventId)}>{T("lk.evidence")}</button></Field>
+                <Field label={T("lk.linked")}>{link.plan_node_code ? <a href={href("schedule", { q: link.plan_node_code })}>{link.plan_node_code}</a> : "—"}</Field>
+                <Field label={T("lk.retrieval")}>{link.method}{link.retrieval_used ? T("lk.rag") : T("lk.deterministic")}</Field>
+                <Field label={T("lk.decidedBy")}>{link.decided_by ? `${link.decided_by} · ${fmtDate(link.decided_at)}` : T("lk.linker")}</Field>
               </div>
               <div className="reasons">{link.reasons.map((r, i) => <Badge key={i} tone={link.decision === "matched" ? "ai" : "warn"}>{r}</Badge>)}</div>
-              {link.unmatched_type && <p><Badge tone="bad">unmatched: {humanize(link.unmatched_type)}</Badge></p>}
+              {link.unmatched_type && <p><Badge tone="bad">{humanize("unmatched")}: {humanize(link.unmatched_type)}</Badge></p>}
               {link.conflict && <ConflictBox link={link} onEvidence={setEvidence} />}
-              {link.llm_suggestion && <p className="muted small">LLM tie-breaker (advisory): {JSON.stringify(link.llm_suggestion)}</p>}
+              {link.llm_suggestion && <p className="muted small">{T("lk.tiebreak")}: {JSON.stringify(link.llm_suggestion)}</p>}
 
-              <h3>Candidate L5/L6 activities</h3>
-              {link.candidates.length === 0 ? <Empty>No candidate was retrieved.</Empty> : (
+              <h3>{T("lk.candidates")}</h3>
+              {link.candidates.length === 0 ? <Empty>{T("lk.noCandidate")}</Empty> : (
                 <ol className="candidates">
                   {link.candidates.slice(0, 8).map((cd) => (
                     <li key={cd.rank}>
@@ -143,7 +143,7 @@ function LinkWorkspace({ eventId, onChanged }: { eventId: number; onChanged: () 
                         <a className="mono" href={href("schedule", { q: cd.plan_node_code })}>{cd.plan_node_code}</a>
                         <span>{cd.activity_name}</span>
                         <span className="muted">{humanize(cd.discipline)} · {cd.area ?? "—"}</span>
-                        <button type="button" className="btn btn-sm" disabled={busy} onClick={() => approve(cd.plan_node_code)}>{cd.rank === 1 ? "Approve" : "Choose"}</button>
+                        <button type="button" className="btn btn-sm" disabled={busy} onClick={() => approve(cd.plan_node_code)}>{cd.rank === 1 ? T("lk.approve") : T("lk.choose")}</button>
                       </div>
                       <div className="cand-why">
                         {cd.retrieval_methods.map((m) => <Badge key={m} tone="info">{m}</Badge>)}
@@ -154,20 +154,20 @@ function LinkWorkspace({ eventId, onChanged }: { eventId: number; onChanged: () 
                 </ol>
               )}
 
-              <h3>Planner actions</h3>
+              <h3>{T("lk.actions")}</h3>
               <div className="actions">
-                <button type="button" className="btn btn-primary" disabled={busy || !top} onClick={() => approve()}>Confirm top candidate</button>
+                <button type="button" className="btn btn-primary" disabled={busy || !top} onClick={() => approve()}>{T("lk.confirmTop")}</button>
                 <form className="inline" onSubmit={(e) => { e.preventDefault(); if (other.trim()) approve(other.trim()); }}>
-                  <input placeholder="Other activity code" value={other} onChange={(e) => setOther(e.target.value)} aria-label="Other activity code" />
-                  <button className="btn" disabled={busy || !other.trim()}>Choose</button>
+                  <input placeholder={T("lk.otherCode")} value={other} onChange={(e) => setOther(e.target.value)} aria-label={T("lk.otherCode")} />
+                  <button className="btn" disabled={busy || !other.trim()}>{T("lk.choose")}</button>
                 </form>
-                <button type="button" className="btn" disabled={busy || link.state !== "auto"} title="Hold an automatic decision for planner review" onClick={() => run(async () => { await p2e.hold(c, eventId); return "Sent to planner review; the linker will not override it."; })}>Send to review</button>
-                <button type="button" className="btn btn-danger" disabled={busy || link.state === "rejected"} onClick={() => run(async () => { await p2e.reject(c, eventId); return "Rejected: the report matches no schedule activity."; })}>Reject</button>
-                <button type="button" className="btn" disabled={busy} onClick={() => setShowNew(!showNew)}>New activity…</button>
+                <button type="button" className="btn" disabled={busy || link.state !== "auto"} title={T("lk.holdHint")} onClick={() => run(async () => { await p2e.hold(c, eventId); return T("lk.held"); })}>{T("lk.sendReview")}</button>
+                <button type="button" className="btn btn-danger" disabled={busy || link.state === "rejected"} onClick={() => run(async () => { await p2e.reject(c, eventId); return T("lk.rejectedMsg"); })}>{T("lk.reject")}</button>
+                <button type="button" className="btn" disabled={busy} onClick={() => setShowNew(!showNew)}>{T("lk.newActivity")}</button>
               </div>
               {showNew && <NewActivityForm eventId={eventId} defaultName={link.activity_text} busy={busy} run={run} />}
               {result && (result.ok ? <div className="state state-ok">{result.text}</div> : <ErrorBox error={result.text} />)}
-              {link.state === "auto" && link.decision === "matched" && <p className="muted small">If actuals were already applied from this report, revert them in the <a href="#/audit">audit trail</a>.</p>}
+              {link.state === "auto" && link.decision === "matched" && <p className="muted small">{T("lk.revert")} <a href="#/audit">{T("nav.audit")}</a>.</p>}
             </>
           );
         }}
@@ -181,17 +181,17 @@ function ConflictBox({ link, onEvidence }: { link: LinkDetail; onEvidence: (id: 
   const cf = link.conflict!;
   return (
     <div className="conflict">
-      <strong>Cross-source date conflict on {cf.plan_node_code}</strong> — dates {cf.dates.join(" vs ")}. The system does not choose between them; both reports are kept.
+      <strong>{T("lk.conflictOn", { code: cf.plan_node_code })}</strong> — {cf.dates.join(" vs ")}. {T("lk.conflictKeep")}
       <ul>{cf.findings.map((f, i) => <li key={i}><Badge tone="bad">{humanize(f.rule)}</Badge> {f.detail}</li>)}</ul>
       <table className="table compact">
-        <thead><tr><th>Report</th><th>Source</th><th>Type</th><th>Date</th><th>Qty</th><th></th></tr></thead>
+        <thead><tr><th>{T("f.report")}</th><th>{T("f.source")}</th><th>{T("f.type")}</th><th>{T("f.date")}</th><th>{T("f.qty")}</th><th></th></tr></thead>
         <tbody>{cf.events.map((e) => (
-          <tr key={e.event_id}><td className="source-cell">{e.source_text}</td><td>{e.document}</td><td>{e.event_type}</td><td>{e.event_date}</td>
+          <tr key={e.event_id}><td className="source-cell">{e.source_text}</td><td>{e.document}</td><td>{humanize(e.event_type)}</td><td>{e.event_date}</td>
             <td>{e.quantity != null ? `${e.quantity} ${e.unit}` : "—"}</td>
-            <td><button type="button" className="btn btn-sm" onClick={() => onEvidence(e.event_id)}>Evidence</button> <a href={href("linking", { event: e.event_id, conflict: "true" })}>open</a></td></tr>
+            <td><button type="button" className="btn btn-sm" onClick={() => onEvidence(e.event_id)}>{T("lk.evidence")}</button> <a href={href("linking", { event: e.event_id, conflict: "true" })}>{T("lk.open")}</a></td></tr>
         ))}</tbody>
       </table>
-      <p className="muted small">Resolve by rejecting the wrong report, or confirm the activity and set the date by override under “Blocked actuals”.</p>
+      <p className="muted small">{T("lk.resolve")}</p>
     </div>
   );
 }
@@ -202,13 +202,13 @@ function NewActivityForm({ eventId, defaultName, busy, run }: { eventId: number;
   return (
     <form className="subform" onSubmit={(e) => { e.preventDefault(); run(async () => {
       const r = await p2e.newActivity(project.code, eventId, { ...form, as_of: asOf });
-      return `Created ${r.link.plan_node_code} and linked the report. ${r.apply.applied.length ? "Actuals applied." : ""}`;
+      return `${T("lk.created", { code: String(r.link.plan_node_code) })} ${r.apply.applied.length ? T("lk.actualsApplied") : ""}`;
     }); }}>
-      <p className="muted small">Mark as NEW work: creates an L5 activity under an L4 WBS node (or L6 under a summary). Audited.</p>
-      <label className="stacked">Parent WBS code<input required value={form.parent_code} onChange={(e) => setForm({ ...form, parent_code: e.target.value })} placeholder="e.g. CGS-EXP-01.A3.CIV.PR3" /></label>
-      <label className="stacked">New activity code<input required value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} placeholder="e.g. CIV-A3-NW01" /></label>
-      <label className="stacked">Name<input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label>
-      <button className="btn btn-primary" disabled={busy}>Create activity</button>
+      <p className="muted small">{T("lk.newHint")}</p>
+      <label className="stacked">{T("lk.parent")}<input required value={form.parent_code} onChange={(e) => setForm({ ...form, parent_code: e.target.value })} placeholder="e.g. CGS-EXP-01.A3.CIV.PR3" /></label>
+      <label className="stacked">{T("lk.newCode")}<input required value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} placeholder="e.g. CIV-A3-NW01" /></label>
+      <label className="stacked">{T("auth.name")}<input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label>
+      <button className="btn btn-primary" disabled={busy}>{humanize("create_activity")}</button>
     </form>
   );
 }
@@ -217,12 +217,12 @@ function BlockedActuals() {
   const { project, asOf, live } = useApp();
   const state = useApi(() => p2e.review(project.code, asOf), [project.code, asOf, live]);
   return (
-    <Card title={`Activities whose reported actuals are blocked by a rule (as of ${asOf})`}>
-      <Async state={state} what="Loading the review queue">
-        {(q) => q.activities.length === 0 ? <Empty>No blocked activities.</Empty> : (
+    <Card title={T("lk.blockedTitle", { asOf })}>
+      <Async state={state} what={T("lk.loadingQueue")}>
+        {(q) => q.activities.length === 0 ? <Empty>{T("lk.noBlocked")}</Empty> : (
           <div className="scroll">
             <table className="table compact">
-              <thead><tr><th>Activity</th><th>Why blocked</th><th>Proposed</th><th>Evidence</th><th>Override</th></tr></thead>
+              <thead><tr><th>{T("f.activity")}</th><th>{T("lk.why")}</th><th>{T("lk.proposed")}</th><th>{T("lk.evidence")}</th><th>{humanize("override")}</th></tr></thead>
               <tbody>{q.activities.map((a) => <BlockedRow key={a.plan_node_code} a={a} onDone={state.reload} />)}</tbody>
             </table>
           </div>
@@ -243,7 +243,7 @@ function BlockedRow({ a, onDone }: { a: { plan_node_code: string; activity_name:
     if (finish) body.actual_finish = finish;
     try {
       const e = await p2e.override(project.code, a.plan_node_code, body);
-      setMsg({ ok: true, text: `Audit entry ${e.id}` });
+      setMsg({ ok: true, text: T("lk.auditEntry", { id: e.id }) });
       onDone();
     } catch (err) {
       setMsg({ ok: false, text: (err as Error).message });
@@ -253,13 +253,13 @@ function BlockedRow({ a, onDone }: { a: { plan_node_code: string; activity_name:
     <tr>
       <td><a className="mono" href={href("schedule", { q: a.plan_node_code })}>{a.plan_node_code}</a><div className="small muted">{a.activity_name}</div></td>
       <td>{a.blockers.map((b, i) => <div key={i} className="small">{b}</div>)}</td>
-      <td className="small">start {fmtDate(a.proposed.actual_start)}<br />finish {fmtDate(a.proposed.actual_finish)}</td>
+      <td className="small">{humanize("start")} {fmtDate(a.proposed.actual_start)}<br />{humanize("finish")} {fmtDate(a.proposed.actual_finish)}</td>
       <td className="small">{a.evidence_event_ids.map((id) => <a key={id} href={href("linking", { event: id, decision: "" })}>#{id} </a>)}</td>
       <td>
         <form className="inline" onSubmit={(e) => { e.preventDefault(); submit(); }}>
-          <input type="date" aria-label="Actual start" value={start} onChange={(e) => setStart(e.target.value)} />
-          <input type="date" aria-label="Actual finish" value={finish} onChange={(e) => setFinish(e.target.value)} />
-          <button className="btn btn-sm" disabled={!start && !finish}>Set</button>
+          <input type="date" aria-label={T("f.actualStart")} value={start} onChange={(e) => setStart(e.target.value)} />
+          <input type="date" aria-label={T("f.actualFinish")} value={finish} onChange={(e) => setFinish(e.target.value)} />
+          <button className="btn btn-sm" disabled={!start && !finish}>{T("lk.set")}</button>
         </form>
         {msg && <div className={msg.ok ? "ok-text small" : "bad-text small"}>{msg.text}</div>}
       </td>

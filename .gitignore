@@ -13,3 +13,7 @@ web/.env.local
 
 # local design-tool scratch (impeccable)
 .impeccable/
+
+# Vercel CLI link
+.vercel
+web/public/ort/

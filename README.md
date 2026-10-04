@@ -10,7 +10,8 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.142-009688?logo=fastapi&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6?logo=typescript&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-308%20backend%20%7C%2017%20frontend-2ea44f)
+![Tests](https://img.shields.io/badge/tests-314%20backend%20%7C%2018%20frontend-2ea44f)
+![Deploy](https://img.shields.io/badge/deploy-Vercel%20%2B%20Neon%20Postgres%20%2B%20Blob-000000?logo=vercel)
 ![AI tokens](https://img.shields.io/badge/AI%20tokens%20for%20routine%20work-0-5B3FD1)
 ![Languages](https://img.shields.io/badge/languages-English%20%7C%20தமிழ்%20%7C%20हिन्दी%20%7C%20অসমীয়া-14213D)
 ![Official resources](https://img.shields.io/badge/official%20resources-BHASHINI%20%7C%20AIKosh%20%7C%20OIL-FF9933)
@@ -95,8 +96,9 @@ sequenceDiagram
 ```mermaid
 flowchart TB
     subgraph CLIENT["Browser — React 19 · TypeScript · Vite"]
-        P1["14 screens · Ask P2E assistant<br/>EN / தமிழ் / हिन्दी interface"]
+        P1["15 screens · Ask P2E assistant<br/>EN / தமிழ் / हिन्दी interface"]
         P2["Voice hook: BHASHINI or browser speech"]
+        P3["On-device AI: Qwen3.5-0.8B ONNX<br/>ONNX Runtime Web on the user's GPU (WebGPU)"]
     end
     subgraph API["FastAPI — 58 REST routes + live SSE · role keys"]
         direction LR
@@ -109,9 +111,9 @@ flowchart TB
         R7["assistant · i18n — scoped multilingual answers"]
         R8["integrations/bhashini — ASR · TTS · NMT"]
     end
-    subgraph DATA["Storage — on-premise"]
-        D1[("SQLite → Postgres-ready")]
-        D2[("Evidence store<br/>content-addressed originals")]
+    subgraph DATA["Storage"]
+        D1[("Postgres (Vercel · Neon)<br/>SQLite for local dev")]
+        D2[("Evidence store: Vercel Blob<br/>local folder in dev")]
         D3[("Official facts<br/>OIL annual report & site")]
     end
     subgraph GOV["Official external services (optional)"]
@@ -130,6 +132,7 @@ flowchart TB
 |---|---|
 | Deterministic core (rules + scoring) | Fast, free, explainable; no hallucinated activity matches |
 | Optional on-prem LLM, advisory only | Can only pick an existing candidate or NONE; never applies anything |
+| On-device AI for wording only | The browser model rephrases the verified answer in the user's language; it never links, decides or writes |
 | Evidence for every event | Each event points to the exact report line or sheet cell; originals stored unchanged |
 | Append-only, hash-chained audit | Every change is reversible and tampering is detected |
 | One pipeline for every channel | A supervisor's tap is validated exactly like a DPR line |
@@ -164,7 +167,38 @@ erDiagram
 | **Schedule I/O** | Import **Primavera P6 XER**, MS Project XML, CSV; export actuals to CSV / MSPDI |
 | **Intelligence** | Dashboards, delay causes, productivity, silent-work alerts, daily / weekly **PM reports**, **ROI & efficiency**, cited project Q&A |
 | **Ask P2E** | Typed or spoken assistant about the app, the project and Oil India (official sources only); declines everything else |
+| **Dashboards** | Progress **S-curve** (planned vs actual, hover read-out), **activity Kanban** by status with late flags, planned-vs-actual and status-by-discipline bars, freshness, delay causes |
+| **Admin** | **Access requests** screen: review sign-ups, approve or reject (role keys are still issued by the admin) |
 | **Help** | User Guide, Terms of Use (draft), Video Guide — in three languages |
+
+---
+
+## AI design and guard rails
+
+The routine work (extraction, linking, applying dates) is deterministic: **0 AI tokens**. AI is used only to **word answers** in English, Tamil or Hindi, and it can be switched off.
+
+```mermaid
+flowchart LR
+    Q["Question"] --> API["Backend: rules answer<br/>+ verified facts + scope rules"]
+    API --> UI["Browser"]
+    UI -->|"On-device AI on"| M["Qwen3.5-0.8B (ONNX, q4f16)<br/>ONNX Runtime Web · WebGPU"]
+    M --> G{"Guard"}
+    G -->|pass| A1["AI wording<br/>(badge: on-device)"]
+    G -->|fail| A2["Verified rules answer"]
+    UI -->|"AI off / no WebGPU"| A2
+```
+
+| Guard rail | Where |
+|---|---|
+| Scope: only this app, this project, Oil India; anything else → `OUT_OF_SCOPE` → polite refusal | system prompt (`p2e/assistant.py`) |
+| Facts only: the model sees only the verified facts for this question | backend builds the prompt |
+| Every number in the AI answer must exist in the facts, and every number of the verified answer must be kept | `guard()` in `web/src/utils/localAi.ts`, `ai_answer()` on the server |
+| Any failure, no WebGPU, or model still downloading → the deterministic answer | browser + server |
+| The model never links, decides or writes the schedule | architecture |
+
+**Model.** [`onnx-community/Qwen3.5-0.8B-Text-ONNX`](https://huggingface.co/onnx-community/Qwen3.5-0.8B-Text-ONNX) (base model Qwen/Qwen3.5-0.8B, **Apache-2.0**, 201 languages). About **470 MB**, downloaded once and cached by the browser; it runs on the **user's own GPU** through ONNX Runtime Web (WebGPU), so the server needs no GPU and no AI account. The ONNX Runtime engine is served from this site (`/ort/`); the model comes from Hugging Face, or from your own Vercel Blob store when `VITE_MODEL_HOST` is set (see *Deploy on Vercel*). Measured on a laptop: first answer including the one-time download ≈ 43 s.
+
+Optional server-side model: any OpenAI-compatible endpoint you host (`P2E_LLM_ENDPOINT`, `P2E_LLM_MODEL`; remote hosts refused unless `P2E_LLM_ALLOW_REMOTE=1`) with the same guard rails, per-minute/day budgets and timeout (`p2e/llm.py`).
 
 ---
 
@@ -199,7 +233,7 @@ Details and configuration: [docs/OFFICIAL_RESOURCES.md](docs/OFFICIAL_RESOURCES.
 
 ## Quick start (Windows)
 
-**Fastest:** double-click **`start_demo.bat`** → opens http://localhost:8000 → the cinematic landing page opens → **Sign in** → press **Fill demo credentials** (admin demo account) → set **As of = 2026-09-16**. New users use **Request access** (stored for an admin to review; `GET /api/v1/access-requests`). The demo account is offered only when `P2E_DEMO_ACCOUNT` is set; production leaves it unset.
+**Fastest:** double-click **`start_demo.bat`** → opens http://localhost:8000 → the cinematic landing page opens → **Sign in** → press **Fill demo credentials** (admin demo account) → set **As of = 2026-09-16**. New users use **Request access**; an admin reviews them under **Admin → Access Requests**. To try the on-device AI, open **Ask P2E** and tick **On-device AI** (Chrome / Edge with WebGPU). The demo account is offered only when `P2E_DEMO_ACCOUNT` is set; production leaves it unset.
 
 First-time setup:
 ```powershell
@@ -221,13 +255,37 @@ $env:BHASHINI_USER_ID = "<ULCA user id>"; $env:BHASHINI_ULCA_API_KEY = "<ULCA AP
 
 Useful scripts: weekly PM report `scripts\phase8\generate_reports.py --period weekly --as-of 2026-09-16` · blind-set evaluation `scripts\phase8\evaluate_blind.py --blind data\blind` · rebuild an old database `scripts\phase1\init_database.py --rebuild`.
 
+## Deploy on Vercel (frontend, backend, database, files)
+
+Everything runs on Vercel: the React build as static files, the FastAPI app as one Python function (`api/index.py`, routed by `vercel.json`), **Postgres** created in the Vercel dashboard (Neon), and uploaded field reports in **Vercel Blob**. The AI runs in each user's browser, so no GPU server is needed.
+
+1. **Import the project.** Vercel → *Add New → Project* → import this GitHub repository. Leave the build settings to `vercel.json`.
+2. **Create the database.** In the project: *Storage → Create Database → Neon (Postgres)* → pick a region near your users (e.g. Mumbai / Singapore) → *Connect* it to this project. Vercel adds `DATABASE_URL` to the project's environment variables; the app reads it and uses the psycopg driver.
+3. **Create file storage.** *Storage → Create → Blob* → access **Private** → connect it to the project. Vercel adds `BLOB_READ_WRITE_TOKEN`; uploads then go to Blob instead of the read-only function disk.
+4. **Set the keys.** *Settings → Environment Variables*: `P2E_API_KEYS = planner:<16+ chars>,supervisor:<16+ chars>,admin:<16+ chars>` (new random keys, never the demo ones). Add `P2E_DEMO_ACCOUNT=admin` only for an evaluator demo.
+5. **Load the data once, from your PC.** On the database and Blob pages open the *.env.local* tab, copy the two values, then:
+   ```powershell
+   $env:DATABASE_URL = "<postgres://… from Vercel>"
+   $env:BLOB_READ_WRITE_TOKEN = "<vercel_blob_rw_… from Vercel>"
+   .venv\Scripts\python scripts\deploy\copy_to_vercel.py     # data/p2e.db → Postgres, data/uploads → Blob
+   ```
+   (Tested against a local Postgres: all 10 tables copy, every GET route, the assistant and sign-up work.)
+6. **Deploy** (*Deployments → Redeploy*, or push to `main`). Open the site, sign in, check *Overview* and *Ask P2E*.
+7. **Optional: serve the AI model from your own Vercel Blob** instead of Hugging Face. Create a second Blob store with **Public** access, then
+   ```powershell
+   cd web; $env:BLOB_READ_WRITE_TOKEN = "<token of the PUBLIC store>"; node scripts\mirror-model.mjs
+   ```
+   and add the printed `VITE_MODEL_HOST` as an environment variable, then redeploy.
+
+Live updates use a stream that the server closes after 25 s on Vercel; the browser reconnects automatically. Secrets live only in Vercel environment variables, never in the repository.
+
 ### Checks
 ```powershell
-.venv\Scripts\python -m pytest                     # 308 backend tests
+.venv\Scripts\python -m pytest                     # 314 backend tests
 .venv\Scripts\python scripts\phase3\evaluate_linking.py
 .venv\Scripts\python scripts\phase5\evaluate_apply.py
 .venv\Scripts\python scripts\phase6\evaluate_qa.py
-cd web; npm test; npm run build                   # 17 frontend tests + type-checked build
+cd web; npm test; npm run build                   # 18 frontend tests + type-checked build
 ```
 
 ---
@@ -238,11 +296,12 @@ cd web; npm test; npm run build                   # 17 frontend tests + type-che
 p2e/                 FastAPI backend
   plan/ ingest/ extract/ agent/ link/ memory/ decide/ analytics/ api/
   assistant.py  i18n.py  integrations/bhashini.py
-web/src/             React frontend (pages/, components/, hooks/useSpeech.ts, i18n.ts)
+web/src/             React frontend (pages/, components/, hooks/useSpeech.ts, utils/localAi.ts, i18n.ts)
+api/index.py         Vercel entry point (vercel.json routes /api/* here)
 data/synthetic/      demo project (schedule, 81 DPRs, 3 sheets, ground truth)
 data/company/        Oil India facts — official sources only
 data/help/           user guide + terms (EN / TA / HI)
-scripts/             pipeline steps, evaluations, reports
+scripts/             pipeline steps, evaluations, reports, deploy/copy_to_vercel.py
 tests/               backend tests
 docs/                architecture, AI design, plans, presentation pack
 ```

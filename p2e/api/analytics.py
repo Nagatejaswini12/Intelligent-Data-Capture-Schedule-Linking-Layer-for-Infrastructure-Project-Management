@@ -132,6 +132,7 @@ class AssistantIn(BaseModel):
     question: str = Field(min_length=1, max_length=500)
     lang: Literal["en", "ta", "hi"] | None = Field(None, description="answer language; Tamil / Hindi script in the question wins")
     as_of: date | None = None
+    ai: bool = Field(False, description="also return the guard-railed prompt for the browser's on-device model")
 
 
 @router.post("/assistant/ask", responses={**AUTH, **NOT_FOUND, 422: P})
@@ -140,7 +141,7 @@ def assistant_ask(project_code: str, body: AssistantIn, request: Request, sessio
     citations and sources; anything else is declined. Deterministic, 0 LLM tokens."""
     project = project_or_404(session, project_code)
     ctx = get_context(session, project, request.app.state.glossary_path)
-    return assistant.ask(session, project, body.question, ctx, body.as_of or today(project), body.lang)
+    return assistant.ask(session, project, body.question, ctx, body.as_of or today(project), body.lang, llm=request.app.state.llm, ai=body.ai)
 
 
 @router.post("/memory/ask", responses={**AUTH, **NOT_FOUND, 422: P})

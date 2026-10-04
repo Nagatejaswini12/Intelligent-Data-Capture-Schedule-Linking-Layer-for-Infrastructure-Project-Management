@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { parseSse } from "../hooks/useStream";
 import { decisionTone, fmtDate, fmtNum, humanize, pct, statusTone, variance } from "./format";
+import { guard } from "./localAi";
 import { href, parseHash } from "./route";
 
 describe("formatting", () => {
@@ -14,7 +15,7 @@ describe("formatting", () => {
     expect(variance(3)).toBe("+3 d");
     expect(variance(0)).toBe("on time");
     expect(variance(null)).toBe("—");
-    expect(humanize("in_progress")).toBe("in progress");
+    expect(humanize("in_progress")).toBe("In progress");
   });
 
   it("maps decisions and statuses to tones", () => {
@@ -64,5 +65,18 @@ describe("interface languages", () => {
     expect(translate("hi", "roi.autoHint", { a: 261, n: 433 })).toBe("433 में से 261 आइटम");
     expect(translate("en", "overview.sub", { asOf: "2026-09-16" })).toContain("2026-09-16");
     expect(translate("ta", "no.such.key")).toBe("no.such.key");
+  });
+});
+
+describe("on-device AI guard", () => {
+  const prompt = [{ role: "system" as const, content: "rules" }, { role: "user" as const, content: "<facts>12 activities delayed, 3 on hold</facts> Question: how many?" }];
+  it("keeps grounded answers and rejects hallucinated numbers or out-of-scope replies", () => {
+    expect(guard("<think>x</think> 12 activities are delayed and 3 are on hold.", prompt)).toBe("12 activities are delayed and 3 are on hold.");
+    expect(guard("15 activities are delayed.", prompt)).toBeNull();
+    expect(guard("OUT_OF_SCOPE", prompt)).toBeNull();
+    expect(guard("  ", prompt)).toBeNull();
+    expect(guard("௧௫ தாமதம்", prompt)).toBeNull();        // Tamil digits are numbers too
+    expect(guard("12 are delayed.", prompt, "12 delayed, 3 on hold")).toBeNull();   // dropped a verified number
+    expect(guard("12 delayed and 3 on hold.", prompt, "12 delayed, 3 on hold")).toBe("12 delayed and 3 on hold.");
   });
 });

@@ -86,3 +86,18 @@ def request_access(body: AccessIn, session: SessionDep) -> dict:
 def list_access_requests(session: SessionDep, _: Admin) -> list:
     """Admin: review pending access requests (newest first)."""
     return list(session.scalars(select(AccessRequest).order_by(AccessRequest.id.desc())))
+
+
+class DecideIn(BaseModel):
+    status: Literal["approved", "rejected"]
+
+
+@router.patch("/access-requests/{request_id}", response_model=AccessOut, responses={401: P, 403: P, 404: P})
+def decide_access_request(request_id: int, body: DecideIn, session: SessionDep, _: Admin) -> AccessRequest:
+    """Admin: approve or reject. Approval only records the decision; the role key is still issued out of band."""
+    req = session.get(AccessRequest, request_id)
+    if req is None:
+        raise HTTPException(404, "access request not found")
+    req.status = body.status
+    session.commit()
+    return req

@@ -143,4 +143,10 @@ def test_login_demo_and_access_requests(tmp_path, monkeypatch):
         assert c.get("/api/v1/access-requests", headers={"X-API-Key": "planner-key-0123456789ab"}).status_code == 403
         rows = c.get("/api/v1/access-requests", headers={"X-API-Key": "admin-key-0123456789abcd"}).json()
         assert rows[0]["email"] == "r.gogoi@example.in" and rows[0]["status"] == "pending"
+        admin = {"X-API-Key": "admin-key-0123456789abcd"}
+        url = f"/api/v1/access-requests/{rows[0]['id']}"
+        assert c.patch(url, json={"status": "approved"}, headers={"X-API-Key": "planner-key-0123456789ab"}).status_code == 403
+        assert c.patch(url, json={"status": "maybe"}, headers=admin).status_code == 422
+        assert c.patch(url, json={"status": "approved"}, headers=admin).json()["status"] == "approved"
+        assert c.patch("/api/v1/access-requests/9999", json={"status": "rejected"}, headers=admin).status_code == 404
     app.state.engine.dispose()

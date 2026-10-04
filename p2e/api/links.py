@@ -62,9 +62,9 @@ def run_linking(project_code: str, request: Request, session: SessionDep, _: Upl
     """Link valid progress events to L5/L6 activities. Idempotent; planner decisions are never overwritten."""
     project = project_or_404(session, project_code)
     out = service.link_events(session, project, request.app.state.glossary_path, body.event_ids if body else None,
-                              llm=request.app.state.llm)
+                              llm=request.app.state.tiebreak)
     session.commit()
-    return s.LinkRunOut(**out, llm_tiebreaker=request.app.state.llm is not None)
+    return s.LinkRunOut(**out, llm_tiebreaker=request.app.state.tiebreak is not None)
 
 
 @router.get("/links", response_model=s.LinkPage, responses={**AUTH, **NOT_FOUND})

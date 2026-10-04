@@ -1,20 +1,22 @@
 import { p2e } from "../api/p2e";
-import { Async, Bars, Card, CompareBars, Flow, Kpi, PageTitle, StackBars } from "../components/ui";
+import { useState } from "react";
+import { Async, Bars, Card, CompareBars, Flow, Kanban, Kpi, PageTitle, SCurve, StackBars } from "../components/ui";
 import { useApi } from "../hooks/useApi";
 import { useApp } from "../state";
-import { useT } from "../i18n";
-import { pct } from "../utils/format";
+import { useT, T } from "../i18n";
+import { humanize, pct } from "../utils/format";
 import { navigate } from "../utils/route";
 
 const STATUS = [
-  { key: "completed", label: "Completed", tone: "ok" as const },
-  { key: "in_progress", label: "In progress", tone: "info" as const },
-  { key: "not_started", label: "Not started", tone: "muted" as const },
+  { key: "completed", label: "completed", tone: "ok" as const },        // labels go through humanize(): translated
+  { key: "in_progress", label: "in_progress", tone: "info" as const },
+  { key: "not_started", label: "not_started", tone: "muted" as const },
 ];
 
 export function OverviewPage() {
   const { project, asOf, live } = useApp();
   const { t } = useT();
+  const [disc, setDisc] = useState("");
   const c = project.code;
   const state = useApi(async () => {
     const [dash, data, matched, review, unmatched, docs, events, delays] = await Promise.all([
@@ -28,7 +30,7 @@ export function OverviewPage() {
   return (
     <>
       <PageTitle title={t("overview.title")} subtitle={t("overview.sub", { asOf })} />
-      <Async state={state} what="Loading project status">
+      <Async state={state} what={T("ov.loading")}>
         {({ dash, rows, matched, review, unmatched, docs, events, delays }) => {
           const sum = (k: "completed" | "in_progress" | "not_started" | "started_late" | "finished_late" | "due_not_started") =>
             Object.values(dash.by_discipline).reduce((a, v) => a + (v[k] ?? 0), 0);
@@ -43,44 +45,55 @@ export function OverviewPage() {
           return (
             <>
               <Flow steps={[
-                { label: "Field execution", value: `${docs} reports`, tone: "info" },
-                { label: "AI understanding", value: `${events} events`, tone: "ai" },
-                { label: "Schedule linking", value: `${matched} linked`, tone: "ai" },
-                { label: "Human validation", value: `${review} in review`, tone: review ? "warn" : "ok" },
-                { label: "Verified progress", value: `${sum("completed") + sum("in_progress")} activities with actuals`, tone: "ok" },
-                { label: "Project intelligence", value: "Q&A + analytics", tone: "info" },
+                { label: T("ov.f1"), value: T("ov.v1", { n: docs }), tone: "info" },
+                { label: T("ov.f2"), value: T("ov.v2", { n: events }), tone: "ai" },
+                { label: T("ov.f3"), value: T("ov.v3", { n: matched }), tone: "ai" },
+                { label: T("ov.f4"), value: T("ov.v4", { n: review }), tone: review ? "warn" : "ok" },
+                { label: T("ov.f5"), value: T("ov.v5", { n: sum("completed") + sum("in_progress") }), tone: "ok" },
+                { label: T("ov.f6"), value: T("ov.v6"), tone: "info" },
               ]} />
               <div className="kpis">
-                <Kpi label={t("kpi.complete")} value={`${sum("completed")} / ${total}`} hint={`${pct(sum("completed"), total)} of activities`} tone="ok" onClick={() => navigate("schedule", { status: "completed" })} />
-                <Kpi label={t("kpi.plannedComplete")} value={`${plannedDone} / ${total}`} hint={`${pct(plannedDone, total)} per baseline`} tone="info" />
+                <Kpi label={t("kpi.complete")} value={`${sum("completed")} / ${total}`} hint={T("ov.ofActivities", { p: pct(sum("completed"), total) })} tone="ok" onClick={() => navigate("schedule", { status: "completed" })} />
+                <Kpi label={t("kpi.plannedComplete")} value={`${plannedDone} / ${total}`} hint={T("ov.perBaseline", { p: pct(plannedDone, total) })} tone="info" />
                 <Kpi label={t("kpi.inProgress")} value={sum("in_progress")} tone="info" onClick={() => navigate("schedule", { status: "in_progress" })} />
-                <Kpi label={t("kpi.review")} value={dash.review_backlog.pending_events} hint={`${dash.review_backlog.blocked_activities} activities blocked by a rule`} tone={dash.review_backlog.pending_events ? "warn" : "ok"} onClick={() => navigate("linking")} />
+                <Kpi label={t("kpi.review")} value={dash.review_backlog.pending_events} hint={T("ov.blocked", { n: dash.review_backlog.blocked_activities })} tone={dash.review_backlog.pending_events ? "warn" : "ok"} onClick={() => navigate("linking")} />
                 <Kpi label={t("kpi.conflicts")} value={dash.review_backlog.pending_conflicts} tone={dash.review_backlog.pending_conflicts ? "bad" : "ok"} onClick={() => navigate("linking", { conflict: "true" })} />
-                <Kpi label={t("kpi.unmatched")} value={unmatched} hint="not safely linkable" tone={unmatched ? "bad" : "ok"} onClick={() => navigate("linking", { decision: "unmatched" })} />
-                <Kpi label={t("kpi.silent")} value={silent} hint="expected active, no recent report" tone={silent ? "warn" : "ok"} onClick={() => navigate("watch")} />
+                <Kpi label={t("kpi.unmatched")} value={unmatched} hint={T("ov.notLinkable")} tone={unmatched ? "bad" : "ok"} onClick={() => navigate("linking", { decision: "unmatched" })} />
+                <Kpi label={t("kpi.silent")} value={silent} hint={T("ov.silentHint")} tone={silent ? "warn" : "ok"} onClick={() => navigate("watch")} />
                 <Kpi label={t("kpi.startedLate")} value={sum("started_late")} tone="warn" onClick={() => navigate("schedule", { late: "1" })} />
                 <Kpi label={t("kpi.finishedLate")} value={sum("finished_late")} tone="warn" onClick={() => navigate("schedule", { late: "1" })} />
                 <Kpi label={t("kpi.overdue")} value={sum("due_not_started")} tone={sum("due_not_started") ? "bad" : "ok"} onClick={() => navigate("schedule", { status: "not_started" })} />
               </div>
+              <Card title={t("card.sCurve")}>
+                <SCurve rows={rows} asOf={asOf} planned={T("sc.planned")} actual={T("sc.actual")} today={T("sc.today")} />
+              </Card>
+              <Card title={t("card.kanban")} actions={
+                <select aria-label={T("f.discipline")} value={disc} onChange={(e) => setDisc(e.target.value)}>
+                  <option value="">{T("kb.allDisc")}</option>
+                  {Object.keys(dash.by_discipline).map((d) => <option key={d} value={d}>{humanize(d)}</option>)}
+                </select>}>
+                <Kanban rows={disc ? rows.filter((r) => (r.discipline ?? "-") === disc) : rows} asOf={asOf} columns={STATUS}
+                  onOpen={(r) => navigate("schedule", { q: r.code })} onMore={(status) => navigate("schedule", { status, ...(disc ? { discipline: disc } : {}) })} />
+              </Card>
               <div className="grid-2">
                 <Card title={t("card.plannedVsActual")}>
-                  <CompareBars rows={plannedVsActual} a={{ label: "Planned complete by as-of", tone: "muted" }} b={{ label: "Actually complete", tone: "ok" }} />
+                  <CompareBars rows={plannedVsActual} a={{ label: t("kpi.plannedComplete"), tone: "muted" }} b={{ label: t("kpi.complete"), tone: "ok" }} />
                 </Card>
                 <Card title={t("card.statusByDiscipline")}>
                   <StackBars rows={byDisc} segments={STATUS} />
                 </Card>
-                <Card title={t("card.freshness")} actions={<a href="#/watch">Silent activities →</a>}>
+                <Card title={t("card.freshness")} actions={<a href="#/watch">{t("kpi.silent")} →</a>}>
                   <table className="table compact">
-                    <thead><tr><th>Discipline</th><th>Last report</th><th>Days since</th><th>Silent activities</th></tr></thead>
+                    <thead><tr><th>{T("f.discipline")}</th><th>{T("agent.lastReport")}</th><th>{T("ov.daysSince")}</th><th>{t("kpi.silent")}</th></tr></thead>
                     <tbody>{Object.entries(dash.freshness).map(([g, f]) => (
-                      <tr key={g}><td>{g}</td><td>{f.last_report}</td><td className={f.days_since > 1 ? "warn-text" : ""}>{f.days_since}</td>
+                      <tr key={g}><td>{humanize(g)}</td><td>{f.last_report}</td><td className={f.days_since > 1 ? "warn-text" : ""}>{f.days_since}</td>
                         <td>{g === "mechanical" ? (dash.silent_activities_by_discipline.static_eq ?? 0) + (dash.silent_activities_by_discipline.rotating_eq ?? 0) : dash.silent_activities_by_discipline[g] ?? 0}</td></tr>
                     ))}</tbody>
                   </table>
                 </Card>
-                <Card title={t("card.delayCauses")} actions={<a href="#/analytics">Delay intelligence →</a>}>
+                <Card title={t("card.delayCauses")} actions={<a href="#/analytics?tab=delays">{T("ov.delayIntel")} →</a>}>
                   <Bars data={Object.entries(delays.by_category)} tone="warn" />
-                  <p className="muted small">{delays.reports.length} hold reports up to {asOf}; recurring: {delays.recurring.map((r) => `${r.discipline}/${r.category} ×${r.reports}`).join(", ") || "none"}.</p>
+                  <p className="muted small">{T("ov.holds", { n: delays.reports.length, asOf, rec: delays.recurring.map((r) => `${humanize(r.discipline)}/${humanize(r.category)} ×${r.reports}`).join(", ") || T("lk.none") })}</p>
                 </Card>
               </div>
             </>

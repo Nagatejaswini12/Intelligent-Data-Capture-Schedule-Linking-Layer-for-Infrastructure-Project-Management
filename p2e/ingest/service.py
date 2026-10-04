@@ -6,6 +6,9 @@ import hashlib
 import io
 import os
 import re
+import urllib.error
+import urllib.parse
+import urllib.request
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -125,9 +128,27 @@ def _blob_path(upload_dir: Path, storage_uri: str) -> Path:
     return Path(upload_dir) / storage_uri
 
 
+def _vercel_blob(method: str, name: str, data: bytes | None = None) -> bytes:
+    """Vercel Blob (private store), used when BLOB_READ_WRITE_TOKEN is set (Vercel functions have no writable disk)."""
+    token = os.environ["BLOB_READ_WRITE_TOKEN"]
+    store = token.split("_")[3]                                    # vercel_blob_rw_<storeId>_<secret>
+    headers = {"authorization": f"Bearer {token}"}
+    if method == "PUT":
+        url = "https://vercel.com/api/blob/?" + urllib.parse.urlencode({"pathname": f"uploads/{name}"})
+        headers |= {"x-api-version": "12", "x-vercel-blob-store-id": store, "x-vercel-blob-access": "private",
+                    "x-add-random-suffix": "0", "x-allow-overwrite": "1", "x-content-type": "application/octet-stream"}
+    else:
+        url = f"https://{store}.private.blob.vercel-storage.com/uploads/{name}"
+    with urllib.request.urlopen(urllib.request.Request(url, data, headers, method=method), timeout=30) as r:
+        return r.read()
+
+
 def store_blob(upload_dir: Path, sha256: str, fmt: str, data: bytes) -> str:
     """Content-addressed write (<sha256>.<fmt>); an existing blob is never overwritten."""
     name = f"{sha256}.{fmt}"
+    if os.environ.get("BLOB_READ_WRITE_TOKEN"):
+        _vercel_blob("PUT", name, data)                            # same name = same bytes, so overwrite is harmless
+        return name
     path = _blob_path(upload_dir, name)
     path.parent.mkdir(parents=True, exist_ok=True)
     if not path.exists():
@@ -139,7 +160,13 @@ def store_blob(upload_dir: Path, sha256: str, fmt: str, data: bytes) -> str:
 
 def read_blob(upload_dir: Path, doc: SourceDocument) -> bytes:
     try:
-        data = _blob_path(upload_dir, doc.storage_uri).read_bytes()
+        if os.environ.get("BLOB_READ_WRITE_TOKEN"):
+            try:
+                data = _vercel_blob("GET", doc.storage_uri)
+            except urllib.error.HTTPError as e:
+                raise (FileNotFoundError() if e.code == 404 else OSError()) from None
+        else:
+            data = _blob_path(upload_dir, doc.storage_uri).read_bytes()
     except FileNotFoundError:
         raise SourceUnavailable(doc, "raw_source_file_missing") from None
     except OSError:                                  # permissions, a directory in its place, I/O error

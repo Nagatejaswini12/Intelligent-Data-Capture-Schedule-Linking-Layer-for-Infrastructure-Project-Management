@@ -4,7 +4,7 @@ import { EvidenceModal } from "../components/Evidence";
 import { Async, Badge, Card, Empty, ErrorBox, PageTitle } from "../components/ui";
 import { useApi } from "../hooks/useApi";
 import { useApp } from "../state";
-import { useT } from "../i18n";
+import { useT, T } from "../i18n";
 import { fmtDate, humanize } from "../utils/format";
 import { href } from "../utils/route";
 
@@ -37,23 +37,23 @@ export function MemoryPage() {
       <PageTitle icon="agent-memory" title={t("memory.title")} subtitle={t("memory.sub")} />
       <div className="split split-wide">
         <div>
-          <Card title="Ask">
+          <Card title={T("as.ask")}>
             <form className="ask" onSubmit={(e) => { e.preventDefault(); if (question.trim()) ask(question.trim()); }}>
-              <input value={question} onChange={(e) => setQuestion(e.target.value)} placeholder="e.g. What delayed electrical cable pulling in Area 3?" aria-label="Question" maxLength={500} />
-              <button className="btn btn-primary" disabled={busy || question.trim().length < 3}>{busy ? "…" : "Ask"}</button>
+              <input value={question} onChange={(e) => setQuestion(e.target.value)} placeholder={T("me.placeholder")} aria-label={T("me.question")} maxLength={500} />
+              <button className="btn btn-primary" disabled={busy || question.trim().length < 3}>{busy ? "…" : T("as.ask")}</button>
             </form>
             <div className="chips">{SUGGESTED.map((s) => <button type="button" key={s} className="chip" onClick={() => { setQuestion(s); ask(s); }}>{s}</button>)}</div>
-            <p className="muted small">Questions are answered as of {asOf} unless they name a date (“by 2026-08-31”). For today's reporting checklist use the <a href={href("agent", { message: "What should I report today?" })}>Time Agent</a>.</p>
+            <p className="muted small">{T("me.note", { asOf })} <a href={href("agent", { message: "What should I report today?" })}>{T("nav.agent")}</a>.</p>
           </Card>
-          {history.length === 0 && <Empty>Ask a question or pick one above.</Empty>}
+          {history.length === 0 && <Empty>{T("me.empty")}</Empty>}
           {history.map((h, i) => <AnswerCard key={history.length - i} q={h.q} a={h.a} error={h.error} />)}
         </div>
-        <Card title="Knowledge entries">
-          <Async state={knowledge} what="Distilling knowledge">
-            {(ks) => ks.length === 0 ? <Empty>No knowledge yet.</Empty> : (
+        <Card title={T("me.knowledge")}>
+          <Async state={knowledge} what={T("me.loading")}>
+            {(ks) => ks.length === 0 ? <Empty>{T("me.noKnowledge")}</Empty> : (
               <ul className="knowledge">{ks.map((k) => (
-                <li key={k.id}><Badge tone={k.kind === "delays" ? "warn" : "ai"}>{k.kind}</Badge> <strong>{k.title}</strong><p className="small">{k.text}</p>
-                  <span className="muted small">{k.citations.length} cited records</span></li>
+                <li key={k.id}><Badge tone={k.kind === "delays" ? "warn" : "ai"}>{humanize(k.kind)}</Badge> <strong>{k.title}</strong><p className="small">{k.text}</p>
+                  <span className="muted small">{T("me.cited", { n: k.citations.length })}</span></li>
               ))}</ul>
             )}
           </Async>
@@ -71,9 +71,9 @@ export function AnswerCard({ q, a, error }: { q: string; a?: Answer; error?: str
       {error ? <ErrorBox error={error} /> : a && (
         <>
           <p className="answer-text">{a.answer}</p>
-          <p className="muted small"><Badge tone="info">{a.intent}</Badge> <Badge tone="ok">{t("memory.tokens")}</Badge> as of {fmtDate(a.filters.as_of)}
+          <p className="muted small"><Badge tone="info">{humanize(a.intent)}</Badge> <Badge tone="ok">{t("memory.tokens")}</Badge> as of {fmtDate(a.filters.as_of)}
             {Object.entries(a.filters).filter(([k, v]) => k !== "as_of" && v && (!Array.isArray(v) || v.length)).map(([k, v]) => ` · ${humanize(k)}: ${Array.isArray(v) ? v.join(", ") : v}`)}</p>
-          {a.citations.length === 0 ? <p className="muted small">No records cited — nothing is claimed.</p> : (
+          {a.citations.length === 0 ? <p className="muted small">{T("me.noCite")}</p> : (
             <details open={a.citations.length <= 12}>
               <summary>{a.citations.length} citations</summary>
               <ol className="citations">{a.citations.map((c, i) => <CitationItem key={i} c={c} onEvidence={setEvidence} />)}</ol>
@@ -87,7 +87,7 @@ export function AnswerCard({ q, a, error }: { q: string; a?: Answer; error?: str
 }
 
 function CitationItem({ c, onEvidence }: { c: Citation; onEvidence: (id: number) => void }) {
-  if (c.kind === "activity") return <li><Badge tone="ai">activity</Badge> <a className="mono" href={href("schedule", { q: String(c.id) })}>{c.id}</a> {c.text} <span className="muted small">{c.date}</span></li>;
-  if (c.kind === "event") return <li><Badge tone="info">report</Badge> <button type="button" className="linkish" onClick={() => onEvidence(Number(c.id))}>#{c.id}</button> {c.text} <span className="muted small">{c.date}{c.activity ? ` · ${c.activity}` : ""}</span></li>;
-  return <li><Badge>document</Badge> <a href={href("reports", { doc: c.id })}>{c.text}</a> <span className="muted small">{c.date}</span></li>;
+  if (c.kind === "activity") return <li><Badge tone="ai">{T("f.activity")}</Badge> <a className="mono" href={href("schedule", { q: String(c.id) })}>{c.id}</a> {c.text} <span className="muted small">{c.date}</span></li>;
+  if (c.kind === "event") return <li><Badge tone="info">{T("f.report")}</Badge> <button type="button" className="linkish" onClick={() => onEvidence(Number(c.id))}>#{c.id}</button> {c.text} <span className="muted small">{c.date}{c.activity ? ` · ${c.activity}` : ""}</span></li>;
+  return <li><Badge>{T("rp.doc")}</Badge> <a href={href("reports", { doc: c.id })}>{c.text}</a> <span className="muted small">{c.date}</span></li>;
 }

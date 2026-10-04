@@ -7,7 +7,9 @@ from p2e.db.models import Base
 
 
 def make_engine(db_url: str) -> Engine:
-    engine = create_engine(db_url)
+    pg = db_url.startswith("postgresql+psycopg")
+    # Postgres via a pooler (Neon on Vercel): no server-side prepared statements, drop stale pooled connections
+    engine = create_engine(db_url, **({"connect_args": {"prepare_threshold": None}, "pool_pre_ping": True} if pg else {}))
     if engine.dialect.name == "sqlite":
         @event.listens_for(engine, "connect")
         def _sqlite_pragmas(conn, _record):   # SQLite ignores foreign keys unless asked per connection

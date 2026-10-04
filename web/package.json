@@ -4,19 +4,25 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "ort": "node -e \"for (const f of ['mjs','wasm']) require('fs').cpSync('node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.asyncify.'+f, 'public/ort/ort-wasm-simd-threaded.asyncify.'+f)\"",
+    "predev": "npm run ort",
+    "prebuild": "npm run ort",
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run"
   },
   "dependencies": {
+    "@huggingface/transformers": "^4.3.0",
     "gsap": "^3.15.0",
+    "lenis": "^1.3.26",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@vercel/blob": "^2.8.0",
     "@vitejs/plugin-react": "^6.1.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.2",

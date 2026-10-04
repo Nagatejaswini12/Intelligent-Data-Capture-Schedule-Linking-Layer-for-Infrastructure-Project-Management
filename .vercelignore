@@ -1,0 +1,6 @@
+.venv
+web/node_modules
+web/dist
+data/*.db
+data/uploads
+exports

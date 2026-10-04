@@ -283,11 +283,17 @@ def handle(session: Session, project: Project, message: str, ref: datetime, role
     if CHECKLIST_RE.match(message):                     # "what should I report today?" -> silent-activity checklist
         return checklist_reply(session, project, ref, discipline or answers.get("discipline"), lang)
     ctx = get_context(session, project, glossary_path)
-    raw, note = interpret_llm(llm, ctx, message) if llm is not None else (None, None)
-    raw = raw or interpret_rules(message, load_project_vocab(glossary_path).vocab)
-    if note:
-        raw.notes.append(note)
+    # rules first (instant, 0 tokens); the model is asked only when the rules leave a required field missing
+    raw = interpret_rules(message, load_project_vocab(glossary_path).vocab)
     it = finalize(raw, ctx, ref, discipline, answers, lang)
+    if it.missing and llm is not None:
+        lraw, note = interpret_llm(llm, ctx, message)
+        if lraw is not None:
+            lit = finalize(lraw, ctx, ref, discipline, answers, lang)
+            if len(lit.missing) < len(it.missing):
+                raw, it = lraw, lit
+        if note:
+            raw.notes.append(note)
     out = {"interpretation": it.public(), "question": it.question, "event_id": None, "document_id": None}
     if it.missing:
         return out | {"status": "needs_clarification", "reply": it.question}

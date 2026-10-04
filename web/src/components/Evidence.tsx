@@ -1,3 +1,4 @@
+import { T } from "../i18n";
 import { ApiError } from "../api/client";
 import { p2e, type Evidence as EvidenceT } from "../api/p2e";
 import { useApi } from "../hooks/useApi";
@@ -21,21 +22,21 @@ export function EvidenceView({ eventId }: { eventId: number }) {
     const meta = (unavailable.evidence ?? {}) as Record<string, unknown>;
     return (
       <div className="evidence">
-        <Badge tone="warn">raw source file unavailable</Badge> <span className="muted">{String(unavailable.reason ?? "")}</span>
-        <p className="muted">The audit record is intact; the stored metadata is shown instead.</p>
+        <Badge tone="warn">{T("ev.unavailable")}</Badge> <span className="muted">{String(unavailable.reason ?? "")}</span>
+        <p className="muted">{T("ev.intact")}</p>
         <pre className="source">{String(meta.source_text ?? "")}</pre>
         <p className="muted">{String(meta.filename ?? "")} · {JSON.stringify(meta.source_ref ?? {})}</p>
       </div>
     );
   }
   if (state.error) return <ErrorBox error={state.error} onRetry={state.reload} />;
-  if (state.loading || !state.data?.ev) return <Loading what="Reading the stored source" />;
+  if (state.loading || !state.data?.ev) return <Loading what={T("ev.loading")} />;
   const ev = state.data.ev;
   return (
     <div className="evidence">
       <p>
         <strong>{ev.filename}</strong> · {ev.kind === "spreadsheet" ? `sheet ${ev.sheet}, row ${ev.row}` : `line ${ev.line_number}`}{" "}
-        {ev.found_in_source ? <Badge tone="ok">verified in source</Badge> : <Badge tone="bad">not found in source</Badge>}
+        {ev.found_in_source ? <Badge tone="ok">{T("ev.verified")}</Badge> : <Badge tone="bad">{T("ev.notFound")}</Badge>}
       </p>
       {ev.context && (
         <pre className="source">
@@ -51,10 +52,10 @@ export function EvidenceView({ eventId }: { eventId: number }) {
       )}
       {ev.cells && (
         <table className="table compact">
-          <thead><tr><th>Cell</th><th>Header</th><th>Value</th><th>In file</th></tr></thead>
+          <thead><tr><th>{T("ev.cell")}</th><th>{T("ev.header")}</th><th>{T("ev.value")}</th><th>{T("ev.inFile")}</th></tr></thead>
           <tbody>{ev.cells.map((c) => (
             <tr key={c.cell}><td className="mono">{c.cell}</td><td>{c.header}</td><td>{String(c.value)}</td>
-              <td>{c.matches ? <Badge tone="ok">match</Badge> : <Badge tone="bad">{String(c.value_in_file)}</Badge>}</td></tr>
+              <td>{c.matches ? <Badge tone="ok">{T("ev.match")}</Badge> : <Badge tone="bad">{String(c.value_in_file)}</Badge>}</td></tr>
           ))}</tbody>
         </table>
       )}
@@ -63,5 +64,5 @@ export function EvidenceView({ eventId }: { eventId: number }) {
 }
 
 export function EvidenceModal({ eventId, onClose }: { eventId: number; onClose: () => void }) {
-  return <Modal title={`Evidence · event ${eventId}`} onClose={onClose}><EvidenceView eventId={eventId} /></Modal>;
+  return <Modal title={`${T("lk.evidence")} · ${T("lk.event", { id: eventId })}`} onClose={onClose}><EvidenceView eventId={eventId} /></Modal>;
 }

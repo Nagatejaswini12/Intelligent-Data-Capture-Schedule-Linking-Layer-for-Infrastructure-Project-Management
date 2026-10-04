@@ -42,7 +42,6 @@ code, .mono { font-family: "Cascadia Mono", Consolas, ui-monospace, monospace; f
 .nav-group a.active .nav-icon { color: var(--ai); }
 .brand { flex-direction: column; align-items: flex-start; gap: 4px; }
 .brand-logo { width: 150px; height: auto; display: block; }
-[data-theme="dark"] .brand-logo, [data-theme="dark"] .pub-logo img { filter: brightness(0) invert(1); }
 .nav-icon { width: 16px; text-align: center; color: var(--muted); }
 .nav-count { margin-left: auto; background: var(--warn-soft); color: var(--warn); border-radius: 9px; padding: 0 7px; font-size: 11px; }
 .sidebar-foot { margin-top: auto; font-size: 11px; color: var(--muted); padding: 0 6px; }
@@ -254,3 +253,20 @@ details summary { cursor: pointer; color: var(--muted); font-size: 12px; margin:
 /* voice row (BHASHINI) */
 .assistant-foot { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .heard-note { margin: 4px 10px 0; }
+.nowrap { white-space: nowrap; }
+/* S-curve + Kanban (Overview) */
+.scurve svg { width: 100%; height: auto; display: block; cursor: crosshair; }
+.scurve .grid { stroke: var(--line); stroke-width: 1; }
+.scurve .axis { fill: var(--muted); font-size: 10.5px; }
+.scurve .axis.strong { fill: var(--text); font-weight: 600; }
+.scurve .line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.scurve .planned { stroke: var(--muted); } .scurve .actual { stroke: var(--ok); }
+.scurve .pt { stroke: var(--panel); stroke-width: 2; } .scurve .pt.planned { fill: var(--muted); } .scurve .pt.actual { fill: var(--ok); }
+.scurve .today { stroke: var(--ai); stroke-dasharray: 3 3; } .scurve .cross { stroke: var(--line); stroke-width: 1; }
+.kanban { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.kanban-col { background: var(--panel-2); border-radius: 10px; padding: 10px; display: grid; gap: 8px; align-content: start; }
+.kanban-col header { display: flex; justify-content: space-between; align-items: center; }
+.kanban-card { text-align: left; display: grid; gap: 2px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; cursor: pointer; font: inherit; color: inherit; transition: transform .12s, box-shadow .12s; }
+.kanban-card:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+.kanban-name { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 760px) { .kanban { grid-template-columns: 1fr; } }

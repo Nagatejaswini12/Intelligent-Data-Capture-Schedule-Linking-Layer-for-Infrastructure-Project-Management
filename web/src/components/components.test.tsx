@@ -24,13 +24,13 @@ describe("components render real backend shapes", () => {
     expect(html).toContain("INS-A4-LT4011-LCK");
     expect(html).toContain("2026-09-15");
     expect(html).toContain("16:00");
-    expect(html).toContain("matched");
+    expect(html).toContain("Matched");
   });
 
   it("Time Agent clarification shows the question and an answer box", () => {
     const html = renderToString(<ReplyCard reply={agentClarify as unknown as AgentReply} onAnswer={() => undefined} busy={false} />);
     expect(html).toContain("What date was it completed?");
-    expect(html).toContain("Date answer");
+    expect(html).toContain("today, yesterday or 2026-09-14");
   });
 
   it("memory answer lists its citations", () => {
@@ -44,7 +44,7 @@ describe("components render real backend shapes", () => {
   it("charts render only the given counts", () => {
     const d = dashboard as unknown as Dashboard;
     const rows = Object.entries(d.by_discipline).map(([k, v]) => [k, v as unknown as Record<string, number>] as [string, Record<string, number>]);
-    expect(renderToString(<StackBars rows={rows} segments={[{ key: "completed", label: "Completed", tone: "ok" }]} />)).toContain("piping");
+    expect(renderToString(<StackBars rows={rows} segments={[{ key: "completed", label: "Completed", tone: "ok" }]} />)).toContain("Piping");
     expect(renderToString(<Bars data={[["material", 2]]} />)).toContain(">2<");
     expect(renderToString(<Bars data={[]} />)).toContain("No data");
     expect(renderToString(<CompareBars rows={[["civil", 3, 5]]} a={{ label: "Planned", tone: "muted" }} b={{ label: "Actual", tone: "ok" }} />)).toContain("3 / 5");

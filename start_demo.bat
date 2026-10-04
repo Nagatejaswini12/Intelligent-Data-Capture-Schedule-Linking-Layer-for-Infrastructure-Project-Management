@@ -7,6 +7,8 @@ if not exist ".venv\Scripts\python.exe" (
   exit /b 1
 )
 set P2E_DEMO_ACCOUNT=admin
+rem AI: the chat panel's "On-device AI" switch runs a small ONNX model in the browser on this PC's GPU (WebGPU).
+rem Nothing to install here; without it the app answers with its deterministic rules.
 set P2E_API_KEYS=planner:demo-planner-key-123456,supervisor:demo-supervisor-key-1234,admin:demo-admin-key-12345678
 echo.
 echo  P2E Bridge is starting at http://localhost:8000

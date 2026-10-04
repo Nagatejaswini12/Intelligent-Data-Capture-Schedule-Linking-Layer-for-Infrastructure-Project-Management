@@ -3,7 +3,7 @@ import { p2e } from "../api/p2e";
 import { Async, Badge, Bars, Card, Kpi, PageTitle } from "../components/ui";
 import { useApi } from "../hooks/useApi";
 import { useApp } from "../state";
-import { useT } from "../i18n";
+import { useT, T } from "../i18n";
 import { fmtDate, humanize } from "../utils/format";
 import { href } from "../utils/route";
 
@@ -29,7 +29,7 @@ export function RoiPage() {
   return (
     <>
       <PageTitle title={t("roi.title")} subtitle={t("roi.sub", { asOf })} />
-      <Async state={state} what="Computing efficiency">
+      <Async state={state} what={T("roi.loading")}>
         {({ eff, silent }) => {
           const alerts = silent.items;
           return (
@@ -60,7 +60,7 @@ export function RoiPage() {
                   </form>
                 </Card>
               </div>
-              <Card title={<>{t("roi.shadow")} <Badge tone={eff.shadow.enabled ? "warn" : "muted"}>{eff.shadow.enabled ? "ON" : "off"}</Badge></>}
+              <Card title={<>{t("roi.shadow")} <Badge tone={eff.shadow.enabled ? "warn" : "muted"}>{eff.shadow.enabled ? T("roi.isOn") : T("roi.isOff")}</Badge></>}
                 actions={<button type="button" className="btn btn-sm" onClick={() => p2e.setShadow(project.code, !eff.shadow.enabled).then(state.reload, (e) => alert(e.message))}>
                   {eff.shadow.enabled ? t("roi.off") : t("roi.on")}</button>}>
                 <p>{t("roi.shadowText", { n: eff.shadow.would_update, b: eff.shadow.blocked_for_review })}</p>
@@ -68,12 +68,12 @@ export function RoiPage() {
               <Card title={t("roi.alertTable", { n: alerts.length })}>
                 {alerts.length === 0 ? <p className="muted">{t("roi.allGood")}</p> : (
                   <table className="table compact">
-                    <thead><tr><th>Activity</th><th>Why expected</th><th>Planned</th><th>Last report</th></tr></thead>
+                    <thead><tr><th>{T("f.activity")}</th><th>{T("agent.expected")}</th><th>{T("sc.planned")}</th><th>{T("agent.lastReport")}</th></tr></thead>
                     <tbody>{alerts.slice(0, 25).map((i) => (
                       <tr key={i.plan_node_code}><td><span className="mono">{i.plan_node_code}</span> {i.activity_name}</td>
-                        <td><Badge tone={i.expectation.startsWith("past planned finish") ? "bad" : "warn"}>{i.expectation}</Badge></td>
+                        <td><Badge tone={i.expectation.startsWith("past planned finish") ? "bad" : "warn"}>{humanize(i.expectation)}</Badge></td>
                         <td className="small">{fmtDate(i.planned_start)} → {fmtDate(i.planned_finish)}</td>
-                        <td>{i.last_reported ? fmtDate(i.last_reported) : <Badge tone="bad">never</Badge>}</td></tr>
+                        <td>{i.last_reported ? fmtDate(i.last_reported) : <Badge tone="bad">{T("wa.never")}</Badge>}</td></tr>
                     ))}</tbody>
                   </table>
                 )}

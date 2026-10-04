@@ -3,6 +3,7 @@ Reads need any API key; changing the schedule by hand (approve, new activity, ov
 from __future__ import annotations
 
 import json
+import os
 import time
 from datetime import date, datetime
 from typing import Annotated
@@ -219,9 +220,12 @@ def stream(project_code: str, request: Request, session: SessionDep, _: AnyRole,
     project = project_or_404(session, project_code)
     sm = request.app.state.sessionmaker
 
+    # serverless (Vercel) functions have a time limit: end the stream early, the browser reconnects (= polling)
+    deadline = time.monotonic() + 25 if os.environ.get("VERCEL") else float("inf")
+
     def events():
         last, sent, idle = None, 0, 0.0
-        while limit is None or sent < limit:
+        while (limit is None or sent < limit) and time.monotonic() < deadline:
             with sm() as s2:
                 snap = snapshot(s2, s2.get(Project, project.id))
             if snap != last:

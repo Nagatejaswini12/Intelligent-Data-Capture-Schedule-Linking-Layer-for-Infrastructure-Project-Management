@@ -32,10 +32,14 @@ def is_private_endpoint(url: str) -> bool:
 
 
 def from_env():
-    """-> a LangChain language model, or None when no endpoint is configured."""
+    """-> a language model (.invoke(prompt) -> text), or None when no endpoint is configured.
+    With P2E_LLM_MODEL set: any OpenAI-compatible server (Ollama, LM Studio, vLLM, Groq); otherwise a TGI endpoint."""
     url = os.environ.get("P2E_LLM_ENDPOINT")
     if not url:
         return None
+    if os.environ.get("P2E_LLM_MODEL"):
+        from p2e import llm
+        return llm.from_env(is_private_endpoint)
     if not is_private_endpoint(url) and os.environ.get("P2E_LLM_ALLOW_REMOTE") != "1":
         raise ValueError("P2E_LLM_ENDPOINT is not a private/on-premise host; set P2E_LLM_ALLOW_REMOTE=1 to allow it explicitly")
     from langchain_huggingface import HuggingFaceEndpoint     # imported only when an endpoint is configured
