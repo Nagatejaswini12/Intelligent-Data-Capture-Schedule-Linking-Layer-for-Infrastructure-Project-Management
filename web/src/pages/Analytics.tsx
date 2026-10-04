@@ -3,6 +3,7 @@ import { p2e } from "../api/p2e";
 import { Async, Bars, Card, CompareBars, Kpi, PageTitle, StackBars } from "../components/ui";
 import { useApi } from "../hooks/useApi";
 import { useApp } from "../state";
+import { useT } from "../i18n";
 import { fmtNum, humanize } from "../utils/format";
 import { href, navigate, useRoute } from "../utils/route";
 
@@ -15,6 +16,7 @@ const TABS = [["progress", "Progress"], ["productivity", "Productivity"], ["dela
 
 export function AnalyticsPage() {
   const { project, asOf, live } = useApp();
+  const { t } = useT();
   const c = project.code;
   const { params } = useRoute();
   const tab = params.get("tab") ?? "progress";
@@ -24,8 +26,12 @@ export function AnalyticsPage() {
   }, [c, asOf, live]);
   return (
     <>
-      <PageTitle title="Project analytics" subtitle={`Computed by the backend from the recorded history as of ${asOf}.`}
-        actions={<button type="button" className="btn" onClick={() => download(`/api/v1/projects/${c}/analytics/dataset.csv`, `${c}-actual-progress.csv`, { as_of: asOf }).catch((e) => alert(e.message))}>Download actual-progress dataset (CSV)</button>} />
+      <PageTitle title={t("analytics.title")} subtitle={t("analytics.sub", { asOf })}
+        actions={<>
+          <button type="button" className="btn btn-primary" onClick={() => p2e.pmReport(c, asOf, "daily").catch((e) => alert(e.message))}>{t("analytics.daily")}</button>
+          <button type="button" className="btn" onClick={() => p2e.pmReport(c, asOf, "weekly").catch((e) => alert(e.message))}>{t("analytics.weekly")}</button>
+          <button type="button" className="btn" onClick={() => download(`/api/v1/projects/${c}/analytics/dataset.csv`, `${c}-actual-progress.csv`, { as_of: asOf }).catch((e) => alert(e.message))}>{t("analytics.dataset")}</button>
+        </>} />
       <div className="tabs" role="tablist">{TABS.map(([k, l]) => <a key={k} role="tab" aria-selected={tab === k} className={tab === k ? "active" : ""} href={href("analytics", { tab: k })}>{l}</a>)}</div>
       <Async state={state} what="Computing analytics">
         {({ dash, prod, delays }) => {
@@ -69,12 +75,12 @@ export function AnalyticsPage() {
           if (tab === "health") return (
             <>
               <div className="kpis">
-                <Kpi label="Started late" value={sum("started_late")} tone="warn" onClick={() => navigate("schedule", { late: "1" })} />
-                <Kpi label="Finished late" value={sum("finished_late")} tone="warn" onClick={() => navigate("schedule", { late: "1" })} />
-                <Kpi label="Overdue, not started" value={sum("due_not_started")} tone="bad" onClick={() => navigate("schedule", { status: "not_started" })} />
+                <Kpi label={t("kpi.startedLate")} value={sum("started_late")} tone="warn" onClick={() => navigate("schedule", { late: "1" })} />
+                <Kpi label={t("kpi.finishedLate")} value={sum("finished_late")} tone="warn" onClick={() => navigate("schedule", { late: "1" })} />
+                <Kpi label={t("kpi.overdue")} value={sum("due_not_started")} tone="bad" onClick={() => navigate("schedule", { status: "not_started" })} />
                 <Kpi label="Pending review" value={dash.review_backlog.pending_events} tone="warn" onClick={() => navigate("linking")} />
                 <Kpi label="Blocked actuals" value={dash.review_backlog.blocked_activities} tone="warn" onClick={() => navigate("linking", { tab: "blocked" })} />
-                <Kpi label="Silent activities" value={Object.values(dash.silent_activities_by_discipline).reduce((a, b) => a + b, 0)} tone="warn" onClick={() => navigate("watch")} />
+                <Kpi label={t("kpi.silent")} value={Object.values(dash.silent_activities_by_discipline).reduce((a, b) => a + b, 0)} tone="warn" onClick={() => navigate("watch")} />
               </div>
               <div className="grid-2">
                 <Card title="Late starts / late finishes by discipline">

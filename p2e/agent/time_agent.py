@@ -27,6 +27,7 @@ from p2e.db.models import DISCIPLINES, ExtractionRun, PlanNode, ProgressEvent, P
 from p2e.extract.model import ExtractedItem
 from p2e.extract.pipeline import load_project_vocab, validate_item
 from p2e.extract.rules import Vocabulary, extract_area, extract_tags, parse_date, parse_time
+from p2e.i18n import tr
 from p2e.ingest import service as ingest
 from p2e.link import service as linking
 from p2e.decide import watch
@@ -39,12 +40,32 @@ UNITS = {"spool": "spools", "spools": "spools", "cable": "cables", "cables": "ca
          "cum": "cum", "m": "m", "metre": "m", "metres": "m", "meter": "m", "meters": "m"}
 DISCIPLINE_WORDS = {"civil": "civil", "piping": "piping", "electrical": "electrical", "instrumentation": "instrumentation",
                     "hse": "hse"}
-RELATIVE = {"today": 0, "yesterday": 1, "yday": 1}
+# Relative dates in English, Hinglish, Tanglish and Tamil / Hindi script (progress reports are past tense: kal = yesterday)
+RELATIVE = {"today": 0, "yesterday": 1, "yday": 1, "aaj": 0, "kal": 1,
+            "inniku": 0, "innaiku": 0, "indru": 0, "nethu": 1, "netru": 1, "naethu": 1,
+            "இன்று": 0, "இன்னைக்கு": 0, "நேற்று": 1, "நேத்து": 1, "आज": 0, "कल": 1}
+# Status words the Time Agent understands on top of the project glossary (Tanglish, Tamil script, Hindi script).
+# Only the agent uses them; the DPR glossary is part of the frozen synthetic dataset.
+AGENT_VERBS = {
+    "start": ["start panniten", "start pannom", "start aachu", "aarambichom", "aarambichitom", "thodangiyachu",
+              "தொடங்கியது", "தொடங்கினோம்", "தொடங்கப்பட்டது", "ஆரம்பித்தோம்", "ஆரம்பமானது",
+              "शुरू", "शुरू हुआ", "शुरू हो गया", "शुरू किया", "चालू किया"],
+    "finish": ["mudinjidhu", "mudinjathu", "mudichitom", "mudichom", "complete aachu", "mudinjiruchu", "khatam",
+               "முடிந்தது", "முடிந்துவிட்டது", "முடித்தோம்", "நிறைவடைந்தது", "முடிச்சாச்சு",
+               "पूरा हो गया", "पूरा हुआ", "हो गया", "खत्म हो गया", "समाप्त"],
+    "progress": ["nadakkudhu", "nadanthukittu irukku", "நடைபெறுகிறது", "நடந்து கொண்டிருக்கிறது", "நடக்குது",
+                 "चल रहा है", "जारी है"],
+    "hold": ["nikkudhu", "niruthi vechirukkom", "நிறுத்தப்பட்டது", "நின்றுவிட்டது", "நிறுத்தி வைக்கப்பட்டுள்ளது",
+             "रुका हुआ है", "रुक गया", "बंद है"],
+    "resume": ["thirumba aarambichom", "மீண்டும் தொடங்கியது", "மறுபடியும் தொடங்கினோம்", "फिर से शुरू"],
+}
+INDIC = "ऀ-ॿ஀-௿"      # Devanagari + Tamil: \b does not work across their vowel signs
+NOT_WORD_BEFORE, NOT_WORD_AFTER = rf"(?<![a-z0-9{INDIC}])", rf"(?![a-z0-9{INDIC}])"
 TIME_RES = [re.compile(r"\b(?:at|from|@)?\s*\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)\b"),
             re.compile(r"\b(?:at|from|@)\s*\d{1,2}[:.]\d{2}\b"), re.compile(r"\b\d{1,2}:\d{2}\b")]
 DATE_RE = re.compile(r"\b(?:on\s+)?(\d{4}-\d{2}-\d{2}|\d{1,2}[/.]\d{1,2}(?:[/.]\d{2,4})?"
                      r"|\d{1,2}(?:st|nd|rd|th)?[- ][a-z]{3,4}(?:[- ]\d{2,4})?|[a-z]{3,4} \d{1,2},? \d{4})\b")
-REL_RE = re.compile(r"\b(today|yesterday|yday)\b")
+REL_RE = re.compile(NOT_WORD_BEFORE + "(" + "|".join(sorted(RELATIVE, key=len, reverse=True)) + ")" + NOT_WORD_AFTER)
 QTY_RE = re.compile(r"\b(\d+(?:\.\d+)?)\s*(" + "|".join(sorted(UNITS, key=len, reverse=True)) + r")\b")
 CHECKLIST_RE = re.compile(r"^\s*(?:checklist|what (?:should|do|must) i report(?: today)?)\s*\??\s*$", re.IGNORECASE)
 EDGE_WORDS = {"on", "at", "for", "of", "in", "and", "the", "is", "was", "has", "been", "from", "by"}
@@ -103,11 +124,12 @@ def interpret_rules(message: str, vocab: Vocabulary) -> Raw:
         return not any(a < y and x < b for x, y in taken)
 
     types = []
-    for phrase in sorted(vocab.verbs, key=len, reverse=True):
-        for m in re.finditer(rf"(?<![a-z]){re.escape(phrase.lower())}(?![a-z])", low):
+    verbs = {p.lower(): t for t, phrases in AGENT_VERBS.items() for p in phrases} | vocab.verbs
+    for phrase in sorted(verbs, key=len, reverse=True):
+        for m in re.finditer(rf"(?<![a-z{INDIC}]){re.escape(phrase.lower())}(?![a-z{INDIC}])", low):
             if free(*m.span()):
                 taken.append(m.span())
-                types.append(vocab.verbs[phrase])
+                types.append(verbs[phrase])
     time_text = None
     for pat in TIME_RES:
         for m in pat.finditer(low):
@@ -214,19 +236,18 @@ def resolve_date(text: str, ref: date) -> date | None:
     return parse_date(re.sub(r"^on\s+", "", t), ref)
 
 
-def finalize(raw: Raw, ctx: ProjectContext, ref: datetime, discipline: str | None, answers: dict) -> Interpretation:
+def finalize(raw: Raw, ctx: ProjectContext, ref: datetime, discipline: str | None, answers: dict,
+             lang: str = "en") -> Interpretation:
     missing, questions = [], []
     words = ctx.content_words(ctx.normalize(raw.activity_text)) if raw.activity_text else []
     tags = extract_tags(raw.activity_text) if raw.activity_text else []
     if not words and not tags:
         missing.append("activity")
-        questions.append("Which activity was it? Please resend the message with the line, equipment or area "
-                         "(for example 'Line 1203 erection started today').")
+        questions.append(tr(lang, "q_activity"))
     event_type = raw.event_types[0] if len(raw.event_types) == 1 else ("progress" if not raw.event_types and raw.quantity else None)
     if event_type is None:
         missing.append("event_type")
-        questions.append("The message reports more than one status; please send one message per status." if raw.event_types
-                         else "Did the work start, finish or is it in progress? Please resend the message with that word.")
+        questions.append(tr(lang, "q_event_multi" if raw.event_types else "q_event_none"))
     dates = {d for d in (resolve_date(t, ref.date()) for t in raw.date_texts) if d}
     date_text = raw.date_texts[0] if len(dates) == 1 else None
     if not dates and answers.get("date"):
@@ -234,13 +255,13 @@ def finalize(raw: Raw, ctx: ProjectContext, ref: datetime, discipline: str | Non
         dates, date_text = ({d}, answers["date"]) if d else (set(), None)
     if len(dates) != 1:
         missing.append("date")
-        verb = {"start": "started", "finish": "completed"}.get(event_type or "", "done")
-        questions.append(f"The message mentions more than one date ({', '.join(raw.date_texts)}); please resend it with one date."
-                         if len(dates) > 1 else f"What date was it {verb}? (for example 'today', 'yesterday' or 2026-09-24)")
+        verb = tr(lang, {"start": "verb_start", "finish": "verb_finish"}.get(event_type or "", "verb_other"))
+        questions.append(tr(lang, "q_date_multi", dates=", ".join(raw.date_texts)) if len(dates) > 1
+                         else tr(lang, "q_date_none", verb=verb))
     disc = raw.disciplines[0] if len(raw.disciplines) == 1 else (discipline or answers.get("discipline"))
     if len(raw.disciplines) > 1 or disc not in DISCIPLINES:
         missing.append("discipline")
-        questions.append("Which discipline is this (civil, piping, electrical, instrumentation, hse)?")
+        questions.append(tr(lang, "q_discipline"))
     piping = disc == "piping"
     return Interpretation(
         activity_text=raw.activity_text, event_type=event_type, event_date=next(iter(dates)) if len(dates) == 1 else None,
@@ -254,24 +275,24 @@ def finalize(raw: Raw, ctx: ProjectContext, ref: datetime, discipline: str | Non
 # ----------------------------------------------------------------------------- record + link
 
 def handle(session: Session, project: Project, message: str, ref: datetime, role: str, upload_dir: Path, glossary_path: Path,
-           llm=None, discipline: str | None = None, answers: dict | None = None, allowed_discipline: str | None = None) -> dict:
+           llm=None, discipline: str | None = None, answers: dict | None = None, allowed_discipline: str | None = None,
+           lang: str = "en") -> dict:
     """One supervisor turn. Returns {status, reply, question, interpretation, event_id, document_id, link_event_id}.
-    status: needs_clarification | rejected (nothing stored) | recorded | duplicate."""
+    status: needs_clarification | rejected (nothing stored) | recorded | duplicate. Replies in `lang` (en | ta | hi)."""
     answers = {k: v for k, v in (answers or {}).items() if v}
     if CHECKLIST_RE.match(message):                     # "what should I report today?" -> silent-activity checklist
-        return checklist_reply(session, project, ref, discipline or answers.get("discipline"))
+        return checklist_reply(session, project, ref, discipline or answers.get("discipline"), lang)
     ctx = get_context(session, project, glossary_path)
     raw, note = interpret_llm(llm, ctx, message) if llm is not None else (None, None)
     raw = raw or interpret_rules(message, load_project_vocab(glossary_path).vocab)
     if note:
         raw.notes.append(note)
-    it = finalize(raw, ctx, ref, discipline, answers)
+    it = finalize(raw, ctx, ref, discipline, answers, lang)
     out = {"interpretation": it.public(), "question": it.question, "event_id": None, "document_id": None}
     if it.missing:
         return out | {"status": "needs_clarification", "reply": it.question}
     if allowed_discipline and it.discipline != allowed_discipline:      # discipline-scoped supervisor key
-        return out | {"status": "rejected", "reply": f"Not recorded: this key may only log {allowed_discipline} progress "
-                                                     f"(the message reports {it.discipline})."}
+        return out | {"status": "rejected", "reply": tr(lang, "not_scope", allowed=allowed_discipline, got=it.discipline)}
     content = _record_text(message, ref, role, it, answers)
     lines = content.split("\n")
     item = ExtractedItem(source_ref={"line": MESSAGE_LINE, "index": 0}, source_text=message, activity_text=it.activity_text,
@@ -281,13 +302,13 @@ def handle(session: Session, project: Project, message: str, ref: datetime, role
     project_start = session.scalar(select(func.min(PlanNode.planned_start)).where(PlanNode.project_id == project.id))
     errors = validate_item(item, lines=lines, report_date=ref.date(), project_start=project_start)   # Phase 2 rules
     if errors:
-        return out | {"status": "rejected", "reply": "Not recorded: " + "; ".join(errors) + ". Please correct and resend."}
+        return out | {"status": "rejected", "reply": tr(lang, "not_valid", errors="; ".join(errors))}
     data = content.encode("utf-8")
     try:
         doc = ingest.ingest_upload(session, project, f"time-agent-{hashlib.sha256(data).hexdigest()[:12]}.txt", data, role, upload_dir)
     except ingest.DuplicateDocument as e:              # the same message, reference time and answers were already recorded
         ev = session.scalar(select(ProgressEvent).where(ProgressEvent.source_document_id == e.extra["existing_document_id"]))
-        return out | {"status": "duplicate", "reply": "Already recorded.", "event_id": ev.id if ev else None,
+        return out | {"status": "duplicate", "reply": tr(lang, "duplicate"), "event_id": ev.id if ev else None,
                       "document_id": e.extra["existing_document_id"]}
     run = ExtractionRun(document=doc, extractor=AGENT_EXTRACTOR, parser_version=AGENT_VERSION, status="succeeded",
                         events_total=1, events_valid=1, finished_at=datetime.now().astimezone())
@@ -302,29 +323,27 @@ def handle(session: Session, project: Project, message: str, ref: datetime, role
     session.flush()
     linking.link_events(session, project, glossary_path, event_ids=[ev.id], llm=llm)    # the existing Phase 3 linker
     link = linking.get_link(session, project, ev.id)
-    return out | {"status": "recorded", "reply": reply_for(link), "event_id": ev.id, "document_id": doc.id}
+    return out | {"status": "recorded", "reply": reply_for(link, lang), "event_id": ev.id, "document_id": doc.id}
 
 
-def checklist_reply(session: Session, project: Project, ref: datetime, discipline: str | None) -> dict:
+def checklist_reply(session: Session, project: Project, ref: datetime, discipline: str | None, lang: str = "en") -> dict:
     base = {"interpretation": {}, "event_id": None, "document_id": None}
     if discipline not in DISCIPLINES:
-        q = "Which discipline is this (civil, piping, electrical, instrumentation, hse)?"
+        q = tr(lang, "q_discipline")
         return base | {"status": "needs_clarification", "reply": q, "question": q}
     items = watch.checklist(session, project, ref.date(), discipline)
     done = sum(i["reported_today"] for i in items)
-    reply = (f"{len(items)} {discipline} activities are expected to be active today; {done} already reported."
-             + (" Not reported yet: " + "; ".join(f"{i['plan_node_code']} {i['activity_name']}" for i in items if not i["reported_today"])[:600]
-                if done < len(items) else ""))
+    missing = "; ".join(f"{i['plan_node_code']} {i['activity_name']}" for i in items if not i["reported_today"])[:600]
+    reply = (tr(lang, "checklist", n=len(items), discipline=discipline, done=done)
+             + (tr(lang, "checklist_missing", items=missing) if done < len(items) else ""))
     return base | {"status": "checklist", "reply": reply, "question": None,
                    "checklist": [{k: (v.isoformat() if isinstance(v, date) else v) for k, v in i.items()} for i in items]}
 
 
-def reply_for(link) -> str:
+def reply_for(link, lang: str = "en") -> str:
     if link.decision == "matched":
-        return f"Recorded and linked to {link.node.code} ({link.node.name})."
-    if link.decision == "review":
-        return "Recorded, but planner review is required."
-    return "Recorded, but it could not be safely linked to an existing activity."
+        return tr(lang, "rec_matched", code=link.node.code, name=link.node.name)
+    return tr(lang, "rec_review" if link.decision == "review" else "rec_unmatched")
 
 
 def _record_text(message: str, ref: datetime, role: str, it: Interpretation, answers: dict) -> str:

@@ -11,36 +11,63 @@ import { LinkingPage } from "./pages/Linking";
 import { MemoryPage } from "./pages/Memory";
 import { OverviewPage } from "./pages/Overview";
 import { ReportsPage } from "./pages/Reports";
+import { RoiPage } from "./pages/ROI";
+import { GuidePage, TermsPage, VideoPage } from "./pages/Help";
+import { Assistant } from "./components/Assistant";
+import { LANGS, LangContext, loadLang, saveLang, useT, type Lang } from "./i18n";
 import { SchedulePage } from "./pages/Schedule";
 import { WatchPage } from "./pages/Watch";
 import { AppContext } from "./state";
 import { todayIso } from "./utils/format";
 import { href, useRoute } from "./utils/route";
 
+// labels are i18n keys (web/src/i18n.ts)
 const NAV: { group: string; items: { page: string; label: string; icon: string }[] }[] = [
-  { group: "Operate", items: [
-    { page: "overview", label: "Overview", icon: "◎" },
-    { page: "reports", label: "Field Reports", icon: "▤" },
-    { page: "linking", label: "Activity Linking", icon: "⇄" },
-    { page: "agent", label: "Time Agent", icon: "✎" },
+  { group: "nav.operate", items: [
+    { page: "overview", label: "nav.overview", icon: "◎" },
+    { page: "reports", label: "nav.reports", icon: "▤" },
+    { page: "linking", label: "nav.linking", icon: "⇄" },
+    { page: "agent", label: "nav.agent", icon: "✎" },
   ] },
-  { group: "Plan", items: [
-    { page: "schedule", label: "Schedule", icon: "▦" },
-    { page: "watch", label: "Silent Activity Watch", icon: "◔" },
-    { page: "audit", label: "Audit Trail", icon: "☰" },
+  { group: "nav.plan", items: [
+    { page: "schedule", label: "nav.schedule", icon: "▦" },
+    { page: "watch", label: "nav.watch", icon: "◔" },
+    { page: "audit", label: "nav.audit", icon: "☰" },
   ] },
-  { group: "Intelligence", items: [
-    { page: "analytics", label: "Analytics", icon: "▥" },
-    { page: "memory", label: "Project Memory", icon: "❖" },
+  { group: "nav.intelligence", items: [
+    { page: "analytics", label: "nav.analytics", icon: "▥" },
+    { page: "roi", label: "nav.roi", icon: "₹" },
+    { page: "memory", label: "nav.memory", icon: "❖" },
   ] },
-  { group: "Present", items: [{ page: "demo", label: "Demo Flow", icon: "▶" }] },
+  { group: "nav.present", items: [{ page: "demo", label: "nav.demo", icon: "▶" }] },
+  { group: "nav.help", items: [
+    { page: "guide", label: "nav.guide", icon: "?" },
+    { page: "video", label: "nav.video", icon: "▷" },
+    { page: "terms", label: "nav.terms", icon: "§" },
+  ] },
 ];
 
 const PAGES: Record<string, () => ReactNode> = {
   overview: () => <OverviewPage />, reports: () => <ReportsPage />, linking: () => <LinkingPage />, agent: () => <AgentPage />,
   schedule: () => <SchedulePage />, watch: () => <WatchPage />, audit: () => <AuditPage />, analytics: () => <AnalyticsPage />,
-  memory: () => <MemoryPage />, demo: () => <DemoPage />,
+  memory: () => <MemoryPage />, demo: () => <DemoPage />, roi: () => <RoiPage />,
+  guide: () => <GuidePage />, terms: () => <TermsPage />, video: () => <VideoPage />,
 };
+
+function LangPicker() {
+  const { lang, setLang, t } = useT();
+  return (
+    <select className="lang-picker" value={lang} onChange={(e) => setLang(e.target.value as Lang)} aria-label={t("shell.language")}>
+      {LANGS.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
+    </select>
+  );
+}
+
+export function App() {
+  const [lang, setLangState] = useState<Lang>(loadLang);
+  useEffect(() => saveLang(lang), [lang]);
+  return <LangContext.Provider value={{ lang, setLang: setLangState }}><Shell /></LangContext.Provider>;
+}
 
 function loadAsOf(): string {
   try {
@@ -50,7 +77,8 @@ function loadAsOf(): string {
   }
 }
 
-export function App() {
+function Shell() {
+  const { t } = useT();
   const [signedIn, setSignedIn] = useState(() => !!apiKey.get());
   const [projects, setProjects] = useState<Project[] | null>(null);
   const [projectCode, setProjectCode] = useState<string | null>(null);
@@ -80,49 +108,53 @@ export function App() {
   if (error) return <div className="center"><ErrorBox error={error} onRetry={() => window.location.reload()} /></div>;
   if (!projects) return <div className="center"><Loading what="Connecting to the P2E Bridge API" /></div>;
   if (!project) return <div className="center"><ErrorBox error="No project imported yet. Run scripts/phase1/init_database.py." /></div>;
-  if (!signedIn) return <SignIn project={project} onDone={() => setSignedIn(true)} />;
+  if (!signedIn) return route.page === "terms" ? <div className="content"><LangPicker /> <a href={href("overview")}>←</a><TermsPage /></div>
+    : <SignIn project={project} onDone={() => setSignedIn(true)} />;
 
   const page = PAGES[route.page] ? route.page : "overview";
   return (
     <AppContext.Provider value={{ project, asOf, setAsOf, live, snapshot }}>
       <div className="shell">
         <aside className="sidebar">
-          <div className="brand"><span className="brand-mark">P2E</span><span><strong>Bridge</strong><small>Project control · SIH26122</small></span></div>
+          <div className="brand"><span className="brand-mark">P2E</span><span><strong>Bridge</strong><small>{t("shell.tagline")}</small></span></div>
           <nav aria-label="Main">
             {NAV.map((g) => (
               <div key={g.group} className="nav-group">
-                <span className="nav-title">{g.group}</span>
+                <span className="nav-title">{t(g.group)}</span>
                 {g.items.map((it) => (
                   <a key={it.page} href={href(it.page)} className={page === it.page ? "active" : ""} aria-current={page === it.page ? "page" : undefined}>
-                    <span className="nav-icon" aria-hidden>{it.icon}</span>{it.label}
+                    <span className="nav-icon" aria-hidden>{it.icon}</span>{t(it.label)}
                     {it.page === "linking" && snapshot?.pending_review ? <span className="nav-count">{snapshot.pending_review}</span> : null}
                   </a>
                 ))}
               </div>
             ))}
           </nav>
-          <p className="sidebar-foot">Field execution → AI understanding → schedule linking → human validation → verified progress → project intelligence</p>
+          <p className="sidebar-foot">{t("shell.foot")}</p>
         </aside>
         <div className="main">
           <header className="topbar">
             <div className="topbar-project">
               <strong>{project.code}</strong><span className="muted">{project.name}</span>
             </div>
-            <label className="asof">As of
+            <label className="asof">{t("shell.asof")}
               <input type="date" value={asOf} onChange={(e) => e.target.value && setAsOf(e.target.value)} />
             </label>
-            <Badge tone={connected ? "ok" : "muted"} title="Live updates from the backend event stream">{connected ? "● live" : "○ offline"}</Badge>
+            <LangPicker />
+            <Badge tone={connected ? "ok" : "muted"} title="Live updates from the backend event stream">{connected ? t("shell.live") : t("shell.offline")}</Badge>
             <button type="button" className="btn btn-sm" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Toggle colour theme">{theme === "dark" ? "☀" : "☾"}</button>
-            <button type="button" className="btn btn-sm" onClick={() => { apiKey.clear(); setSignedIn(false); }}>Sign out</button>
+            <button type="button" className="btn btn-sm" onClick={() => { apiKey.clear(); setSignedIn(false); }}>{t("shell.signout")}</button>
           </header>
           <main className="content" key={page}>{PAGES[page]()}</main>
         </div>
       </div>
+      <Assistant />
     </AppContext.Provider>
   );
 }
 
 function SignIn({ project, onDone }: { project: Project; onDone: () => void }) {
+  const { t } = useT();
   const [key, setKey] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -144,10 +176,12 @@ function SignIn({ project, onDone }: { project: Project; onDone: () => void }) {
     <div className="center">
       <form className="card signin" onSubmit={(e) => { e.preventDefault(); submit(); }}>
         <div className="brand"><span className="brand-mark">P2E</span><span><strong>Bridge</strong><small>{project.code} · {project.name}</small></span></div>
-        <p className="muted">Sign in with your role API key (supervisor, planner or admin). It is kept only in this browser tab.</p>
-        <label className="stacked">API key<input type="password" autoComplete="off" value={key} onChange={(e) => setKey(e.target.value)} required minLength={16} autoFocus /></label>
+        <LangPicker />
+        <p className="muted">{t("signin.intro")}</p>
+        <label className="stacked">{t("signin.key")}<input type="password" autoComplete="off" value={key} onChange={(e) => setKey(e.target.value)} required minLength={16} autoFocus /></label>
         {error && <ErrorBox error={error} />}
-        <button className="btn btn-primary" disabled={busy || key.trim().length < 16}>{busy ? "Checking…" : "Sign in"}</button>
+        <button className="btn btn-primary" disabled={busy || key.trim().length < 16}>{busy ? t("signin.checking") : t("signin.go")}</button>
+        <p className="muted small"><a href={href("terms")}>{t("signin.terms")}</a></p>
       </form>
     </div>
   );

@@ -1,0 +1,105 @@
+{
+  "_note": "User guide shown on the Guide page and used by the assistant for 'how do I…' questions. Tamil and Hindi are translations to be reviewed by native speakers.",
+  "sections": [
+    {
+      "id": "start",
+      "keywords": ["sign in", "login", "log in", "key", "api key", "start", "begin", "as of", "language", "what is p2e", "about the app", "app", "application", "உள்நுழை", "சாவி", "மொழி", "செயலி", "பயன்பாடு", "लॉगिन", "कुंजी", "भाषा", "ऐप", "एप्लिकेशन"],
+      "title": {"en": "Getting started", "ta": "தொடங்குதல்", "hi": "शुरुआत"},
+      "steps": {
+        "en": ["P2E Bridge turns daily field reports into verified, audited actual dates on the project schedule.", "Sign in with the access key your administrator gave you (supervisor, planner or admin).", "Choose your language (English, தமிழ், हिन्दी) in the top bar; the screens and the assistant follow it.", "Set 'As of' in the top bar to the date you are working on (for the demo project: 2026-09-16)."],
+        "ta": ["P2E Bridge தினசரி களஅறிக்கைகளைத் திட்ட அட்டவணையில் சரிபார்க்கப்பட்ட, தணிக்கை செய்யப்பட்ட உண்மைத் தேதிகளாக மாற்றுகிறது.", "நிர்வாகி வழங்கிய அணுகல் சாவியுடன் உள்நுழையவும் (supervisor, planner அல்லது admin).", "மேல் பட்டியில் மொழியைத் தேர்ந்தெடுக்கவும் (English, தமிழ், हिन्दी); திரைகளும் உதவியாளரும் அதைப் பின்பற்றும்.", "மேல் பட்டியில் 'As of' தேதியை அமைக்கவும் (மாதிரித் திட்டத்துக்கு: 2026-09-16)."],
+        "hi": ["P2E Bridge दैनिक फ़ील्ड रिपोर्टों को प्रोजेक्ट शेड्यूल पर सत्यापित और ऑडिट की गई वास्तविक तारीख़ों में बदलता है।", "प्रशासक से मिली एक्सेस कुंजी से साइन इन करें (supervisor, planner या admin)।", "ऊपर की पट्टी में भाषा चुनें (English, தமிழ், हिन्दी); स्क्रीन और सहायक उसी भाषा में चलेंगे।", "ऊपर की पट्टी में 'As of' तारीख़ चुनें (डेमो प्रोजेक्ट के लिए: 2026-09-16)।"]
+      }
+    },
+    {
+      "id": "supervisor",
+      "keywords": ["time agent", "report progress", "log", "supervisor", "menu", "my activities", "tap", "started", "finished", "tamil", "hindi", "hinglish", "tanglish", "நேர முகவர்", "முன்னேற்றம்", "மேற்பார்வையாளர்", "பதிவு", "टाइम एजेंट", "प्रगति", "सुपरवाइज़र", "दर्ज"],
+      "title": {"en": "Supervisors: report progress", "ta": "மேற்பார்வையாளர்கள்: முன்னேற்றம் பதிவு", "hi": "सुपरवाइज़र: प्रगति दर्ज करें"},
+      "steps": {
+        "en": ["Open Time Agent and pick your discipline.", "Fastest: under 'My activities today' tap Start, Finish or Hold next to the activity. No typing, no AI cost.", "Or type a message such as 'Line 1203 hydrotest started today', 'LT-4011 loop check நேற்று முடிந்தது' or 'P-101A grouting कल पूरा हो गया'.", "If something is missing, the agent asks one short question. Type 'undo' to send your last report back to the planner, or use 'it' / 'that one' for the activity you just reported."],
+        "ta": ["Time Agent-ஐத் திறந்து உங்கள் துறையைத் தேர்ந்தெடுக்கவும்.", "விரைவான வழி: 'My activities today' பட்டியலில் வேலைக்கு அருகில் Start, Finish அல்லது Hold அழுத்தவும். தட்டச்சு இல்லை, AI செலவு இல்லை.", "அல்லது 'Line 1203 hydrotest இன்று தொடங்கியது' அல்லது 'LT-4011 loop check நேற்று முடிந்தது' போன்ற செய்தியைத் தட்டச்சு செய்யவும்.", "ஏதாவது விடுபட்டால் முகவர் ஒரு சிறிய கேள்வி கேட்கும். கடைசி அறிக்கையைத் திட்டமிடுபவருக்குத் திருப்ப 'undo' என்று தட்டச்சு செய்யவும்."],
+        "hi": ["Time Agent खोलें और अपना विभाग चुनें।", "सबसे तेज़: 'My activities today' में काम के आगे Start, Finish या Hold दबाएँ। कोई टाइपिंग नहीं, कोई AI ख़र्च नहीं।", "या संदेश लिखें, जैसे 'Line 1203 hydrotest आज शुरू हुआ' या 'P-101A grouting कल पूरा हो गया'।", "कुछ छूट जाए तो एजेंट एक छोटा सवाल पूछेगा। आख़िरी रिपोर्ट प्लानर को वापस भेजने के लिए 'undo' लिखें।"]
+      }
+    },
+    {
+      "id": "voice",
+      "keywords": ["voice", "speak", "mic", "microphone", "talk", "speech", "listen", "குரல்", "பேசு", "மைக்", "आवाज़", "बोलें", "माइक"],
+      "title": {"en": "Voice", "ta": "குரல்", "hi": "आवाज़"},
+      "steps": {
+        "en": ["Press 🎤 in the Time Agent or the assistant and speak; the text appears for you to check before sending.", "Recognition follows the chosen language (English, Tamil, Hindi). Use Chrome or Edge.", "Tick 'Speak replies' to hear the answer. Tamil or Hindi speech needs that language's voice installed on the computer or phone."],
+        "ta": ["Time Agent அல்லது உதவியாளரில் 🎤 அழுத்திப் பேசவும்; அனுப்பும் முன் சரிபார்க்க உரை தோன்றும்.", "தேர்ந்தெடுத்த மொழியில் (ஆங்கிலம், தமிழ், இந்தி) குரல் புரிந்துகொள்ளப்படும். Chrome அல்லது Edge பயன்படுத்தவும்.", "பதிலைக் கேட்க 'Speak replies' தேர்வு செய்யவும். தமிழ் குரலுக்கு கணினி/தொலைபேசியில் தமிழ் குரல் நிறுவப்பட்டிருக்க வேண்டும்."],
+        "hi": ["Time Agent या सहायक में 🎤 दबाकर बोलें; भेजने से पहले जाँचने के लिए टेक्स्ट दिखेगा।", "पहचान चुनी गई भाषा (अंग्रेज़ी, तमिल, हिंदी) में होती है। Chrome या Edge इस्तेमाल करें।", "जवाब सुनने के लिए 'Speak replies' चुनें। हिंदी आवाज़ के लिए डिवाइस पर हिंदी वॉइस इंस्टॉल होनी चाहिए।"]
+      }
+    },
+    {
+      "id": "upload",
+      "keywords": ["upload", "file", "dpr", "daily progress report", "spreadsheet", "excel", "xlsx", "csv", "docx", "word", "field report", "பதிவேற்ற", "கோப்பு", "அறிக்கை", "अपलोड", "फ़ाइल", "रिपोर्ट"],
+      "title": {"en": "Upload field reports", "ta": "களஅறிக்கைகளைப் பதிவேற்றுதல்", "hi": "फ़ील्ड रिपोर्ट अपलोड करें"},
+      "steps": {
+        "en": ["Open Field Reports and upload a daily progress report (.txt or .docx) or a discipline sheet (.xlsx or .csv), up to 10 MB.", "Press Process. Every extracted event keeps a link to the exact line or cell it came from (Evidence).", "Macro-enabled files and unreadable files are refused with a clear reason."],
+        "ta": ["Field Reports-இல் தினசரி அறிக்கை (.txt அல்லது .docx) அல்லது துறைத் தாள் (.xlsx அல்லது .csv) பதிவேற்றவும், அதிகபட்சம் 10 MB.", "Process அழுத்தவும். ஒவ்வொரு நிகழ்வும் அது வந்த சரியான வரி அல்லது கலத்துடன் இணைக்கப்படும் (Evidence).", "மேக்ரோ கொண்ட அல்லது படிக்க முடியாத கோப்புகள் காரணத்துடன் மறுக்கப்படும்."],
+        "hi": ["Field Reports में दैनिक प्रगति रिपोर्ट (.txt या .docx) या विभाग शीट (.xlsx या .csv) अपलोड करें, अधिकतम 10 MB।", "Process दबाएँ। हर घटना उस सटीक पंक्ति या सेल से जुड़ी रहती है जहाँ से वह आई (Evidence)।", "मैक्रो वाली या अपठनीय फ़ाइलें कारण बताकर अस्वीकार की जाती हैं।"]
+      }
+    },
+    {
+      "id": "planner",
+      "keywords": ["planner", "review", "review queue", "approve", "confirm", "reject", "new activity", "linking", "conflict", "override", "திட்டமிடுபவர்", "சரிபார்ப்பு", "அங்கீகரி", "प्लानर", "समीक्षा", "स्वीकृत", "मंज़ूरी"],
+      "title": {"en": "Planners: review and approve", "ta": "திட்டமிடுபவர்கள்: சரிபார்த்து அங்கீகரித்தல்", "hi": "प्लानर: समीक्षा और मंज़ूरी"},
+      "steps": {
+        "en": ["Activity Linking shows every report with its suggested activity, confidence and evidence.", "Confident matches are applied automatically; uncertain, conflicting or new work waits in the review queue.", "Approve the suggestion, choose another activity, mark it as new work, or override a date. Every change is written to the audit trail."],
+        "ta": ["Activity Linking ஒவ்வொரு அறிக்கையையும் பரிந்துரைக்கப்பட்ட வேலை, நம்பகத்தன்மை, ஆதாரத்துடன் காட்டும்.", "உறுதியான பொருத்தங்கள் தானாகப் பயன்படுத்தப்படும்; உறுதியற்ற, முரண்பட்ட அல்லது புதிய வேலைகள் சரிபார்ப்பு வரிசையில் காத்திருக்கும்.", "பரிந்துரையை அங்கீகரிக்கவும், வேறு வேலையைத் தேர்ந்தெடுக்கவும், புதிய வேலையாகக் குறிக்கவும் அல்லது தேதியை மாற்றவும். ஒவ்வொரு மாற்றமும் தணிக்கைப் பதிவில் சேரும்."],
+        "hi": ["Activity Linking हर रिपोर्ट को सुझाए गए काम, विश्वास स्तर और सबूत के साथ दिखाता है।", "पक्के मिलान अपने-आप लागू होते हैं; अनिश्चित, विरोधाभासी या नया काम समीक्षा कतार में रहता है।", "सुझाव मंज़ूर करें, दूसरा काम चुनें, नया काम चिह्नित करें या तारीख़ बदलें। हर बदलाव ऑडिट ट्रेल में दर्ज होता है।"]
+      }
+    },
+    {
+      "id": "audit",
+      "keywords": ["audit", "undo", "history", "trail", "who changed", "revert", "தணிக்கை", "மாற்று", "திரும்ப", "ऑडिट", "पूर्ववत", "इतिहास"],
+      "title": {"en": "Audit trail and undo", "ta": "தணிக்கைப் பதிவு மற்றும் மீட்டமைப்பு", "hi": "ऑडिट ट्रेल और पूर्ववत"},
+      "steps": {
+        "en": ["Audit Trail lists every schedule change with who or what made it, the rule, the confidence and the source reports.", "Any change can be undone; the undo is itself recorded. The trail is hash-chained, so tampering is detected."],
+        "ta": ["Audit Trail ஒவ்வொரு அட்டவணை மாற்றத்தையும் யார்/எது செய்தது, விதி, நம்பகத்தன்மை, மூல அறிக்கைகளுடன் பட்டியலிடும்.", "எந்த மாற்றத்தையும் திரும்பப் பெறலாம்; அதுவும் பதிவாகும். பதிவு hash-சங்கிலியால் பாதுகாக்கப்படுவதால் மாற்றங்கள் கண்டறியப்படும்."],
+        "hi": ["Audit Trail हर शेड्यूल बदलाव को दिखाता है: किसने या किसने किया, नियम, विश्वास स्तर और स्रोत रिपोर्टें।", "हर बदलाव पूर्ववत किया जा सकता है; पूर्ववत भी दर्ज होता है। ट्रेल hash-chain से सुरक्षित है, छेड़छाड़ पकड़ी जाती है।"]
+      }
+    },
+    {
+      "id": "schedule",
+      "keywords": ["schedule", "primavera", "p6", "xer", "ms project", "xml", "export", "import", "plan", "அட்டவணை", "ஏற்றுமதி", "இறக்குமதி", "शेड्यूल", "निर्यात", "आयात"],
+      "title": {"en": "Schedule import and export", "ta": "அட்டவணை இறக்குமதி / ஏற்றுமதி", "hi": "शेड्यूल आयात और निर्यात"},
+      "steps": {
+        "en": ["The plan is imported from Primavera P6 (.xer), MS Project (.xml) or CSV by the administrator.", "Schedule shows planned versus actual dates. Export the updated actuals as CSV or MS Project XML for the planner to load into P6 / MS Project."],
+        "ta": ["திட்டம் Primavera P6 (.xer), MS Project (.xml) அல்லது CSV-இலிருந்து நிர்வாகியால் இறக்குமதி செய்யப்படுகிறது.", "Schedule திட்டமிட்ட மற்றும் உண்மைத் தேதிகளைக் காட்டும். புதுப்பிக்கப்பட்ட தேதிகளை CSV அல்லது MS Project XML ஆக ஏற்றுமதி செய்யலாம்."],
+        "hi": ["योजना प्रशासक द्वारा Primavera P6 (.xer), MS Project (.xml) या CSV से आयात की जाती है।", "Schedule नियोजित बनाम वास्तविक तारीख़ें दिखाता है। अपडेट की गई तारीख़ें CSV या MS Project XML में निर्यात करें।"]
+      }
+    },
+    {
+      "id": "roi",
+      "keywords": ["roi", "efficiency", "savings", "tokens", "cost", "dashboard", "pm report", "weekly report", "daily report", "pdf", "analytics", "alerts", "shadow", "pilot", "சேமிப்பு", "செலவு", "அறிக்கை", "डैशबोर्ड", "बचत", "लागत", "रिपोर्ट"],
+      "title": {"en": "ROI, reports and shadow mode", "ta": "ROI, அறிக்கைகள், shadow mode", "hi": "ROI, रिपोर्ट और shadow mode"},
+      "steps": {
+        "en": ["ROI & Efficiency shows how many reports were linked automatically, AI tokens and cost per 1,000 reports, planner hours saved and work expected but not reported. Enter your own rates under Assumptions.", "Analytics → Daily or Weekly PM report downloads a printable report; open it and 'Save as PDF'.", "Shadow mode (planner): the system proposes updates but writes nothing automatically, so a live project can run it alongside the current process."],
+        "ta": ["ROI & Efficiency எத்தனை அறிக்கைகள் தானாக இணைக்கப்பட்டன, 1,000 அறிக்கைக்கு AI டோக்கன் மற்றும் செலவு, சேமித்த நேரம், பதிவாகாத வேலைகளைக் காட்டும். Assumptions-இல் உங்கள் விகிதங்களை உள்ளிடவும்.", "Analytics → Daily அல்லது Weekly PM report அச்சிடக்கூடிய அறிக்கையைப் பதிவிறக்கும்; திறந்து 'Save as PDF' செய்யவும்.", "Shadow mode (திட்டமிடுபவர்): அமைப்பு புதுப்பிப்புகளைப் பரிந்துரைக்கும், ஆனால் தானாக எதையும் எழுதாது."],
+        "hi": ["ROI & Efficiency दिखाता है कि कितनी रिपोर्टें अपने-आप जुड़ीं, प्रति 1,000 रिपोर्ट AI टोकन और लागत, बचे घंटे और बिना रिपोर्ट वाला काम। Assumptions में अपनी दरें डालें।", "Analytics → Daily या Weekly PM report प्रिंट योग्य रिपोर्ट डाउनलोड करता है; खोलकर 'Save as PDF' करें।", "Shadow mode (प्लानर): सिस्टम बदलाव सुझाता है पर अपने-आप कुछ नहीं लिखता।"]
+      }
+    },
+    {
+      "id": "assistant",
+      "keywords": ["assistant", "chatbot", "chat", "ask", "question", "help", "guide", "உதவியாளர்", "உதவி", "கேள்வி", "வழிகாட்டி", "सहायक", "मदद", "सवाल", "गाइड"],
+      "title": {"en": "The assistant", "ta": "உதவியாளர்", "hi": "सहायक"},
+      "steps": {
+        "en": ["Press 'Ask P2E' (bottom right) on any screen. Type or speak in English, Tamil or Hindi.", "It answers about this app, the project's progress and Oil India Limited (company, results, production, environment, CSR, market, reviews), always with sources. Other topics are politely declined."],
+        "ta": ["எந்தத் திரையிலும் 'Ask P2E' (கீழ் வலது) அழுத்தவும். ஆங்கிலம், தமிழ் அல்லது இந்தியில் தட்டச்சு செய்யவும் அல்லது பேசவும்.", "இந்தச் செயலி, திட்ட முன்னேற்றம், ஆயில் இந்தியா நிறுவனம் (முடிவுகள், உற்பத்தி, சுற்றுச்சூழல், CSR, சந்தை, மதிப்பாய்வுகள்) பற்றி ஆதாரங்களுடன் பதிலளிக்கும். பிற தலைப்புகள் மரியாதையுடன் மறுக்கப்படும்."],
+        "hi": ["किसी भी स्क्रीन पर 'Ask P2E' (नीचे दाएँ) दबाएँ। अंग्रेज़ी, तमिल या हिंदी में लिखें या बोलें।", "यह इस ऐप, प्रोजेक्ट की प्रगति और ऑयल इंडिया (नतीजे, उत्पादन, पर्यावरण, CSR, बाज़ार, समीक्षाएँ) के बारे में स्रोत सहित जवाब देता है। बाक़ी विषयों पर विनम्रता से मना करता है।"]
+      }
+    },
+    {
+      "id": "privacy",
+      "keywords": ["privacy", "data", "secure", "security", "confidential", "cloud", "internet", "தனியுரிமை", "தரவு", "பாதுகாப்பு", "गोपनीयता", "डेटा", "सुरक्षा"],
+      "title": {"en": "Data and privacy", "ta": "தரவு மற்றும் தனியுரிமை", "hi": "डेटा और गोपनीयता"},
+      "steps": {
+        "en": ["P2E Bridge runs on the company's own servers. Project data is not sent to any external AI service.", "Access is by role key; every change is audited. See Terms of Use for details."],
+        "ta": ["P2E Bridge நிறுவனத்தின் சொந்த சர்வர்களில் இயங்குகிறது. திட்டத் தரவு எந்த வெளிப்புற AI சேவைக்கும் அனுப்பப்படுவதில்லை.", "பங்குச் சாவி மூலம் அணுகல்; ஒவ்வொரு மாற்றமும் தணிக்கை செய்யப்படும். விவரங்களுக்கு Terms of Use பார்க்கவும்."],
+        "hi": ["P2E Bridge कंपनी के अपने सर्वरों पर चलता है। प्रोजेक्ट डेटा किसी बाहरी AI सेवा को नहीं भेजा जाता।", "पहुँच भूमिका कुंजी से है; हर बदलाव ऑडिट होता है। विवरण के लिए Terms of Use देखें।"]
+      }
+    }
+  ]
+}

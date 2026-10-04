@@ -28,11 +28,18 @@ def init_db(engine: Engine) -> None:
     if insp.has_table("source_document") and "status" not in {c["name"] for c in insp.get_columns("source_document")}:
         raise SchemaOutdated("database was created before Phase 2 (missing source_document.status); rebuild it with "
                              "scripts/phase1/init_database.py --rebuild")
+    if engine.dialect.name == "sqlite" and insp.has_table("source_document"):   # SQLite cannot widen a CHECK in place (W4)
+        with engine.connect() as conn:
+            ddl = conn.execute(text("SELECT sql FROM sqlite_master WHERE name = 'source_document'")).scalar() or ""
+        if "'xlsx'" in ddl and "'docx'" not in ddl:
+            raise SchemaOutdated("database predates .docx / .xer support; rebuild it with "
+                                 "scripts/phase1/init_database.py --rebuild")
     Base.metadata.create_all(engine)
     insp = inspect(engine)
     for table, column, ddl in (("event_link", "conflict", "JSON"),          # Phase 3.1
                                ("plan_node", "percent_complete", "FLOAT"),   # Phase 5
-                               ("audit_log", "entry_hash", "VARCHAR(64)")):   # Phase 7
+                               ("audit_log", "entry_hash", "VARCHAR(64)"),   # Phase 7
+                               ("project", "shadow_mode", "BOOLEAN NOT NULL DEFAULT 0")):   # upgrade W5
         if column not in {c["name"] for c in insp.get_columns(table)}:
             with engine.begin() as conn:    # additive, nullable: existing databases keep all their data
                 conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {ddl}"))

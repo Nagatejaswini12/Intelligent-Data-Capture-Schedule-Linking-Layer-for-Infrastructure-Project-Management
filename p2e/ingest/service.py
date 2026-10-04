@@ -1,6 +1,7 @@
 """Ingestion (upload checks, content-addressed raw store, duplicate detection) and persisted extraction runs."""
 from __future__ import annotations
 
+import csv
 import hashlib
 import io
 import os
@@ -14,13 +15,15 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from p2e.db.models import ExtractionIssue, ExtractionRun, PlanNode, ProgressEvent, Project, SourceDocument
-from p2e.extract import dpr, xlsx
+from p2e.extract import dpr, formats, xlsx
 from p2e.extract.pipeline import ProjectVocab, extract_bytes, validate_item
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 MAX_XLSX_UNCOMPRESSED = 50 * 1024 * 1024
 MAX_XLSX_ENTRIES = 1000
-KINDS = {".txt": ("dpr_text", "txt", dpr), ".xlsx": ("spreadsheet", "xlsx", xlsx)}
+KINDS = {".txt": ("dpr_text", "txt", dpr), ".xlsx": ("spreadsheet", "xlsx", xlsx),
+         ".docx": ("dpr_text", "docx", dpr), ".csv": ("spreadsheet", "csv", xlsx)}     # docx / csv: upgrade W4
+ACCEPTED = ".txt or .docx daily progress reports, .xlsx or .csv sheets"
 
 
 class IngestError(Exception):
@@ -72,38 +75,49 @@ def check_content(filename: str, data: bytes) -> tuple[str, str]:
     """-> (kind, format). Extension decides the parser; content must agree with it."""
     suffix = Path(filename).suffix.lower()
     if suffix not in KINDS:
-        raise UnsupportedFile(f"unsupported file type {suffix or '(none)'!r}; accepted: .txt daily progress reports, .xlsx sheets")
+        raise UnsupportedFile(f"unsupported file type {suffix or '(none)'!r}; accepted: {ACCEPTED}")
     if len(data) > MAX_UPLOAD_BYTES:
         raise FileTooLarge(f"file is larger than {MAX_UPLOAD_BYTES} bytes")
     if not data:
         raise MalformedFile("file is empty")
-    if suffix == ".txt":
+    what = {".txt": "text report", ".csv": "CSV sheet", ".xlsx": "workbook", ".docx": "Word report"}[suffix]
+    if suffix in (".txt", ".csv"):
         if b"\x00" in data:
-            raise MalformedFile("text report contains binary data")
+            raise MalformedFile(f"{what} contains binary data")
         try:
-            data.decode("utf-8")
+            text = data.decode("utf-8-sig")
         except UnicodeDecodeError as e:
-            raise MalformedFile(f"text report is not UTF-8: {e}") from None
-    else:
-        if not data.startswith(b"PK\x03\x04"):
-            raise MalformedFile("not an .xlsx workbook (not a zip container)")
-        try:
-            with zipfile.ZipFile(io.BytesIO(data)) as z:
-                infos = z.infolist()
-                names = {i.filename for i in infos}
-                if len(infos) > MAX_XLSX_ENTRIES or sum(i.file_size for i in infos) > MAX_XLSX_UNCOMPRESSED:
-                    raise MalformedFile("workbook expands beyond the allowed size")
-                if "xl/workbook.xml" not in names or "[Content_Types].xml" not in names:
-                    raise MalformedFile("not an .xlsx workbook (xl/workbook.xml missing)")
-                if any(n.lower().endswith("vbaproject.bin") for n in names) or b"macroEnabled" in z.read("[Content_Types].xml"):
-                    raise UnsupportedFile("macro-enabled workbooks are not accepted")
+            raise MalformedFile(f"{what} is not UTF-8: {e}") from None
+        if suffix == ".csv":
+            try:
+                if not any(any(c.strip() for c in row) for row in csv.reader(io.StringIO(text))):
+                    raise MalformedFile("CSV sheet has no values")
+            except csv.Error as e:
+                raise MalformedFile(f"CSV sheet cannot be read: {e}") from None
+        return KINDS[suffix][0], KINDS[suffix][1]
+    main_part = "xl/workbook.xml" if suffix == ".xlsx" else "word/document.xml"
+    if not data.startswith(b"PK\x03\x04"):
+        raise MalformedFile(f"not a {suffix} {what} (not a zip container)")
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as z:
+            infos = z.infolist()
+            names = {i.filename for i in infos}
+            if len(infos) > MAX_XLSX_ENTRIES or sum(i.file_size for i in infos) > MAX_XLSX_UNCOMPRESSED:
+                raise MalformedFile(f"{what} expands beyond the allowed size")
+            if main_part not in names or "[Content_Types].xml" not in names:
+                raise MalformedFile(f"not a {suffix} {what} ({main_part} missing)")
+            if any(n.lower().endswith("vbaproject.bin") for n in names) or b"macroEnabled" in z.read("[Content_Types].xml"):
+                raise UnsupportedFile("macro-enabled files are not accepted")
+        if suffix == ".xlsx":
             load_workbook(io.BytesIO(data), read_only=True, data_only=True).close()
-        except zipfile.BadZipFile as e:
-            raise MalformedFile(f"corrupt workbook: {e}") from None
-        except IngestError:
-            raise
-        except Exception as e:      # openpyxl raises many types on malformed parts
-            raise MalformedFile(f"workbook cannot be read: {type(e).__name__}: {e}") from None
+        else:
+            formats.docx_text(data)
+    except zipfile.BadZipFile as e:
+        raise MalformedFile(f"corrupt {what}: {e}") from None
+    except IngestError:
+        raise
+    except Exception as e:      # openpyxl / XML parsers raise many types on malformed parts
+        raise MalformedFile(f"{what} cannot be read: {type(e).__name__}: {e}") from None
     return KINDS[suffix][0], KINDS[suffix][1]
 
 
@@ -169,15 +183,15 @@ def process_document(session: Session, doc: SourceDocument, upload_dir: Path, pv
     run = ExtractionRun(document=doc, extractor=module.EXTRACTOR, parser_version=module.PARSER_VERSION, status="failed")
     session.add(run)
     try:
-        data = read_blob(upload_dir, doc)
-        result = extract_bytes(data, "." + doc.format, pv)
+        data, fmt = formats.normalize(read_blob(upload_dir, doc), doc.format)
+        result = extract_bytes(data, "." + fmt, pv)
     except Exception as e:
         run.error = doc.error = f"{type(e).__name__}: {e}"
         run.finished_at = datetime.now(timezone.utc)
         doc.status = "failed"
         session.flush()
         return run, "failed"
-    lines = data.decode("utf-8").split("\n") if doc.format == "txt" else None
+    lines = dpr.text_lines(data.decode("utf-8")) if fmt == "txt" else None
     project_start = session.scalar(select(func.min(PlanNode.planned_start)).where(PlanNode.project_id == doc.project_id))
     session.execute(delete(ProgressEvent).where(ProgressEvent.source_document_id == doc.id))   # replace older-version events
     session.flush()
@@ -243,10 +257,11 @@ def evidence(doc: SourceDocument, ev: ProgressEvent, upload_dir: Path, context: 
     except SourceUnavailable as e:
         e.extra["evidence"] = evidence_metadata(doc, ev)
         raise
+    data, fmt = formats.normalize(data, doc.format)
     out = {"document_id": doc.id, "filename": doc.filename, "kind": doc.kind, "sha256": doc.sha256,
            "source_ref": ev.source_ref, "source_text": ev.source_text}
-    if doc.format == "txt":
-        lines = data.decode("utf-8").split("\n")
+    if fmt == "txt":
+        lines = dpr.text_lines(data.decode("utf-8"))
         ln = ev.source_ref["line"]
         line = lines[ln - 1] if 1 <= ln <= len(lines) else ""
         out |= {"line_number": ln, "line_text": line, "span_start": ev.span_start, "span_end": ev.span_end,

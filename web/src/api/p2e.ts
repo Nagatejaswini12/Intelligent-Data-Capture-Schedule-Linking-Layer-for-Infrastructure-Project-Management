@@ -4,7 +4,7 @@ import { api, download, request } from "./client";
 export type Decision = "matched" | "review" | "unmatched";
 export type LinkState = "auto" | "pending" | "confirmed" | "rejected";
 
-export interface Project { code: string; name: string; timezone: string; data_date: string | null }
+export interface Project { code: string; name: string; timezone: string; data_date: string | null; shadow_mode?: boolean }
 export interface Run { id: number; extractor: string; parser_version: string; status: string; events_total: number;
   events_valid: number; events_invalid: number; issues_count: number; error: string | null; finished_at: string | null }
 export interface DocumentOut { id: number; kind: string; format: string; filename: string; sha256: string; size_bytes: number;
@@ -67,6 +67,18 @@ export interface Citation { kind: "activity" | "event" | "document"; id: string 
 export interface Answer { question: string; intent: string; filters: Record<string, unknown>; answer: string; values: Record<string, unknown>;
   citations: Citation[] }
 export interface KnowledgeEntry { id: string; kind: string; title: string; text: string; values: Record<string, unknown>; citations: Citation[] }
+type L3 = { en: string; ta: string; hi: string };
+export interface HelpDoc { title?: L3; status?: L3; sections: { id?: string; title?: L3; steps?: { en: string[]; ta: string[]; hi: string[] };
+  heading?: L3; text?: L3 }[] }
+export interface AssistantReply { question: string; lang: "en" | "ta" | "hi"; topic: string; answer: string;
+  citations: { kind: string; id: string | number; text: string; date?: string }[]; sources: { title: string; url: string; as_of: string }[] }
+export interface Efficiency { as_of: string; assumptions: Record<string, number>; reports: number; items: number;
+  tiers: { automatic: number; planner: number; review_pending: number; flagged: number }; automatic_by_evidence: Record<string, number>;
+  auto_link_rate: number | null; llm_calls: number; llm_call_ratio: number | null; processing_seconds_median: number | null;
+  manual_lag_days: number; planner_hours_saved: number; planner_inr_saved: number;
+  shadow: { enabled: boolean; would_update: number; blocked_for_review: number };
+  tokens: { ours_estimated: number; llm_for_everything_estimated: number; ours_per_1000_reports: number; llm_for_everything_per_1000_reports: number };
+  inr_per_1000_reports: { ours: number; llm_for_everything: number } }
 export interface AgentReply { status: "recorded" | "duplicate" | "needs_clarification" | "rejected" | "checklist"; reply: string;
   question: string | null; interpretation: Record<string, unknown>; event_id: number | null; document_id: number | null;
   reference_datetime: string; link: LinkDetail | null; checklist: (WatchItem & { reported_today: boolean })[] | null }
@@ -112,8 +124,11 @@ export const p2e = {
   // Phase 1: schedule tree
   hierarchy: (c: string) => api<TreeNode>(`${P(c)}/hierarchy`),
   // Phase 4: Time Agent
-  agent: (c: string, body: { message: string; reference_datetime: string; discipline?: string; answers?: Record<string, string> }) =>
+  helpDoc: (doc: "guide" | "terms") => api<HelpDoc>(`/api/v1/help/${doc}`),   // upgrade L4 (public)
+  assistant: (c: string, body: { question: string; lang: string; as_of: string }) => api<AssistantReply>(`${P(c)}/assistant/ask`, { method: "POST", body }),   // upgrade L3
+  agent: (c: string, body: { message: string; reference_datetime: string; discipline?: string; answers?: Record<string, string>; lang?: string }) =>
     api<AgentReply>(`${P(c)}/agent/messages`, { method: "POST", body }),
+  retract: (c: string, eventId: number) => api<LinkDetail>(`${P(c)}/agent/events/${eventId}/retract`, { method: "POST" }),   // upgrade W1
   // Silent-activity watch
   silent: (c: string, q: { as_of: string; days?: number; discipline?: string; area?: string }) => api<WatchOut>(`${P(c)}/watch/silent`, { query: q }),
   checklist: (c: string, q: { as_of: string; discipline: string; area?: string }) => api<WatchOut>(`${P(c)}/watch/checklist`, { query: q }),
@@ -122,6 +137,9 @@ export const p2e = {
   dataset: (c: string, asOf: string) => api<{ as_of: string; items: DatasetRow[] }>(`${P(c)}/analytics/dataset`, { query: { as_of: asOf } }),   // Phase 7
   productivity: (c: string, asOf: string) => api<Productivity>(`${P(c)}/analytics/productivity`, { query: { as_of: asOf } }),
   delays: (c: string, asOf: string) => api<Delays>(`${P(c)}/analytics/delays`, { query: { as_of: asOf } }),
+  pmReport: (c: string, asOf: string, period: "daily" | "weekly") => download(`${P(c)}/reports/pm`, `${c}-${period}-report-${asOf}.html`, { as_of: asOf, period, download: "true" }),   // upgrade W3
+  setShadow: (c: string, enabled: boolean) => api<{ project: string; shadow_mode: boolean }>(`${P(c)}/shadow-mode`, { method: "PUT", body: { enabled } }),   // upgrade W5
+  efficiency: (c: string, q: Record<string, string | number>) => api<Efficiency>(`${P(c)}/analytics/efficiency`, { query: q }),   // upgrade W2
   knowledge: (c: string, asOf: string) => api<KnowledgeEntry[]>(`${P(c)}/knowledge`, { query: { as_of: asOf } }),
   ask: (c: string, question: string, asOf: string) => api<Answer>(`${P(c)}/memory/ask`, { method: "POST", body: { question, as_of: asOf } }),
 };

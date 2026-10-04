@@ -2,6 +2,7 @@ import { p2e } from "../api/p2e";
 import { Async, Badge, Bars, Card, Empty, PageTitle } from "../components/ui";
 import { useApi } from "../hooks/useApi";
 import { useApp } from "../state";
+import { useT } from "../i18n";
 import { fmtDate, humanize } from "../utils/format";
 import { href, navigate, useRoute } from "../utils/route";
 
@@ -9,6 +10,7 @@ const DISCIPLINES = ["civil", "piping", "electrical", "instrumentation", "hse", 
 
 export function WatchPage() {
   const { project, asOf, live } = useApp();
+  const { t } = useT();
   const { params } = useRoute();
   const f = { days: params.get("days") ?? "3", discipline: params.get("discipline") ?? "", area: params.get("area") ?? "" };
   const set = (k: string, v: string) => navigate("watch", { ...f, [k]: v });
@@ -16,8 +18,8 @@ export function WatchPage() {
     [project.code, asOf, f.days, f.discipline, f.area, live]);
   return (
     <>
-      <PageTitle title="Silent activity watch" subtitle="These activities may need a field update: the plan expects them to be active, but no linked report mentions them recently."
-        actions={<a className="btn" href={href("agent", { message: "What should I report today?", discipline: f.discipline })}>Ask the Time Agent for a checklist →</a>} />
+      <PageTitle title={t("watch.title")} subtitle={t("watch.sub")}
+        actions={<a className="btn" href={href("agent", { message: "What should I report today?", discipline: f.discipline })}>{t("watch.ask")}</a>} />
       <Card title={`Silent as of ${asOf}`} actions={<>
         <label className="check">no report in
           <select aria-label="Days" value={f.days} onChange={(e) => set("days", e.target.value)}>{[1, 2, 3, 5, 7, 14].map((d) => <option key={d} value={d}>{d} day{d > 1 ? "s" : ""}</option>)}</select>

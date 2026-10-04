@@ -6,12 +6,14 @@ import csv
 import io
 from collections import Counter, defaultdict
 from datetime import date
+from typing import Literal
 
-from fastapi import APIRouter, Request
-from fastapi.responses import Response
+from fastapi import APIRouter, Query, Request
+from fastapi.responses import HTMLResponse, Response
 from pydantic import BaseModel, Field
 
-from p2e.analytics import metrics, qa
+from p2e import assistant
+from p2e.analytics import efficiency, metrics, qa, report
 from p2e.api import schemas as s
 from p2e.api.auth import AnyRole
 from p2e.api.review import today
@@ -36,6 +38,33 @@ def dashboard(project_code: str, session: SessionDep, _: AnyRole, as_of: date | 
     review backlog."""
     project = project_or_404(session, project_code)
     return metrics.dashboard(session, project, as_of or today(project))
+
+
+@router.get("/analytics/efficiency", responses={**AUTH, **NOT_FOUND, 422: P})
+def efficiency_view(project_code: str, session: SessionDep, _: AnyRole, as_of: date | None = None,
+                    manual_minutes_per_item: float = Query(5.0, gt=0, le=240),
+                    planner_inr_per_hour: float = Query(750.0, ge=0, le=100000),
+                    manual_lag_days: float = Query(3.0, ge=0, le=365),
+                    tokens_per_llm_call: int = Query(1500, gt=0, le=200000),
+                    inr_per_1k_tokens: float = Query(0.25, ge=0, le=1000)) -> dict:
+    """Upgrade W2: decision tiers, auto-link rate, LLM call ratio, processing time, planner hours and rupees saved, and
+    tokens / rupees per 1,000 reports vs an "LLM reads everything" baseline. Rupee and token figures use the given
+    assumptions (defaults are placeholders) and are estimates."""
+    project = project_or_404(session, project_code)
+    a = efficiency.Assumptions(manual_minutes_per_item, planner_inr_per_hour, manual_lag_days, tokens_per_llm_call, inr_per_1k_tokens)
+    return efficiency.efficiency(session, project, as_of or today(project), a)
+
+
+@router.get("/reports/pm", responses={**AUTH, **NOT_FOUND, 422: P, 200: {"content": {"text/html": {}}}})
+def pm_report(project_code: str, session: SessionDep, _: AnyRole, as_of: date | None = None,
+              period: Literal["daily", "weekly"] = "daily", download: bool = False):
+    """Upgrade W3: printable project-manager report (started, finished, delays and causes, silent and late activities,
+    review backlog, efficiency), every row citing its activity / event / document. Save as PDF from the browser."""
+    project = project_or_404(session, project_code)
+    as_of = as_of or today(project)
+    html = report.pm_report(session, project, as_of, period)
+    headers = {"Content-Disposition": f'attachment; filename="{project.code}-{period}-report-{as_of}.html"'} if download else {}
+    return HTMLResponse(html, headers=headers)
 
 
 @router.get("/analytics/dataset.csv", responses={**AUTH, **NOT_FOUND, 200: {"content": {"text/csv": {}}}})
@@ -97,6 +126,21 @@ def knowledge_entries(project_code: str, session: SessionDep, _: AnyRole, as_of:
     """Institutional knowledge entries (activity-type durations, delay patterns) with the records they cite."""
     project = project_or_404(session, project_code)
     return knowledge.entries(session, project, as_of or today(project))
+
+
+class AssistantIn(BaseModel):
+    question: str = Field(min_length=1, max_length=500)
+    lang: Literal["en", "ta", "hi"] | None = Field(None, description="answer language; Tamil / Hindi script in the question wins")
+    as_of: date | None = None
+
+
+@router.post("/assistant/ask", responses={**AUTH, **NOT_FOUND, 422: P})
+def assistant_ask(project_code: str, body: AssistantIn, request: Request, session: SessionDep, _: AnyRole) -> dict:
+    """Scoped multilingual assistant (English / Tamil / Hindi): this app, this project and Oil India Limited only, with
+    citations and sources; anything else is declined. Deterministic, 0 LLM tokens."""
+    project = project_or_404(session, project_code)
+    ctx = get_context(session, project, request.app.state.glossary_path)
+    return assistant.ask(session, project, body.question, ctx, body.as_of or today(project), body.lang)
 
 
 @router.post("/memory/ask", responses={**AUTH, **NOT_FOUND, 422: P})

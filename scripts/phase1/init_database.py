@@ -2,7 +2,7 @@ r"""Phase 1: create the database and import the Phase 0 synthetic schedule (safe
 
     .venv\Scripts\python scripts\phase1\init_database.py            # data/p2e.db from data/synthetic/schedule/schedule.csv
     .venv\Scripts\python scripts\phase1\init_database.py --rebuild  # delete the SQLite file first
-    options: --db sqlite:///path.db   --schedule path/to/schedule.csv|.xml
+    options: --db sqlite:///path.db   --schedule path/to/schedule.csv|.xml|.xer (Primavera P6)
 """
 from __future__ import annotations
 

@@ -19,6 +19,12 @@ $env:P2E_API_KEYS = "planner:<planner key>,supervisor:<supervisor key>"
 .venv\Scripts\python -m uvicorn p2e.main:app --port 8000
 # open http://localhost:8000 , sign in with one of the keys, set "As of" to 2026-09-16 for the synthetic project
 
+# upgrade W1–W5 (docs/plan/UPGRADE_PLAN.md)
+.venv\Scripts\python scripts\phase1\init_database.py --rebuild                  # needed once if data\p2e.db predates .docx/.xer support
+.venv\Scripts\python scripts\phase1\init_database.py --schedule my_plan.xer     # Primavera P6 XER (also .csv / MS Project .xml)
+.venv\Scripts\python scripts\phase8\generate_reports.py --period weekly --as-of 2026-09-16   # PM report -> exports\reports\
+.venv\Scripts\python scripts\phase8\evaluate_blind.py --blind data\blind        # outside-written reports + labels.csv
+
 # development with hot reload instead of step 2 (proxies /api to :8000)
 cd web; npm run dev        # http://localhost:5173
 ```

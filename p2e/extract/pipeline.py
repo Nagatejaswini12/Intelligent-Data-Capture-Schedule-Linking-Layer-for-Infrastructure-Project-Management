@@ -14,6 +14,7 @@ from pathlib import Path
 
 from p2e.db.models import DISCIPLINES
 from p2e.extract.dpr import extract_dpr
+from p2e.extract.formats import normalize
 from p2e.extract.model import DocumentExtraction, ExtractedItem
 from p2e.extract.rules import Vocabulary, is_canonical_tag, load_vocabulary
 from p2e.extract.xlsx import extract_xlsx
@@ -37,6 +38,8 @@ def load_project_vocab(glossary_path: Path) -> ProjectVocab:
 
 
 def extract_bytes(data: bytes, suffix: str, pv: ProjectVocab) -> DocumentExtraction:
+    data, fmt = normalize(data, suffix.lstrip("."))      # .docx -> text, .csv -> workbook (upgrade W4)
+    suffix = "." + fmt
     if suffix == ".txt":
         return extract_dpr(data.decode("utf-8"), pv.vocab)
     if suffix == ".xlsx":

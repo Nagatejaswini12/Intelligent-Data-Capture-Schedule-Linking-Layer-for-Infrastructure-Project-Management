@@ -225,3 +225,23 @@ details summary { cursor: pointer; color: var(--muted); font-size: 12px; margin:
   .sidebar { position: static; height: auto; }
   .bars li, .stack-row, .compare-row { grid-template-columns: 100px 1fr 54px; }
 }
+
+/* Time Agent: one-tap "My activities" menu */
+.menu-list { list-style: none; margin: 6px 0 0; padding: 0; max-height: 320px; overflow-y: auto; }
+.menu-list li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.menu-actions { display: flex; gap: 4px; }
+
+/* ROI page */
+.stack { display: grid; gap: 8px; }
+
+/* Upgrade L: language picker, assistant, guide / terms / video */
+.lang-picker { font: inherit; padding: 3px 6px; border-radius: 6px; }
+.assistant-fab { position: fixed; right: 18px; bottom: 18px; z-index: 50; box-shadow: 0 4px 14px rgb(0 0 0 / 0.25); }
+.assistant { position: fixed; right: 18px; bottom: 18px; z-index: 50; width: min(420px, calc(100vw - 36px)); max-height: min(640px, calc(100vh - 36px));
+  display: flex; flex-direction: column; gap: 6px; padding: 10px; box-shadow: 0 8px 28px rgb(0 0 0 / 0.35); }
+.assistant-head { display: flex; justify-content: space-between; align-items: center; }
+.assistant-log { flex: 1; overflow-y: auto; min-height: 120px; }
+.guide-steps { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.terms-section h3 { margin: 14px 0 4px; font-size: 15px; }
+.terms-section p { margin: 0; line-height: 1.55; }
+.guide-video { width: 100%; max-height: 70vh; border-radius: 8px; background: #000; }

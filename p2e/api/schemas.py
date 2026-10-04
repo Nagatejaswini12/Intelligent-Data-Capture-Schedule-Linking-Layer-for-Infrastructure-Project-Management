@@ -35,6 +35,7 @@ class ProjectOut(Out):
     name: str
     timezone: str
     data_date: date | None
+    shadow_mode: bool = False
     created_at: datetime
     updated_at: datetime
     schedule_sources: list[ScheduleSourceOut]
@@ -371,6 +372,7 @@ class AgentMessageIn(BaseModel):
     reference_datetime: datetime | None = Field(None, description="resolves today/yesterday; default: now in the project timezone")
     discipline: Discipline | None = Field(None, description="the supervisor's discipline when the message does not say it")
     answers: AgentAnswers | None = Field(None, description="answers to a previous clarification (resend the same message)")
+    lang: Literal["en", "ta", "hi"] | None = Field(None, description="reply language; default: the message's script, else English")
 
 
 class AgentReplyOut(Out):
@@ -422,6 +424,7 @@ class ApplyIn(BaseModel):
 class ApplyOut(Out):
     as_of: date
     dry_run: bool
+    shadow: bool = False          # upgrade W5: project in shadow mode, nothing was written
     applied: list[AuditOut]
     would_apply: list[ProposalOut]
     blocked: list[ProposalOut]

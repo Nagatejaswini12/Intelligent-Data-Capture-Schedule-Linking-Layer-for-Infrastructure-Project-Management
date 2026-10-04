@@ -3,6 +3,7 @@ import { p2e, type ApplyOut, type DatasetRow, type TreeNode } from "../api/p2e";
 import { Async, Badge, Card, Empty, ErrorBox, Modal, PageTitle } from "../components/ui";
 import { useApi } from "../hooks/useApi";
 import { useApp } from "../state";
+import { useT } from "../i18n";
 import { fmtDate, fmtNum, humanize, statusTone, variance } from "../utils/format";
 import { href, navigate, useRoute } from "../utils/route";
 
@@ -23,6 +24,7 @@ function find(n: TreeNode, code: string): TreeNode | null {
 
 export function SchedulePage() {
   const { project, asOf, live } = useApp();
+  const { t } = useT();
   const c = project.code;
   const { params } = useRoute();
   const filter = { discipline: params.get("discipline") ?? "", area: params.get("area") ?? "", status: params.get("status") ?? "",
@@ -36,7 +38,7 @@ export function SchedulePage() {
 
   return (
     <>
-      <PageTitle title="Schedule & verified progress" subtitle={`L5/L6 activities with planned vs actual dates as of ${asOf}. Actuals change only through audited apply / override / undo.`}
+      <PageTitle title={t("schedule.title")} subtitle={t("schedule.sub", { asOf })}
         actions={<>
           <button type="button" className="btn btn-primary" onClick={() => setApply(true)}>Apply verified actuals…</button>
           <button type="button" className="btn" onClick={() => p2e.exportCsv(c).catch((e) => alert(e.message))}>Export CSV</button>

@@ -187,7 +187,7 @@ def test_malformed_or_unsafe_xml_rejected(content, expected, tmp_path):
 
 
 def test_unsupported_format_rejected(tmp_path):
-    path = tmp_path / "schedule.xer"
-    path.write_text("ERMHDR", encoding="utf-8")
+    path = tmp_path / "schedule.mpp"            # MS Project binary (.xer is supported since upgrade W4)
+    path.write_text("not supported", encoding="utf-8")
     with pytest.raises(ScheduleValidationError, match="unsupported schedule format"):
         read_schedule(path)

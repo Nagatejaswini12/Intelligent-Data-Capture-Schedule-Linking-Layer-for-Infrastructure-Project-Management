@@ -4,6 +4,7 @@ import { EvidenceModal } from "../components/Evidence";
 import { Async, Badge, Card, Empty, ErrorBox, PageTitle } from "../components/ui";
 import { useApi } from "../hooks/useApi";
 import { useApp } from "../state";
+import { useT } from "../i18n";
 import { fmtDate, humanize } from "../utils/format";
 import { href } from "../utils/route";
 
@@ -15,6 +16,7 @@ const SUGGESTED = [
 
 export function MemoryPage() {
   const { project, asOf } = useApp();
+  const { t } = useT();
   const [question, setQuestion] = useState("");
   const [history, setHistory] = useState<{ q: string; a?: Answer; error?: string }[]>([]);
   const [busy, setBusy] = useState(false);
@@ -32,7 +34,7 @@ export function MemoryPage() {
   };
   return (
     <>
-      <PageTitle title="Project memory" subtitle="Ask the recorded project history. Answers come from fixed query templates or cited retrieval; every number cites its records. No free-form SQL." />
+      <PageTitle title={t("memory.title")} subtitle={t("memory.sub")} />
       <div className="split split-wide">
         <div>
           <Card title="Ask">
@@ -62,13 +64,14 @@ export function MemoryPage() {
 }
 
 export function AnswerCard({ q, a, error }: { q: string; a?: Answer; error?: string }) {
+  const { t } = useT();
   const [evidence, setEvidence] = useState<number | null>(null);
   return (
     <Card title={q} className="answer">
       {error ? <ErrorBox error={error} /> : a && (
         <>
           <p className="answer-text">{a.answer}</p>
-          <p className="muted small"><Badge tone="info">{a.intent}</Badge> as of {fmtDate(a.filters.as_of)}
+          <p className="muted small"><Badge tone="info">{a.intent}</Badge> <Badge tone="ok">{t("memory.tokens")}</Badge> as of {fmtDate(a.filters.as_of)}
             {Object.entries(a.filters).filter(([k, v]) => k !== "as_of" && v && (!Array.isArray(v) || v.length)).map(([k, v]) => ` · ${humanize(k)}: ${Array.isArray(v) ? v.join(", ") : v}`)}</p>
           {a.citations.length === 0 ? <p className="muted small">No records cited — nothing is claimed.</p> : (
             <details open={a.citations.length <= 12}>

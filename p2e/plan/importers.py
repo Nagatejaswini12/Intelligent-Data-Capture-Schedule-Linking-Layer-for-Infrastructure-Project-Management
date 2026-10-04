@@ -104,7 +104,10 @@ def read_schedule(path: Path) -> ParsedSchedule:
     if suffix == ".xml":
         rows, data_date = parse_mspdi(raw)
         return ParsedSchedule(rows, "mspdi", data_date=data_date, **meta)
-    raise ScheduleValidationError([f"{path.name}: unsupported schedule format (expected .csv or MS Project .xml)"])
+    if suffix == ".xer":
+        rows, data_date = parse_xer(raw)
+        return ParsedSchedule(rows, "xer", data_date=data_date, **meta)
+    raise ScheduleValidationError([f"{path.name}: unsupported schedule format (expected .csv, MS Project .xml or Primavera .xer)"])
 
 
 def parse_csv(raw: bytes) -> list[dict]:
@@ -162,6 +165,129 @@ def parse_mspdi(raw: bytes) -> tuple[list[dict], date | None]:
         row["predecessors"] = ";".join(links)
         del row["_outline"]
     return rows, (date.fromisoformat(status) if status else None)
+
+
+XER_LINK = {"PR_FS": "FS", "PR_SS": "SS", "PR_FF": "FF", "PR_SF": "SF"}
+XER_CODES = {"discipline": "discipline", "area": "area", "activity type": "activity_type"}   # P6 activity code types we read
+
+
+def xer_tables(raw: bytes) -> dict[str, list[dict]]:
+    """Primavera P6 XER (tab-separated: %T table, %F field names, %R rows) -> {table: [row dicts]}."""
+    try:
+        text = raw.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = raw.decode("cp1252", errors="replace")       # P6 writes the Windows code page by default
+    if not text.startswith("ERMHDR"):
+        raise ScheduleValidationError(["not a Primavera P6 XER file (missing ERMHDR header)"])
+    tables, name, fields = {}, None, []
+    for line in text.splitlines():
+        tag, _, rest = line.partition("\t")
+        if tag == "%T":
+            name, fields = rest.strip(), []
+            tables[name] = []
+        elif tag == "%F":
+            fields = rest.split("\t")
+        elif tag == "%R" and name:
+            tables[name].append(dict(zip(fields, rest.split("\t"))))
+    return tables
+
+
+def parse_xer(raw: bytes) -> tuple[list[dict], date | None]:
+    """P6 XER -> the same row dicts as the CSV. Hierarchy from PROJWBS (the project node is level 1), a level-5 WBS
+    element with activities is an L5 summary, activities are TASK rows; discipline / area / activity type come from P6
+    activity codes of those names (TASKACTV); planned = target dates; predecessors from TASKPRED (lag hours / 8)."""
+    t = xer_tables(raw)
+    missing = [n for n in ("PROJWBS", "TASK") if not t.get(n)]
+    if missing:
+        raise ScheduleValidationError([f"XER has no {', '.join(missing)} table"])
+    d10 = lambda v: (v or "").strip()[:10]
+    code_type = {r["actv_code_type_id"]: XER_CODES.get(r.get("actv_code_type", "").strip().lower())
+                 for r in t.get("ACTVTYPE", [])}
+    code_value = {r["actv_code_id"]: r.get("short_name", "").strip() for r in t.get("ACTVCODE", [])}
+    codes: dict[str, dict] = {}
+    for r in t.get("TASKACTV", []):
+        if code_type.get(r.get("actv_code_type_id")):
+            codes.setdefault(r["task_id"], {})[code_type[r["actv_code_type_id"]]] = code_value.get(r.get("actv_code_id"), "")
+
+    wbs = {r["wbs_id"]: r for r in t["PROJWBS"]}
+    root_ids = [i for i, r in wbs.items() if r.get("proj_node_flag") == "Y" or r.get("parent_wbs_id") not in wbs]
+    if len(root_ids) != 1:
+        raise ScheduleValidationError([f"XER must have exactly one project WBS root, found {len(root_ids)}"])
+    depth, path = {}, {}
+
+    def walk(i: str, seen: tuple = ()) -> None:
+        if i in depth:
+            return
+        if i in seen:
+            raise ScheduleValidationError([f"XER WBS cycle at wbs_id {i}"])
+        p = wbs[i].get("parent_wbs_id")
+        if i == root_ids[0]:
+            depth[i], path[i] = 1, wbs[i].get("wbs_short_name", "").strip()
+            return
+        walk(p, seen + (i,))
+        depth[i], path[i] = depth[p] + 1, f"{path[p]}.{wbs[i].get('wbs_short_name', '').strip()}"
+    for i in wbs:
+        walk(i)
+
+    tasks = t["TASK"]
+    task_code = {r["task_id"]: r.get("task_code", "").strip() for r in tasks}
+    has_tasks = {r.get("wbs_id") for r in tasks}
+    summary = {i for i in wbs if depth[i] == 5 and i in has_tasks}
+    node_id = {i: (wbs[i].get("wbs_short_name", "").strip() if i in summary else path[i]) for i in wbs}
+    wbs_code = {i: (path[wbs[i]["parent_wbs_id"]] if i in summary else path[i]) for i in wbs}
+    preds: dict[str, list[str]] = {}
+    for r in t.get("TASKPRED", []):
+        hrs = r.get("lag_hr_cnt", "0").strip() or "0"
+        try:
+            days = round(float(hrs) / 8)
+        except ValueError:
+            days = 0
+        preds.setdefault(r["task_id"], []).append(
+            f"{task_code.get(r.get('pred_task_id'), '?task ' + r.get('pred_task_id', ''))}:{XER_LINK.get(r.get('pred_type', ''), '?')}"
+            f"{'+' if days >= 0 else ''}{days}")
+
+    rows, under = [], {}
+    for r in tasks:
+        c = codes.get(r["task_id"], {})
+        ps, pf = d10(r.get("target_start_date")), d10(r.get("target_end_date"))
+        try:
+            dur = str((date.fromisoformat(pf) - date.fromisoformat(ps)).days + 1)
+        except ValueError:
+            dur = ""
+        w = r.get("wbs_id")
+        rows.append({"node_id": task_code[r["task_id"]], "node_type": "activity", "parent_id": node_id.get(w, f"?wbs {w}"),
+                     "level": str(depth.get(w, 0) + 1), "wbs_code": wbs_code.get(w, ""), "name": r.get("task_name", "").strip(),
+                     "discipline": c.get("discipline", ""), "area": c.get("area", ""), "activity_type": c.get("activity_type", ""),
+                     "planned_start": ps, "planned_finish": pf, "planned_duration_days": dur, "planned_qty": "", "qty_unit": "",
+                     "predecessors": ";".join(preds.get(r["task_id"], [])), "actual_start": d10(r.get("act_start_date")),
+                     "actual_finish": d10(r.get("act_end_date"))})
+        under.setdefault(w, []).append(rows[-1])
+    # WBS rows: dates span their activities; discipline / area only when every activity below agrees
+    below: dict[str, list[dict]] = {i: [] for i in wbs}
+    for w, acts in under.items():
+        i = w
+        while i in wbs:
+            below[i] += acts
+            i = wbs[i].get("parent_wbs_id") if i != root_ids[0] else None
+    wbs_rows = []
+    for i in sorted(wbs, key=lambda i: (depth[i], path[i])):
+        acts = below[i]
+        one = lambda f: (lambda vals: vals.pop() if len(vals) == 1 else "")({a[f] for a in acts})
+        starts, finishes = [a["planned_start"] for a in acts if a["planned_start"]], [a["planned_finish"] for a in acts if a["planned_finish"]]
+        ps, pf = (min(starts) if starts else ""), (max(finishes) if finishes else "")
+        dur = str((date.fromisoformat(pf) - date.fromisoformat(ps)).days + 1) if ps and pf else ""
+        parent = wbs[i].get("parent_wbs_id") if i != root_ids[0] else None
+        wbs_rows.append({"node_id": node_id[i], "node_type": "summary" if i in summary else "wbs",
+                         "parent_id": node_id[parent] if parent else "", "level": str(depth[i]), "wbs_code": wbs_code[i],
+                         "name": wbs[i].get("wbs_name", "").strip(), "discipline": one("discipline"), "area": one("area"),
+                         "activity_type": "", "planned_start": ps, "planned_finish": pf, "planned_duration_days": dur,
+                         "planned_qty": "", "qty_unit": "", "predecessors": "", "actual_start": "", "actual_finish": ""})
+    status = d10((t.get("PROJECT") or [{}])[0].get("last_recalc_date"))
+    try:
+        data_date = date.fromisoformat(status) if status else None
+    except ValueError:
+        data_date = None
+    return wbs_rows + rows, data_date
 
 
 # ----------------------------------------------------------------------------- validation

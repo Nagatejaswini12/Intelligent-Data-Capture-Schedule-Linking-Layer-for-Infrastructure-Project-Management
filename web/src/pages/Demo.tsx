@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { p2e, type AgentReply, type Answer, type ApplyOut, type AuditEntry, type DatasetRow } from "../api/p2e";
 import { Badge, Card, ErrorBox, Field, Flow, PageTitle } from "../components/ui";
 import { useApp } from "../state";
+import { useT } from "../i18n";
 import { decisionTone, fmtDate, fmtNum, humanize, statusTone } from "../utils/format";
 import { href } from "../utils/route";
 import { ReplyCard } from "./Agent";
@@ -10,6 +11,7 @@ import { AnswerCard } from "./Memory";
 /** Guided SIH demonstration: every step calls the real backend; nothing is simulated. */
 export function DemoPage() {
   const { project, asOf } = useApp();
+  const { t } = useT();
   const c = project.code;
   const [message, setMessage] = useState("PT-1102 loop check started today at 9 am");
   const [discipline, setDiscipline] = useState("instrumentation");
@@ -37,7 +39,7 @@ export function DemoPage() {
 
   return (
     <>
-      <PageTitle title="Demo flow" subtitle={`A few-minute walk through the real system (as of ${asOf}). Each step calls the live API; results are whatever the backend returns.`}
+      <PageTitle title={t("demo.title")} subtitle={t("demo.sub", { asOf })}
         actions={<button type="button" className="btn" onClick={reset}>Restart</button>} />
       <Flow steps={[
         { label: "1 Field report", value: reply ? "sent" : "—", tone: reply ? "ok" : "muted" },
@@ -113,6 +115,14 @@ export function DemoPage() {
             Ask: “What is the status of {String(reply.interpretation.activity_text ?? code)}?”
           </button>
           {answer && <AnswerCard q={answer.question} a={answer} />}
+        </Step>
+      )}
+
+      {answer && (
+        <Step n="11" title="Prove the return">
+          <p>Every step above used <b>0 AI tokens</b>: the rules, linker and question templates decided everything, with a planner in the loop for anything uncertain.</p>
+          <a className="btn btn-primary" href={href("roi")}>Open ROI &amp; Efficiency</a>{" "}
+          <button type="button" className="btn" disabled={busy} onClick={() => step(() => p2e.pmReport(c, asOf, "weekly"))}>Download the weekly PM report</button>
         </Step>
       )}
     </>

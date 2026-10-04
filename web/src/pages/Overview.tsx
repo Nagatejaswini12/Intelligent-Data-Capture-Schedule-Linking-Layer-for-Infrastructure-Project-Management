@@ -2,6 +2,7 @@ import { p2e } from "../api/p2e";
 import { Async, Bars, Card, CompareBars, Flow, Kpi, PageTitle, StackBars } from "../components/ui";
 import { useApi } from "../hooks/useApi";
 import { useApp } from "../state";
+import { useT } from "../i18n";
 import { pct } from "../utils/format";
 import { navigate } from "../utils/route";
 
@@ -13,6 +14,7 @@ const STATUS = [
 
 export function OverviewPage() {
   const { project, asOf, live } = useApp();
+  const { t } = useT();
   const c = project.code;
   const state = useApi(async () => {
     const [dash, data, matched, review, unmatched, docs, events, delays] = await Promise.all([
@@ -25,7 +27,7 @@ export function OverviewPage() {
 
   return (
     <>
-      <PageTitle title="Project control overview" subtitle={`Recorded history as of ${asOf}. Every figure comes from the backend.`} />
+      <PageTitle title={t("overview.title")} subtitle={t("overview.sub", { asOf })} />
       <Async state={state} what="Loading project status">
         {({ dash, rows, matched, review, unmatched, docs, events, delays }) => {
           const sum = (k: "completed" | "in_progress" | "not_started" | "started_late" | "finished_late" | "due_not_started") =>
@@ -49,25 +51,25 @@ export function OverviewPage() {
                 { label: "Project intelligence", value: "Q&A + analytics", tone: "info" },
               ]} />
               <div className="kpis">
-                <Kpi label="Actually complete" value={`${sum("completed")} / ${total}`} hint={`${pct(sum("completed"), total)} of activities`} tone="ok" onClick={() => navigate("schedule", { status: "completed" })} />
-                <Kpi label="Planned complete by as-of" value={`${plannedDone} / ${total}`} hint={`${pct(plannedDone, total)} per baseline`} tone="info" />
-                <Kpi label="In progress" value={sum("in_progress")} tone="info" onClick={() => navigate("schedule", { status: "in_progress" })} />
-                <Kpi label="Needs planner review" value={dash.review_backlog.pending_events} hint={`${dash.review_backlog.blocked_activities} activities blocked by a rule`} tone={dash.review_backlog.pending_events ? "warn" : "ok"} onClick={() => navigate("linking")} />
-                <Kpi label="Cross-source conflicts" value={dash.review_backlog.pending_conflicts} tone={dash.review_backlog.pending_conflicts ? "bad" : "ok"} onClick={() => navigate("linking", { conflict: "true" })} />
-                <Kpi label="Unmatched reports" value={unmatched} hint="not safely linkable" tone={unmatched ? "bad" : "ok"} onClick={() => navigate("linking", { decision: "unmatched" })} />
-                <Kpi label="Silent activities" value={silent} hint="expected active, no recent report" tone={silent ? "warn" : "ok"} onClick={() => navigate("watch")} />
-                <Kpi label="Started late" value={sum("started_late")} tone="warn" onClick={() => navigate("schedule", { late: "1" })} />
-                <Kpi label="Finished late" value={sum("finished_late")} tone="warn" onClick={() => navigate("schedule", { late: "1" })} />
-                <Kpi label="Overdue, not started" value={sum("due_not_started")} tone={sum("due_not_started") ? "bad" : "ok"} onClick={() => navigate("schedule", { status: "not_started" })} />
+                <Kpi label={t("kpi.complete")} value={`${sum("completed")} / ${total}`} hint={`${pct(sum("completed"), total)} of activities`} tone="ok" onClick={() => navigate("schedule", { status: "completed" })} />
+                <Kpi label={t("kpi.plannedComplete")} value={`${plannedDone} / ${total}`} hint={`${pct(plannedDone, total)} per baseline`} tone="info" />
+                <Kpi label={t("kpi.inProgress")} value={sum("in_progress")} tone="info" onClick={() => navigate("schedule", { status: "in_progress" })} />
+                <Kpi label={t("kpi.review")} value={dash.review_backlog.pending_events} hint={`${dash.review_backlog.blocked_activities} activities blocked by a rule`} tone={dash.review_backlog.pending_events ? "warn" : "ok"} onClick={() => navigate("linking")} />
+                <Kpi label={t("kpi.conflicts")} value={dash.review_backlog.pending_conflicts} tone={dash.review_backlog.pending_conflicts ? "bad" : "ok"} onClick={() => navigate("linking", { conflict: "true" })} />
+                <Kpi label={t("kpi.unmatched")} value={unmatched} hint="not safely linkable" tone={unmatched ? "bad" : "ok"} onClick={() => navigate("linking", { decision: "unmatched" })} />
+                <Kpi label={t("kpi.silent")} value={silent} hint="expected active, no recent report" tone={silent ? "warn" : "ok"} onClick={() => navigate("watch")} />
+                <Kpi label={t("kpi.startedLate")} value={sum("started_late")} tone="warn" onClick={() => navigate("schedule", { late: "1" })} />
+                <Kpi label={t("kpi.finishedLate")} value={sum("finished_late")} tone="warn" onClick={() => navigate("schedule", { late: "1" })} />
+                <Kpi label={t("kpi.overdue")} value={sum("due_not_started")} tone={sum("due_not_started") ? "bad" : "ok"} onClick={() => navigate("schedule", { status: "not_started" })} />
               </div>
               <div className="grid-2">
-                <Card title="Planned vs actual completion by discipline">
+                <Card title={t("card.plannedVsActual")}>
                   <CompareBars rows={plannedVsActual} a={{ label: "Planned complete by as-of", tone: "muted" }} b={{ label: "Actually complete", tone: "ok" }} />
                 </Card>
-                <Card title="Status by discipline">
+                <Card title={t("card.statusByDiscipline")}>
                   <StackBars rows={byDisc} segments={STATUS} />
                 </Card>
-                <Card title="Reporting freshness (daily progress reports)" actions={<a href="#/watch">Silent activities →</a>}>
+                <Card title={t("card.freshness")} actions={<a href="#/watch">Silent activities →</a>}>
                   <table className="table compact">
                     <thead><tr><th>Discipline</th><th>Last report</th><th>Days since</th><th>Silent activities</th></tr></thead>
                     <tbody>{Object.entries(dash.freshness).map(([g, f]) => (
@@ -76,7 +78,7 @@ export function OverviewPage() {
                     ))}</tbody>
                   </table>
                 </Card>
-                <Card title="Reported delay causes" actions={<a href="#/analytics">Delay intelligence →</a>}>
+                <Card title={t("card.delayCauses")} actions={<a href="#/analytics">Delay intelligence →</a>}>
                   <Bars data={Object.entries(delays.by_category)} tone="warn" />
                   <p className="muted small">{delays.reports.length} hold reports up to {asOf}; recurring: {delays.recurring.map((r) => `${r.discipline}/${r.category} ×${r.reports}`).join(", ") || "none"}.</p>
                 </Card>

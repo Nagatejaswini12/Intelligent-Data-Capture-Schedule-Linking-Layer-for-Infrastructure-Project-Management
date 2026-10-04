@@ -171,7 +171,10 @@ def _quantity_percent(n: PlanNode, evs: list[ProgressEvent]) -> float | None:
 
 
 def apply(session: Session, project: Project, as_of: date, actor: str = AUTO_ACTOR, node_ids=None, dry_run: bool = False) -> dict:
-    """Write every unblocked change; caller commits. Returns applied entries, blocked activities and counts."""
+    """Write every unblocked change; caller commits. Returns applied entries, blocked activities and counts.
+    Shadow mode (pilot): the automatic applier only proposes (dry run); planner actions still write."""
+    shadow = actor == AUTO_ACTOR and bool(project.shadow_mode)
+    dry_run = dry_run or shadow
     applied, blocked, unchanged = [], [], 0
     for p in propose(session, project, as_of, node_ids):
         if p.blockers:
@@ -182,7 +185,7 @@ def apply(session: Session, project: Project, as_of: date, actor: str = AUTO_ACT
             applied.append(p if dry_run else _write(session, project, p.node, p.changes, actor, f"{p.basis}_evidence",
                                                      p.confidence, p.evidence, p.warnings, "apply"))
     session.flush()
-    return {"applied": applied, "blocked": blocked, "unchanged": unchanged, "as_of": as_of, "dry_run": dry_run}
+    return {"applied": applied, "blocked": blocked, "unchanged": unchanged, "as_of": as_of, "dry_run": dry_run, "shadow": shadow}
 
 
 def _write(session, project, node: PlanNode, changes: dict, actor, rule, confidence, evidence, warnings, action, reverts_id=None):

@@ -16,7 +16,7 @@ DISCIPLINES = ("civil", "piping", "static_eq", "rotating_eq", "electrical", "ins
 NODE_TYPES = ("wbs", "summary", "activity")   # wbs = L1–L4 hierarchy, summary = L5 parent of L6, activity = executable L5/L6
 LINK_TYPES = ("FS", "SS", "FF", "SF")
 DOC_KINDS = ("schedule_import", "dpr_text", "spreadsheet")
-DOC_FORMATS = ("csv", "mspdi", "txt", "xlsx")
+DOC_FORMATS = ("csv", "mspdi", "txt", "xlsx", "docx", "xer")     # docx / xer: upgrade W4
 DOC_STATUSES = ("imported", "received", "extracted", "failed")
 EVENT_TYPES = ("start", "finish", "progress", "hold", "resume")
 VALIDATION_STATUSES = ("valid", "invalid")
@@ -46,6 +46,7 @@ class Project(Timestamps, Base):
     name: Mapped[str] = mapped_column(String(255))
     timezone: Mapped[str] = mapped_column(String(64), default="Asia/Kolkata")
     data_date: Mapped[date | None] = mapped_column(Date)   # schedule status date
+    shadow_mode: Mapped[bool] = mapped_column(default=False)   # upgrade W5: link + propose, never auto-write actuals
 
     sources: Mapped[list[SourceDocument]] = relationship(back_populates="project", order_by="SourceDocument.id")
 

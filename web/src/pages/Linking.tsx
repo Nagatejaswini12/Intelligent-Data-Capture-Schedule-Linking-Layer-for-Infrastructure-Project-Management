@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useT } from "../i18n";
 import { p2e, type ApplyOut, type LinkDetail } from "../api/p2e";
 import { EvidenceModal } from "../components/Evidence";
 import { Async, Badge, Card, Empty, ErrorBox, Field, Flow, PageTitle } from "../components/ui";
@@ -8,11 +9,12 @@ import { decisionTone, fmtDate, fmtNum, humanize } from "../utils/format";
 import { href, navigate, useRoute } from "../utils/route";
 
 export function LinkingPage() {
+  const { t } = useT();
   const { params } = useRoute();
   const tab = params.get("tab") ?? "events";
   return (
     <>
-      <PageTitle title="Activity linking & planner review" subtitle="Field report → AI extraction → candidate L5/L6 activity → confidence → planner decision. The Phase 3 linker decides; planners validate." />
+      <PageTitle title={t("linking.title")} subtitle={t("linking.sub")} />
       <div className="tabs" role="tablist">
         <a role="tab" aria-selected={tab === "events"} className={tab === "events" ? "active" : ""} href={href("linking")}>Link decisions</a>
         <a role="tab" aria-selected={tab === "blocked"} className={tab === "blocked" ? "active" : ""} href={href("linking", { tab: "blocked" })}>Blocked actuals</a>

@@ -4,6 +4,7 @@ import { EvidenceModal } from "../components/Evidence";
 import { Async, Badge, Card, Empty, ErrorBox, PageTitle } from "../components/ui";
 import { useApi } from "../hooks/useApi";
 import { useApp } from "../state";
+import { useT } from "../i18n";
 import { fmtDateTime, fmtNum, humanize } from "../utils/format";
 import { href, navigate, useRoute } from "../utils/route";
 
@@ -11,6 +12,7 @@ const ACTION_TONE: Record<string, "ai" | "warn" | "muted" | "info"> = { apply: "
 
 export function AuditPage() {
   const { project, live } = useApp();
+  const { t } = useT();
   const { params } = useRoute();
   const f = { node: params.get("node") ?? "", action: params.get("action") ?? "" };
   const state = useApi(() => p2e.audit(project.code, { plan_node_code: f.node || undefined, action: f.action || undefined, limit: 1000 }), [project.code, f.node, f.action, live]);
@@ -28,7 +30,7 @@ export function AuditPage() {
   };
   return (
     <>
-      <PageTitle title="Audit trail" subtitle="Append-only record of every schedule change: before → after, who, which rule, which field reports. Undo writes a compensating entry; nothing is erased." />
+      <PageTitle title={t("audit.title")} subtitle={t("audit.sub")} />
       {msg && (msg.ok ? <div className="state state-ok">{msg.text}</div> : <ErrorBox error={msg.text} />)}
       <Card title="Schedule changes" actions={<>
         <input placeholder="Activity code" value={f.node} onChange={(e) => navigate("audit", { ...f, node: e.target.value })} aria-label="Activity code" />

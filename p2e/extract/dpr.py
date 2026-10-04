@@ -74,8 +74,13 @@ def _resolve(m: re.Match, report_date: date | None) -> tuple[date | None, str | 
     return report_date, rel, []
 
 
+def text_lines(text: str) -> list[str]:
+    """The one line split used for parsing, evidence offsets and evidence display (Windows/Notepad uploads are CRLF)."""
+    return text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+
+
 def extract_dpr(text: str, vocab: Vocabulary) -> DocumentExtraction:
-    lines = text.split("\n")
+    lines = text_lines(text)
     if lines and lines[-1] == "":
         lines.pop()
     report_date, group, layout = _header(lines)

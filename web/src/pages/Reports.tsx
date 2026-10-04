@@ -4,11 +4,13 @@ import { EvidenceModal } from "../components/Evidence";
 import { Async, Badge, Card, Empty, ErrorBox, PageTitle } from "../components/ui";
 import { useApi } from "../hooks/useApi";
 import { useApp } from "../state";
+import { useT } from "../i18n";
 import { decisionTone, fmtDate, humanize } from "../utils/format";
 import { href, navigate, useRoute } from "../utils/route";
 
 export function ReportsPage() {
   const { project, live } = useApp();
+  const { t } = useT();
   const c = project.code;
   const { params } = useRoute();
   const selected = params.get("doc") ? Number(params.get("doc")) : null;
@@ -40,10 +42,10 @@ export function ReportsPage() {
 
   return (
     <>
-      <PageTitle title="Field reports" subtitle="Daily progress reports, discipline trackers and Time Agent messages, with what was extracted from each."
+      <PageTitle title={t("reports.title")} subtitle={t("reports.sub")}
         actions={<>
           <label className="btn btn-primary">{busy === "upload" ? "Uploading…" : "Upload DPR / sheet"}
-            <input type="file" accept=".txt,.xlsx" hidden disabled={!!busy} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) upload(f); }} />
+            <input type="file" accept=".txt,.docx,.xlsx,.csv" hidden disabled={!!busy} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) upload(f); }} />
           </label>
           <button type="button" className="btn" disabled={!!busy} onClick={() => act("process", async () => `Processed: ${JSON.stringify((await p2e.processAll(c)).counts)}`)}>Process all</button>
           <button type="button" className="btn" disabled={!!busy} onClick={() => act("link", async () => { const r = await p2e.runLinker(c); return `Linker: ${JSON.stringify(r.counts)}; conflicts ${JSON.stringify(r.conflicts)}`; })}>Run linker</button>

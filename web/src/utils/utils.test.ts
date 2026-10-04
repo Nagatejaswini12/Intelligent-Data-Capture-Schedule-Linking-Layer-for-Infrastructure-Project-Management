@@ -42,3 +42,27 @@ describe("routing and live stream", () => {
     expect(b.events).toEqual(['{"audit_last_id":2}']);
   });
 });
+
+import { expandReference, UNDO } from "../pages/Agent";
+
+describe("time agent session memory", () => {
+  it("replaces a pronoun with the last recorded activity, only when there is one", () => {
+    expect(expandReference("it finished today", "Line 1211 hydrotest")).toBe("Line 1211 hydrotest finished today");
+    expect(expandReference("that one completed yesterday", "LT-4011 loop check")).toBe("LT-4011 loop check completed yesterday");
+    expect(expandReference("it finished today", null)).toBe("it finished today");
+    expect(expandReference("Line 1203 hydrotest started today", "LT-4011 loop check")).toBe("Line 1203 hydrotest started today");
+    expect(UNDO.test("undo last") && UNDO.test(" Undo ") && !UNDO.test("undo the pump")).toBe(true);
+  });
+});
+
+import { missingTranslations, translate } from "../i18n";
+
+describe("interface languages", () => {
+  it("has English, Tamil and Hindi for every string and fills parameters", () => {
+    expect(missingTranslations()).toEqual([]);
+    expect(translate("ta", "nav.agent")).toBe("நேர முகவர்");
+    expect(translate("hi", "roi.autoHint", { a: 261, n: 433 })).toBe("433 में से 261 आइटम");
+    expect(translate("en", "overview.sub", { asOf: "2026-09-16" })).toContain("2026-09-16");
+    expect(translate("ta", "no.such.key")).toBe("no.such.key");
+  });
+});

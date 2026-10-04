@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import json
 from collections.abc import Iterator
-from typing import Annotated
+from pathlib import Path
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import text
@@ -15,6 +17,7 @@ from p2e.plan import queries
 health_router = APIRouter(tags=["health"])
 router = APIRouter(prefix="/api/v1", tags=["schedule"])
 NOT_FOUND = {404: {"model": s.ProblemOut}}
+HELP_DIR = Path(__file__).resolve().parents[2] / "data" / "help"
 
 
 def get_session(request: Request) -> Iterator[Session]:
@@ -42,7 +45,8 @@ def node_out(n: PlanNode) -> s.PlanNodeOut:
 
 
 def project_out(p: Project) -> s.ProjectOut:
-    return s.ProjectOut(code=p.code, name=p.name, timezone=p.timezone, data_date=p.data_date, created_at=p.created_at,
+    return s.ProjectOut(code=p.code, name=p.name, timezone=p.timezone, data_date=p.data_date, shadow_mode=bool(p.shadow_mode),
+                        created_at=p.created_at,
                         updated_at=p.updated_at,
                         schedule_sources=[s.ScheduleSourceOut.model_validate(x) for x in p.sources if x.kind == "schedule_import"])
 
@@ -54,6 +58,12 @@ def health(session: SessionDep):
     except Exception:
         raise HTTPException(503, "database unavailable") from None
     return s.HealthOut(status="ok", database="ok", version=__version__)
+
+
+@router.get("/help/{doc}", tags=["help"], responses=NOT_FOUND)
+def help_doc(doc: Literal["guide", "terms"]) -> dict:
+    """User guide or terms of use (English / Tamil / Hindi). Public, so the terms can be read before signing in."""
+    return json.loads((HELP_DIR / f"{doc}.json").read_text(encoding="utf-8"))
 
 
 @router.get("/projects", response_model=list[s.ProjectOut])

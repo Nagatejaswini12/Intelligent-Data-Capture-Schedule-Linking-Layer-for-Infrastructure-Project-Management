@@ -10,3 +10,6 @@ docs.zip
 web/node_modules/
 web/dist/
 web/.env.local
+
+# local design-tool scratch (impeccable)
+.impeccable/

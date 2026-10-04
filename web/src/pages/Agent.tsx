@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { p2e, type AgentReply } from "../api/p2e";
 import { Badge, Empty, ErrorBox, Field, PageTitle } from "../components/ui";
+import { useApi } from "../hooks/useApi";
 import { useApp } from "../state";
+import { useT } from "../i18n";
 import { decisionTone, fmtDate, fmtNum, humanize } from "../utils/format";
 import { href, useRoute } from "../utils/route";
 
@@ -9,23 +11,80 @@ const DISCIPLINES = ["civil", "piping", "electrical", "instrumentation", "hse", 
 const EXAMPLES = ["LT-4011 loop check finished yesterday at 4 pm", "Line 1217 erection completed on 14/09/2026",
   "Line 1211 reinstatement completed.", "What should I report today?"];
 
-interface Turn { message: string; answers?: Record<string, string>; reply?: AgentReply; error?: string }
+// Menu taps send the plan name plus a glossary verb through the normal rules interpreter and linker (0 LLM tokens; the
+// linker's gates still apply, so near-identical names go to planner review instead of a guess).
+const TAP: [label: string, verb: string][] = [["agent.start", "tap.start"], ["agent.finish", "tap.finish"], ["agent.hold", "tap.hold"]];
+
+// Browser speech (Chrome/Edge): en-IN also transcribes spoken Hinglish in Latin script, which the glossary understands.
+type Recognizer = { lang: string; interimResults: boolean; onresult: (e: { results: { 0: { transcript: string } }[] }) => void;
+  onend: () => void; start: () => void };
+const SpeechRec = (globalThis as unknown as { SpeechRecognition?: new () => Recognizer; webkitSpeechRecognition?: new () => Recognizer })
+  .SpeechRecognition ?? (globalThis as unknown as { webkitSpeechRecognition?: new () => Recognizer }).webkitSpeechRecognition;
+
+function speak(text: string, lang = "en-IN") {
+  if (!("speechSynthesis" in globalThis)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+interface Turn { message: string; answers?: Record<string, string>; reply?: AgentReply; error?: string; retracted?: boolean; note?: string }
+
+const PRONOUN = /\b(that one|the same one|same one|it)\b/i;
+export const UNDO = /^\s*(undo|undo last|cancel last)\s*$/i;
+
+/** Session memory: "it finished today" -> "<last recorded activity> finished today". The expanded text is what gets sent
+ * and shown, so the stored evidence is exactly what the supervisor saw. No previous activity -> unchanged. */
+export function expandReference(message: string, lastActivity: string | null): string {
+  return lastActivity && PRONOUN.test(message) ? message.replace(PRONOUN, lastActivity) : message;
+}
 
 export function AgentPage() {
   const { project, asOf } = useApp();
+  const { t: tr, lang, speech } = useT();
   const { params } = useRoute();
   const [discipline, setDiscipline] = useState(params.get("discipline") ?? "");
   const [time, setTime] = useState("18:00");
   const [text, setText] = useState(params.get("message") ?? "");
   const [turns, setTurns] = useState<Turn[]>([]);
   const [busy, setBusy] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [voiceReplies, setVoiceReplies] = useState(false);
   const reference = `${asOf}T${time}:00`;      // relative dates resolve against this (project timezone on the server)
+  const menu = useApi(() => (discipline ? p2e.checklist(project.code, { as_of: asOf, discipline }) : Promise.resolve(null)),
+    [project.code, asOf, discipline]);
 
-  const send = async (message: string, answers?: Record<string, string>) => {
+  const recorded = turns.filter((t) => t.reply?.status === "recorded" && t.reply.event_id && !t.retracted);
+  const last = recorded[recorded.length - 1];
+  const lastActivity = last ? String(last.reply!.interpretation.activity_text ?? "") || null : null;
+
+  const retract = async (eventId: number) => {
+    setBusy(true);
+    try {
+      await p2e.retract(project.code, eventId);
+      setTurns((ts) => [...ts.map((t) => (t.reply?.event_id === eventId ? { ...t, retracted: true } : t)),
+        { message: "undo", note: tr("agent.undone") }]);
+      if (voiceReplies) speak(tr("agent.undone"), speech);
+    } catch (e) {
+      setTurns((ts) => [...ts, { message: "undo", error: (e as Error).message }]);
+    }
+    setBusy(false);
+  };
+
+  const send = async (typed: string, answers?: Record<string, string>) => {
+    if (UNDO.test(typed)) {
+      if (last) return retract(last.reply!.event_id!);
+      setTurns((ts) => [...ts, { message: typed, error: tr("agent.nothingUndo") }]);
+      return;
+    }
+    const message = answers ? typed : expandReference(typed, lastActivity);
     setBusy(true);
     const turn: Turn = { message, answers };
     try {
-      turn.reply = await p2e.agent(project.code, { message, reference_datetime: reference, discipline: discipline || undefined, answers });
+      turn.reply = await p2e.agent(project.code, { message, reference_datetime: reference, discipline: discipline || undefined, answers, lang });
+      if (voiceReplies) speak(turn.reply.reply, speech);
+      if (turn.reply.status === "recorded") menu.reload();
     } catch (e) {
       turn.error = (e as Error).message;
     }
@@ -33,33 +92,68 @@ export function AgentPage() {
     setBusy(false);
   };
 
+  const listen = () => {
+    if (!SpeechRec) return;
+    const r = new SpeechRec();
+    r.lang = speech;
+    r.interimResults = false;
+    r.onresult = (e) => setText(e.results[0][0].transcript);
+    r.onend = () => setListening(false);
+    setListening(true);
+    r.start();
+  };
+
   return (
     <>
-      <PageTitle title="Time Agent" subtitle="Supervisors report progress in plain words; the agent structures it and hands it to the schedule linker. It never picks an activity itself and never invents a value." />
+      <PageTitle title={tr("agent.title")} subtitle={tr("agent.sub")} />
       <div className="agent">
         <div className="agent-settings card">
-          <label className="stacked">Supervisor discipline
+          <label className="stacked">{tr("agent.discipline")}
             <select value={discipline} onChange={(e) => setDiscipline(e.target.value)}>
-              <option value="">— state it in the message —</option>{DISCIPLINES.map((d) => <option key={d} value={d}>{humanize(d)}</option>)}
+              <option value="">{tr("agent.stateIt")}</option>{DISCIPLINES.map((d) => <option key={d} value={d}>{humanize(d)}</option>)}
             </select>
           </label>
-          <label className="stacked">Reporting time ({asOf})<input type="time" value={time} onChange={(e) => setTime(e.target.value)} /></label>
+          <label className="stacked">{tr("agent.time")} ({asOf})<input type="time" value={time} onChange={(e) => setTime(e.target.value)} /></label>
           <p className="muted small">"today" / "yesterday" resolve against {reference}. Change the date with "As of" in the top bar.</p>
           <div className="chips">{EXAMPLES.map((x) => <button type="button" key={x} className="chip" onClick={() => setText(x)}>{x}</button>)}</div>
+          {"speechSynthesis" in globalThis && (
+            <label className="small"><input type="checkbox" checked={voiceReplies} onChange={(e) => setVoiceReplies(e.target.checked)} /> {tr("agent.speak")}</label>
+          )}
+          <h3>{tr("agent.menu")}</h3>
+          {!discipline ? <p className="muted small">{tr("agent.pick")}</p>
+            : menu.error ? <ErrorBox error={menu.error} />
+            : menu.loading ? <p className="muted small">Loading…</p>
+            : menu.data && menu.data.items.length === 0 ? <p className="muted small">{tr("agent.nothing")}</p>
+            : (
+              <ul className="menu-list">{menu.data?.items.map((i) => (
+                <li key={i.plan_node_code}>
+                  <span><span className="mono">{i.plan_node_code}</span> {i.activity_name}
+                    {(i as { reported_today?: boolean }).reported_today && <> <Badge tone="ok">{tr("agent.reported")}</Badge></>}</span>
+                  <span className="menu-actions">{TAP.map(([label, verb]) => (
+                    <button type="button" key={label} className="btn btn-sm" disabled={busy}
+                      onClick={() => send(`${i.activity_name} ${tr(verb)}`)}>{tr(label)}</button>
+                  ))}</span>
+                </li>
+              ))}</ul>
+            )}
         </div>
         <div className="chat card">
           <div className="chat-log" aria-live="polite">
-            {turns.length === 0 && <Empty>Example: “LT-4011 loop check finished yesterday at 4 pm”, or ask “What should I report today?”.</Empty>}
+            {turns.length === 0 && <Empty>{tr("agent.empty")}</Empty>}
             {turns.map((t, i) => (
               <div key={i} className="turn">
                 <div className="bubble user">{t.message}{t.answers && <span className="muted small"> · answers {JSON.stringify(t.answers)}</span>}</div>
-                {t.error ? <ErrorBox error={t.error} /> : t.reply && <ReplyCard reply={t.reply} onAnswer={(a) => send(t.message, { ...t.answers, ...a })} busy={busy} />}
+                {t.error ? <ErrorBox error={t.error} /> : t.note ? <div className="bubble agent tone-info"><p>{t.note}</p></div>
+                  : t.reply && <ReplyCard reply={t.reply} onAnswer={(a) => send(t.message, { ...t.answers, ...a })} busy={busy} />}
+                {t.retracted && <Badge tone="warn">{tr("agent.retracted")}</Badge>}
+                {!t.retracted && t === last && <button type="button" className="btn btn-sm" disabled={busy} onClick={() => retract(t.reply!.event_id!)}>{tr("agent.undo")}</button>}
               </div>
             ))}
           </div>
           <form className="chat-input" onSubmit={(e) => { e.preventDefault(); if (text.trim()) { send(text.trim()); setText(""); } }}>
-            <input value={text} onChange={(e) => setText(e.target.value)} placeholder="e.g. Line 1203 hydrotest started today at 9 am" aria-label="Message" maxLength={1000} />
-            <button className="btn btn-primary" disabled={busy || !text.trim()}>{busy ? "…" : "Send"}</button>
+            <input value={text} onChange={(e) => setText(e.target.value)} placeholder={tr("agent.placeholder")} aria-label="Message" maxLength={1000} />
+            {SpeechRec && <button type="button" className="btn" onClick={listen} disabled={busy || listening} aria-label="Speak message">{listening ? tr("agent.listening") : "🎤"}</button>}
+            <button className="btn btn-primary" disabled={busy || !text.trim()}>{busy ? "…" : tr("agent.send")}</button>
           </form>
         </div>
       </div>

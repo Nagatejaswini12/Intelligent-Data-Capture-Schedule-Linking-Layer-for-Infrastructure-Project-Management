@@ -10,6 +10,7 @@ from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import Response, StreamingResponse
+from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 
@@ -45,7 +46,7 @@ def audit_out(e: AuditLog, undone_by: int | None = None) -> s.AuditOut:
 
 
 def apply_out(r: dict) -> s.ApplyOut:
-    return s.ApplyOut(as_of=r["as_of"], dry_run=r["dry_run"],
+    return s.ApplyOut(as_of=r["as_of"], dry_run=r["dry_run"], shadow=r.get("shadow", False),
                       applied=[] if r["dry_run"] else [audit_out(e) for e in r["applied"]],
                       would_apply=[proposal_out(p) for p in r["applied"]] if r["dry_run"] else [],
                       blocked=[proposal_out(p) for p in r["blocked"]], unchanged=r["unchanged"])
@@ -65,6 +66,20 @@ def apply_actuals(project_code: str, session: SessionDep, _: Uploader, body: s.A
     out = apply_out(r)
     session.commit() if not body.dry_run else session.rollback()
     return out
+
+
+class ShadowIn(BaseModel):
+    enabled: bool
+
+
+@router.put("/shadow-mode", responses={**AUTH, **NOT_FOUND, 422: P})
+def set_shadow_mode(project_code: str, body: ShadowIn, session: SessionDep, role: Planner) -> dict:
+    """Upgrade W5 pilot switch: in shadow mode everything is linked and proposed, but the automatic applier writes no
+    actual dates (POST /apply returns would_apply only). Planner approvals still write, with audit entries."""
+    project = project_or_404(session, project_code)
+    project.shadow_mode = body.enabled
+    session.commit()
+    return {"project": project.code, "shadow_mode": project.shadow_mode}
 
 
 @router.get("/review", response_model=s.ReviewQueueOut, responses={**AUTH, **NOT_FOUND})
